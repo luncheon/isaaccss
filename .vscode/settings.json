@@ -7,5 +7,5 @@
     "**/node_modules": true,
     "/core": true
   },
-  "cSpell.words": ["cssify"]
+  "cSpell.words": ["cssify", "isaaccss", "positionals"]
 }

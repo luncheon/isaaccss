@@ -1,4 +1,4 @@
-import type { IsaacConfig, IsaacConfigSource } from "./types";
+import type { IsaacConfig, IsaacConfigSource } from "./types.js";
 
 export const configure = (config: IsaacConfigSource, ...configs: readonly IsaacConfigSource[]): IsaacConfig => {
   const result = {

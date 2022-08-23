@@ -1,4 +1,4 @@
-import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types";
+import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types.js";
 
 const preTransform = (s: string | undefined) => s?.replace(/([^\\])_/g, "$1 ");
 const postTransform = (s: string | undefined) => s?.replace(/\\(.)/g, "$1");

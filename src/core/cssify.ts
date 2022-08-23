@@ -1,4 +1,4 @@
-import type { IsaacClass, IsaacClasses } from "./types";
+import type { IsaacClass, IsaacClasses } from "./types.js";
 
 const groupToMap = <T, K>(array: readonly T[] | Iterable<T>, keySelector: (element: T) => K): Map<K, T[]> => {
   const map = new Map<K, T[]>();

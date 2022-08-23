@@ -67,6 +67,16 @@ or using some replacements:
 
 T.B.D.
 
+## CLI
+
+```
+isaaccss [--pretty] [-o output.css] [target...]
+```
+
+- `--pretty`: pretty print
+- `--output`, `-o`: output css filename
+- `target`: glob pattern with `/\.html/` or `/\.[cm]?[jt]sx?/` extension
+
 ## API
 
 ### `configure(...partialConfigurations): IsaacConfig`

@@ -1,4 +1,4 @@
-import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types";
+import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types.js";
 export declare const parseScript: (code: string, config: IsaacConfig, options?: {
     readonly jsx?: boolean;
     readonly typescript?: boolean;

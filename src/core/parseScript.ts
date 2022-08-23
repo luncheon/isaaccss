@@ -1,6 +1,6 @@
 import { parse, ParserOptions } from "@babel/parser";
-import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types";
-import { parseClass } from "./parseClass";
+import { parseClass } from "./parseClass.js";
+import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types.js";
 
 export const parseScript = (
   code: string,

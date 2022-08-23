@@ -6,11 +6,13 @@
     "module": "esnext",
     "moduleResolution": "node",
     "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitOverride": true,
+    "skipLibCheck": true,
     "newLine": "LF"
   },
   "include": ["src/**/*.ts"],
