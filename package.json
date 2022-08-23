@@ -1,0 +1,31 @@
+{
+  "name": "isaaccss",
+  "version": "0.0.0",
+  "description": "A CSS class DSL like inline styles",
+  "license": "WTFPL",
+  "type": "module",
+  "main": "lib/index.node.js",
+  "browser": "bundle.browser.js",
+  "types": "lib/index.d.ts",
+  "prettier": {
+    "printWidth": 140,
+    "arrowParens": "avoid"
+  },
+  "scripts": {
+    "clean": "rimraf lib/ bundle.browser.js",
+    "build": "npm run clean && esbuild src/index.ts --bundle --minify --format=esm --outfile=bundle.browser.js && tsc -p .",
+    "start": "npm run clean && esbuild src/index.ts --bundle --minify --format=esm --outfile=bundle.browser.js --servedir=."
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.6",
+    "esbuild": "^0.15.5",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "css.escape": "^1.5.1",
+    "escape-string-regexp": "^5.0.0",
+    "htmlparser2": "^8.0.1",
+    "known-css-properties": "^0.25.0"
+  }
+}

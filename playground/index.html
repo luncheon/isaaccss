@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ISaaC CSS Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Code+Pro">
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+        flex: none;
+      }
+      textarea {
+        font-family: 'Source Code Pro', monospace;
+        font-size: 0.9375rem;
+        resize: vertical;
+      }
+      textarea, iframe {
+        display: block;
+        width: 100%;
+        border: 1px solid #ccc;
+      }
+      details {
+        padding: 0.5rem;
+        box-shadow: 0 0 4px #bbb, 0 2px 8px #bbb;
+      }
+      summary {
+        cursor: pointer;
+        width: max-content;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body style="padding: 1rem;">
+    <header style="padding-bottom: 1em">
+      <h1>ISaaC (Inline Style as a Class) Playground</h1>
+    </header>
+
+    <main style="display: flex; flex-direction: column; gap: 1rem">
+      <details open class="shadow">
+        <summary>HTML</summary>
+        <textarea id="html-content" rows="10"
+><form onsubmit="arguments[0].preventDefault()">
+  <label class="cursor:pointer user-select:none d:i-flex a-items:center gap:4px :has(>:checked)/c:rebeccapurple :has(>:checked)/accent-c:rebeccapurple">
+    <input type="checkbox" class="cursor:inherit">
+    Checkbox
+  </label>
+
+  <button class="--hue:210 cursor:pointer p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($hue,100%,80%) bg:hsl($hue,100%,50%) :hover/bg:hsl($hue,100%,60%) :active/bg:hsl($hue,100%,40%)* @hover:hover/:hover/scale:1.1">
+    Submit
+  </button>
+</textarea>
+      </details>
+
+      <details class="shadow">
+        <summary>json</summary>
+        <textarea id="parsed" rows="10" readonly></textarea>
+      </details>
+
+      <details class="shadow">
+        <summary>CSS</summary>
+        <textarea id="css" rows="10" readonly></textarea>
+      </details>
+
+      <details open class="shadow">
+        <summary>Pretty CSS</summary>
+        <textarea id="pretty-css" rows="10" readonly></textarea>
+      </details>
+
+      <details open class="shadow">
+        <summary>Preview</summary>
+        <iframe id="preview"></iframe>
+      </details>
+    </main>
+
+    <script type="module">
+      import { parseHtml, presetDefault, cssify } from "../bundle.browser.js";
+
+      const update = () => {
+        const htmlContent = document.getElementById("html-content").value;
+        const classes = parseHtml(htmlContent, presetDefault);
+        const css = cssify(classes);
+        const beautifiedCss = cssify(classes, { pretty: true });
+        document.getElementById("parsed").value = JSON.stringify([...classes.values()], null, 2);
+        document.getElementById("preview").srcdoc = `<html><head><style>${css}</style></head><body>${htmlContent}</body></html>`;
+        document.getElementById("css").value = css;
+        document.getElementById("pretty-css").value = beautifiedCss;
+      };
+      document.getElementById("html-content").addEventListener("input", update);
+      update();
+    </script>
+  </body>
+</html>

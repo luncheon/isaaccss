@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "lib",
+    "declaration": true,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "newLine": "LF"
+  },
+  "include": ["src/*.ts"]
+}
