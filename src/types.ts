@@ -2,17 +2,17 @@ export type IsaacReplacerFunction = (match: [string, ...any[]]) => string;
 
 export interface IsaacConfigSource {
   readonly media?: {
-    readonly replace?: Iterable<readonly [string | RegExp, string | IsaacReplacerFunction]>;
+    readonly replace?: Iterable<readonly [RegExp, string | IsaacReplacerFunction]>;
   };
   readonly selector?: {
-    readonly replace?: Iterable<readonly [string | RegExp, string | IsaacReplacerFunction]>;
+    readonly replace?: Iterable<readonly [RegExp, string | IsaacReplacerFunction]>;
   };
   readonly property?: {
-    readonly replace?: Iterable<readonly [string | RegExp, string]>;
+    readonly replace?: Iterable<readonly [RegExp, string]>;
     readonly known?: Iterable<string>;
   };
   readonly value?: {
-    readonly replace?: Iterable<readonly [string | RegExp, string | IsaacReplacerFunction]>;
+    readonly replace?: Iterable<readonly [RegExp, string | IsaacReplacerFunction]>;
   };
   readonly specificity?: {
     readonly default?: number;
@@ -21,17 +21,17 @@ export interface IsaacConfigSource {
 
 export interface IsaacConfig extends IsaacConfigSource {
   readonly media: {
-    readonly replace: Map<string | RegExp, string | IsaacReplacerFunction>;
+    readonly replace: Map<RegExp, string | IsaacReplacerFunction>;
   };
   readonly selector: {
-    readonly replace: Map<string | RegExp, string | IsaacReplacerFunction>;
+    readonly replace: Map<RegExp, string | IsaacReplacerFunction>;
   };
   readonly property: {
-    readonly replace: Map<string | RegExp, string>;
+    readonly replace: Map<RegExp, string>;
     readonly known: Set<string>;
   };
   readonly value: {
-    readonly replace: Map<string | RegExp, string | IsaacReplacerFunction>;
+    readonly replace: Map<RegExp, string | IsaacReplacerFunction>;
   };
   readonly specificity: {
     readonly default: number;

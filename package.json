@@ -17,7 +17,6 @@
     "start": "npm run clean && esbuild src/index.ts --bundle --minify --format=esm --outfile=bundle.browser.js --servedir=."
   },
   "devDependencies": {
-    "@babel/types": "^7.18.13",
     "@types/node": "^18.7.6",
     "esbuild": "^0.15.5",
     "rimraf": "^3.0.2",
@@ -25,8 +24,8 @@
   },
   "dependencies": {
     "@babel/parser": "^7.18.13",
+    "@babel/types": "^7.18.13",
     "css.escape": "^1.5.1",
-    "escape-string-regexp": "^5.0.0",
     "htmlparser2": "^8.0.1",
     "known-css-properties": "^0.25.0"
   }

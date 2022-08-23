@@ -1,18 +1,24 @@
-import escapeStringRegexp from "escape-string-regexp";
-import type { IsaacConfig, IsaacClass, IsaacClasses } from "./types";
+import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types";
 
 const preTransform = (s: string | undefined) => s?.replace(/([^\\])_/g, "$1 ");
 const postTransform = (s: string | undefined) => s?.replace(/\\(.)/g, "$1");
 
+const transformMedia = (media: string | undefined, config: IsaacConfig["value"]): string | undefined => {
+  media = preTransform(media);
+  if (media) {
+    for (const [search, replacer] of config.replace) {
+      media = typeof replacer === "function" ? media.replace(search, (...args) => replacer(args)) : media.replace(search, replacer);
+    }
+    media = media.replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3");
+  }
+  return postTransform(media)!;
+};
+
 const transformProperty = (property: string, config: IsaacConfig["property"]): string | undefined => {
   for (const [search, replacer] of config.replace) {
-    if (search instanceof RegExp) {
-      property = property.replace(search, replacer);
-    } else if (property === search) {
-      property = replacer;
-    }
+    property = property.replace(search, replacer);
   }
-  if (!config.known || property.startsWith("--") || config.known.has(property)) {
+  if (property.startsWith("--") || config.known.has(property)) {
     return property;
   }
 };
@@ -21,8 +27,7 @@ const transformValue = (value: string | undefined, config: IsaacConfig["value"])
   value = preTransform(value);
   if (value) {
     for (const [search, replacer] of config.replace) {
-      const pattern = search instanceof RegExp ? search : new RegExp(`\\b${escapeStringRegexp(search)}\\b`, "g");
-      value = typeof replacer === "function" ? value.replaceAll(pattern, (...args) => replacer(args)) : value.replaceAll(pattern, replacer);
+      value = typeof replacer === "function" ? value.replace(search, (...args) => replacer(args)) : value.replace(search, replacer);
     }
   }
   return postTransform(value)!;
@@ -38,7 +43,7 @@ export const parseClass = (className: string, config: IsaacConfig, collectTo = n
     property &&
       collectTo.set(s, {
         className: s,
-        media: transformValue(match[1], config.media),
+        media: transformMedia(match[1], config.media),
         layer: match[7] === "?" ? "" : undefined,
         selector: transformValue(match[2], config.selector),
         property,

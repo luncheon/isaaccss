@@ -1,4 +1,12 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
   "editor.formatOnSave": true,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/lib": true,
+    "/bundle.browser.js": true
+  },
   "cSpell.words": ["cssify"]
 }
