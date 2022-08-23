@@ -13,5 +13,6 @@
     "noImplicitOverride": true,
     "newLine": "LF"
   },
-  "include": ["src/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

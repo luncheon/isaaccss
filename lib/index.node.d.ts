@@ -1,2 +1,2 @@
 import "css.escape";
-export * from "./index";
+export * from "./index.browser";

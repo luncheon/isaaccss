@@ -5,8 +5,7 @@
   "editor.formatOnSave": true,
   "search.exclude": {
     "**/node_modules": true,
-    "**/lib": true,
-    "/bundle.browser.js": true
+    "/core": true
   },
   "cSpell.words": ["cssify"]
 }
