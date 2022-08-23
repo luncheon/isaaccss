@@ -1,2 +1,2 @@
-import type { IsaacClass, IsaacConfig } from "./types";
-export declare const parseHtml: (html: string, config: IsaacConfig) => Map<string, IsaacClass>;
+import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types";
+export declare const parseHtml: (content: string, config: IsaacConfig, collectTo?: Map<string, IsaacClass>) => IsaacClasses;

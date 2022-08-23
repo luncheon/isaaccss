@@ -7,8 +7,8 @@ export interface IsaacConfigSource {
         readonly replace?: Iterable<readonly [string | RegExp, string | IsaacReplacerFunction]>;
     };
     readonly property?: {
-        readonly known?: Iterable<string>;
         readonly replace?: Iterable<readonly [string | RegExp, string]>;
+        readonly known?: Iterable<string>;
     };
     readonly value?: {
         readonly replace?: Iterable<readonly [string | RegExp, string | IsaacReplacerFunction]>;
@@ -45,3 +45,4 @@ export interface IsaacClass {
     readonly specificity?: number;
     readonly important?: boolean;
 }
+export declare type IsaacClasses = Map<string, IsaacClass>;

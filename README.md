@@ -69,7 +69,25 @@ T.B.D.
 
 ## API
 
-T.B.D.
+### `configure(...partialConfigurations): IsaacConfig`
+
+Create a configuration from presets and/or partial settings.
+
+### `cssify(classes: IsaacClasses): string`
+
+Generate the css string from the parsed classes.
+
+### `parseClass(className: string, config: IsaacConfig, collectTo?: IsaacClasses): IsaacClasses`
+
+Parse a class name.
+
+### `parseHtml(content: string, config: IsaacConfig, collectTo?: IsaacClasses): IsaacClasses`
+
+Parse class names in the html content.
+
+### `parseScript(code: string, config: IsaacConfig, options?: { jsx?: boolean, typescript?: boolean }, collectTo?: IsaacClasses): IsaacClasses`
+
+Parse string literals in the script content.
 
 ## License
 

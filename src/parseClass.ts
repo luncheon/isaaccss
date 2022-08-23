@@ -1,5 +1,5 @@
 import escapeStringRegexp from "escape-string-regexp";
-import type { IsaacConfig, IsaacClass } from "./types";
+import type { IsaacConfig, IsaacClass, IsaacClasses } from "./types";
 
 const preTransform = (s: string | undefined) => s?.replace(/([^\\])_/g, "$1 ");
 const postTransform = (s: string | undefined) => s?.replace(/\\(.)/g, "$1");
@@ -28,15 +28,15 @@ const transformValue = (value: string | undefined, config: IsaacConfig["value"])
   return postTransform(value)!;
 };
 
-export const parseClass = (className: string, config: IsaacConfig, classes = new Map<string, IsaacClass>()): Map<string, IsaacClass> => {
+export const parseClass = (className: string, config: IsaacConfig, collectTo = new Map<string, IsaacClass>()): IsaacClasses => {
   for (const s of className.split(" ")) {
     const match =
-      !classes.has(s) &&
+      !collectTo.has(s) &&
       //        @media/                   selector/                property:value specificity
       s.match(/^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/);
     const property = match && transformProperty(match[3], config.property);
     property &&
-      classes.set(s, {
+      collectTo.set(s, {
         className: s,
         media: transformValue(match[1], config.media),
         layer: match[7] === "?" ? "" : undefined,
@@ -47,5 +47,5 @@ export const parseClass = (className: string, config: IsaacConfig, classes = new
         important: match[6] === "!" || undefined,
       });
   }
-  return classes;
+  return collectTo;
 };

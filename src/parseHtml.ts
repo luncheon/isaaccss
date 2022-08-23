@@ -1,9 +1,8 @@
 import { Parser } from "htmlparser2";
 import { parseClass } from "./parseClass";
-import type { IsaacClass, IsaacConfig } from "./types";
+import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types";
 
-export const parseHtml = (html: string, config: IsaacConfig): Map<string, IsaacClass> => {
-  const classes = new Map<string, IsaacClass>();
-  new Parser({ onattribute: (name, value) => name === "class" && parseClass(value, config, classes) }).end(html);
-  return classes;
+export const parseHtml = (content: string, config: IsaacConfig, collectTo = new Map<string, IsaacClass>()): IsaacClasses => {
+  new Parser({ onattribute: (name, value) => name === "class" && parseClass(value, config, collectTo) }).end(content);
+  return collectTo;
 };

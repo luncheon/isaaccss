@@ -1,4 +1,4 @@
-import type { IsaacClass } from "./types";
+import type { IsaacClass, IsaacClasses } from "./types";
 
 const groupToMap = <T, K>(array: readonly T[] | Iterable<T>, keySelector: (element: T) => K): Map<K, T[]> => {
   const map = new Map<K, T[]>();
@@ -28,7 +28,7 @@ const layerSelector = (c: IsaacClass) => c.layer;
 const selectorSelector = (c: IsaacClass) => `.${CSS.escape(c.className)}${":not(#\\0)".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
 const propertyListSelector = (c: IsaacClass) => `${c.property}:${c.value}${c.important ? "!important" : ""}`;
 
-export const cssify = (classes: ReadonlyMap<string, IsaacClass>, options?: { pretty?: boolean }): string => {
+export const cssify = (classes: IsaacClasses, options?: { pretty?: boolean }): string => {
   const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
   return joinGroup(newline, classes.values(), mediaSelector, (media, mediaRecords) => {
     const indent1 = media ? singleIndent : "";
