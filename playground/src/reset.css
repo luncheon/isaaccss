@@ -1,0 +1,15 @@
+:where(*) {
+  margin: 0;
+}
+
+:where(*, ::before, ::after) {
+  box-sizing: border-box;
+  flex: none;
+  border: 0 solid currentColor;
+}
+
+:where(textarea, iframe) {
+  display: block;
+  width: 100%;
+  resize: vertical;
+}

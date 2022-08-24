@@ -1,21 +1,28 @@
 {
   "name": "isaaccss",
   "version": "0.0.0",
-  "description": "A CSS class DSL like inline styles",
+  "description": "Inline Style as a Class CSS Framework",
   "license": "WTFPL",
   "bin": "lib/cli.js",
   "type": "module",
   "main": "lib/index.node.js",
   "types": "lib/index.node.d.ts",
   "browser": "lib/bundle.browser.js",
+  "files": [
+    "lib",
+    "src"
+  ],
   "prettier": {
     "printWidth": 140,
     "arrowParens": "avoid"
   },
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('lib',{recursive:true,force:true})\"",
-    "build": "npm run clean && esbuild src/index.browser.ts --bundle --minify --format=esm --outfile=lib/bundle.browser.js && tsc -p .",
-    "start": "npm run clean && esbuild src/index.browser.ts --bundle --minify --format=esm --outfile=lib/bundle.browser.js --servedir=."
+    "build": "npm run clean && npm run build:lib && npm run build:browser && npm run build:playground",
+    "build:lib": "tsc -p .",
+    "build:browser": "esbuild src/index.browser.ts --bundle --minify --format=esm --outfile=lib/bundle.browser.js",
+    "build:playground": "cd playground && npm run build",
+    "start": "cd playground && npm run watch"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",

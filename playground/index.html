@@ -1,95 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-    <title>ISaaC CSS Playground</title>
+    <meta charset="utf-8">
+    <title>isaaccss playground</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Code+Pro">
-    <style>
-      * {
-        margin: 0;
-        box-sizing: border-box;
-        flex: none;
-      }
-      textarea {
-        font-family: 'Source Code Pro', monospace;
-        font-size: 0.9375rem;
-        resize: vertical;
-      }
-      textarea, iframe {
-        display: block;
-        width: 100%;
-        border: 1px solid #ccc;
-      }
-      details {
-        padding: 0.5rem;
-        box-shadow: 0 0 4px #bbb, 0 2px 8px #bbb;
-      }
-      summary {
-        cursor: pointer;
-        width: max-content;
-        font-weight: bold;
-      }
-    </style>
+    <link rel="stylesheet" href="assets/playground.css">
+    <script defer src="assets/playground.js"></script>
   </head>
-  <body style="padding: 1rem;">
-    <header style="padding-bottom: 1em">
-      <h1>ISaaC (Inline Style as a Class) Playground</h1>
-    </header>
-
-    <main style="display: flex; flex-direction: column; gap: 1rem">
-      <details open class="shadow">
-        <summary>HTML</summary>
-        <textarea id="html-content" rows="10"
-><form onsubmit="arguments[0].preventDefault()">
-  <label class="cursor:pointer user-select:none d:i-flex a-items:center gap:4px :has(>:checked)/c:rebeccapurple :has(>:checked)/accent-c:rebeccapurple">
-    <input type="checkbox" class="cursor:inherit">
-    Checkbox
-  </label>
-
-  <button class="--hue:210 cursor:pointer p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($hue,100%,80%) bg:hsl($hue,100%,50%) :hover/bg:hsl($hue,100%,60%) :active/bg:hsl($hue,100%,40%)* @hover:hover/:hover/scale:1.1">
-    Submit
-  </button>
-</textarea>
-      </details>
-
-      <details class="shadow">
-        <summary>json</summary>
-        <textarea id="parsed" rows="10" readonly></textarea>
-      </details>
-
-      <details class="shadow">
-        <summary>CSS</summary>
-        <textarea id="css" rows="10" readonly></textarea>
-      </details>
-
-      <details open class="shadow">
-        <summary>Pretty CSS</summary>
-        <textarea id="pretty-css" rows="10" readonly></textarea>
-      </details>
-
-      <details open class="shadow">
-        <summary>Preview</summary>
-        <iframe id="preview"></iframe>
-      </details>
-    </main>
-
-    <script type="module">
-      import { parseHtml, presetDefault, cssify } from "../lib/bundle.browser.js";
-
-      const update = () => {
-        const htmlContent = document.getElementById("html-content").value;
-        const classes = parseHtml(htmlContent, presetDefault);
-        const css = cssify(classes);
-        const beautifiedCss = cssify(classes, { pretty: true });
-        document.getElementById("parsed").value = JSON.stringify([...classes.values()], null, 2);
-        document.getElementById("preview").srcdoc = `<html><head><style>${css}</style></head><body>${htmlContent}</body></html>`;
-        document.getElementById("css").value = css;
-        document.getElementById("pretty-css").value = beautifiedCss;
-      };
-      document.getElementById("html-content").addEventListener("input", update);
-      update();
-    </script>
+  <body>
+    <!-- https://github.com/tholman/github-corners -->
+    <a href="https://github.com/luncheon/isaaccss" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
   </body>
 </html>
