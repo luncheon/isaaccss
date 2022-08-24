@@ -64,7 +64,6 @@ export const presetDefault = configure({
     replace: [
       [/^i-flex$/, "inline-flex"],
       [/^i-grid$/, "inline-grid"],
-      [/\$([a-zA-Z_-]+)/g, "var(--$1)"],
     ],
   },
 });

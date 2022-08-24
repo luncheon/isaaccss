@@ -26,8 +26,7 @@ or using some replacements:
 - unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
   - a class name description rule, not a predefined property set, therefore:
     - less to remember
-    - simple and powerful
-    - any [known property](https://github.com/known-css/known-css-properties/blob/master/data/all.json) and any value can be described
+    - simple and flexible: any media, any selector, any property and any value can be described as is
   - high specificity by default
   - specificity can be adjusted
 
@@ -37,10 +36,10 @@ or using some replacements:
 [@media/][selectors/]property:value[*][!][?]
 ```
 
-- optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries):
-  - `@foo/...` generates CSS `@media foo { ... }`
+- optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
+  - `@foo/...` generates `@media foo { ... }`
   - tokens are parenthesized where necessary
-- optional `selectors/` indicates additional selectors:
+- optional `selectors/` indicates additional selectors
   - [pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
     e.g. `:hover/`, `:has(>:checked)/`
   - [pseudo-elements](https://developer.mozilla.org/docs/Web/CSS/Pseudo-elements)  
@@ -54,14 +53,15 @@ or using some replacements:
   - combination of the above  
     e.g. `:hover>input+label::before/`
 - required `property` indicates the property name
-  - any [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) and [custom properties](https://developer.mozilla.org/docs/Web/CSS/--*) (e.g. `--foo`)
+  - [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or [custom properties](https://developer.mozilla.org/docs/Web/CSS/--*)
 - required `value` indicates the property value
+  - `$bar` will be replaced with `var(--bar)`
 - optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
   - for example, add `*` to the preferred style between `:hover` and `:active`
 - optional trailing `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
   - for example, add `?` to the components in a component library, so that applications using it can override the properties
 - optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
-- an underscore `_` becomes a whitespace ` ` and can be escaped with a backslash (`\_` becomes `_`)
+- an underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
 
 ## Configuration
 

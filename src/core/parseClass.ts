@@ -1,18 +1,23 @@
-import type { IsaacClass, IsaacClasses, IsaacConfig } from "./types.js";
+import type { IsaacClass, IsaacClasses, IsaacConfig, IsaacReplacerFunction } from "./types.js";
 
-const preTransform = (s: string | undefined) => s?.replace(/([^\\])_/g, "$1 ");
-const postTransform = (s: string | undefined) => s?.replace(/\\(.)/g, "$1");
+const unescape = (s: string) => s.replace(/\\(.)/g, "$1");
 
-const transformMedia = (media: string | undefined, config: IsaacConfig["value"]): string | undefined => {
-  media = preTransform(media);
-  if (media) {
-    for (const [search, replacer] of config.replace) {
-      media = typeof replacer === "function" ? media.replace(search, (...args) => replacer(args)) : media.replace(search, replacer);
-    }
-    media = media.replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3");
+const replace = (s: string, config: Map<RegExp, string | IsaacReplacerFunction>) => {
+  s = s.replace(/(^|[^\\])_/g, "$1 ");
+  for (const [search, replacer] of config) {
+    s = typeof replacer === "function" ? s.replace(search, (...args) => replacer(args)) : s.replace(search, replacer);
   }
-  return postTransform(media)!;
+  return s;
 };
+
+const transformMedia = (media: string | undefined, config: IsaacConfig["value"]): string | undefined =>
+  media && unescape(replace(media, config.replace).replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3"));
+
+const transformSelector = (selector: string | undefined, config: IsaacConfig["selector"]): string | undefined =>
+  selector && unescape(replace(selector, config.replace));
+
+const transformValue = (value: string, config: IsaacConfig["value"]): string =>
+  unescape(replace(value, config.replace).replace(/(^|[^\\])\$([a-zA-Z_-]+)/g, "$1var(--$2)"));
 
 const transformProperty = (property: string, config: IsaacConfig["property"]): string | undefined => {
   for (const [search, replacer] of config.replace) {
@@ -21,16 +26,6 @@ const transformProperty = (property: string, config: IsaacConfig["property"]): s
   if (property.startsWith("--") || config.known.has(property)) {
     return property;
   }
-};
-
-const transformValue = (value: string | undefined, config: IsaacConfig["value"]): string | undefined => {
-  value = preTransform(value);
-  if (value) {
-    for (const [search, replacer] of config.replace) {
-      value = typeof replacer === "function" ? value.replace(search, (...args) => replacer(args)) : value.replace(search, replacer);
-    }
-  }
-  return postTransform(value)!;
 };
 
 export const parseClass = (className: string, config: IsaacConfig, collectTo = new Map<string, IsaacClass>()): IsaacClasses => {
@@ -45,9 +40,9 @@ export const parseClass = (className: string, config: IsaacConfig, collectTo = n
         className: s,
         media: transformMedia(match[1], config.media),
         layer: match[7] === "?" ? "" : undefined,
-        selector: transformValue(match[2], config.selector),
+        selector: transformSelector(match[2], config.selector),
         property,
-        value: transformValue(match[4], config.value)!,
+        value: transformValue(match[4], config.value),
         specificity: (match[7] === "?" ? 0 : config.specificity.default) + match[5].length,
         important: match[6] === "!" || undefined,
       });
