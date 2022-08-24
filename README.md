@@ -9,7 +9,7 @@ A CSS class DSL like inline styles.
 </button>
 ```
 
-or using some replacements:
+Or using some replacements:
 
 <!-- prettier-ignore -->
 ```html
@@ -18,19 +18,19 @@ or using some replacements:
 </button>
 ```
 
-- unlike inline styles:
-  - media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
-  - specificity can be adjusted
-  - short aliases can be used
+- Unlike inline styles:
+  - Media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
+  - Specificity can be adjusted
+  - Short aliases can be used
   - [`Content-Security-Policy`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy): no need `style-src 'unsafe-inline'` or `style-src 'nonce-a682b15c'`
-- unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
-  - a class name description rule, not a predefined property set, therefore:
-    - less to remember
-    - simple and flexible: any media, any selector, any property and any value can be described as is
-  - high specificity by default
-  - specificity can be adjusted
-- unlike [Linaria](https://linaria.dev/):
-  - short aliases can be used
+- Unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
+  - This is a class name description rule, not a predefined property set, therefore:
+    - Less to remember
+    - Simple and flexible: any media, any selector, any property and any value can be described as is
+  - High specificity (ID-specificity = 1) by default to override styles from other CSS libraries
+  - Specificity can be adjusted
+- Unlike [Linaria](https://linaria.dev/):
+  - Short aliases can be used
 
 ## Class Format
 
@@ -38,32 +38,32 @@ or using some replacements:
 [@media/][selectors/]property:value[*][!][?]
 ```
 
-- optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
-  - `@foo/...` generates `@media foo { ... }`
-  - tokens are parenthesized where necessary
-- optional `selectors/` indicates additional selectors
-  - [pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
+- Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
+  - `@foo/...` generates `@media foo {...}`
+  - Tokens are parenthesized where necessary
+- Optional `selectors/` indicates additional selectors
+  - [Pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
     e.g. `:hover/`, `:has(>:checked)/`
-  - [pseudo-elements](https://developer.mozilla.org/docs/Web/CSS/Pseudo-elements)  
+  - [Pseudo-elements](https://developer.mozilla.org/docs/Web/CSS/Pseudo-elements)  
     e.g. `::before/`, `::part(foo)/`
-  - [child combinator](https://developer.mozilla.org/docs/Web/CSS/Child_combinator)  
+  - [Child combinator](https://developer.mozilla.org/docs/Web/CSS/Child_combinator)  
     e.g. `>div/`
-  - [adjacent sibling combinator](https://developer.mozilla.org/docs/Web/CSS/Adjacent_sibling_combinator)  
+  - [Adjacent sibling combinator](https://developer.mozilla.org/docs/Web/CSS/Adjacent_sibling_combinator)  
     e.g. `+div/`
-  - [general sibling combinator](https://developer.mozilla.org/docs/Web/CSS/General_sibling_combinator)  
+  - [General sibling combinator](https://developer.mozilla.org/docs/Web/CSS/General_sibling_combinator)  
     e.g. `~div/`
-  - combination of the above  
+  - Combination of the above  
     e.g. `:hover>input+label::before/`
-- required `property` indicates the property name
-  - [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or [custom properties](https://developer.mozilla.org/docs/Web/CSS/--*)
-- required `value` indicates the property value
+- Required `property` indicates the property name
+  - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
+- Required `value` indicates the property value
   - `$bar` will be replaced with `var(--bar)`
-- optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
-  - for example, add `*` to the preferred style between `:hover` and `:active`
-- optional trailing `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
-  - for example, add `?` to the components in a component library, so that applications using it can override the properties
-- optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
-- an underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
+- Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
+  - For example, add `*` to the preferred style between `:hover` and `:active`
+- Optional trailing `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
+  - For example, add `?` to the components in a component library, so that applications using it can override the properties
+- Optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
+- An underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
 
 ## Usage
 
@@ -90,10 +90,10 @@ esbuild.build({
   minify: true,
   plugins: [
     isaaccss({
-      // optional filename filter. default is following.
+      // Optional filename filter. Default is following.
       filter: /\.[cm][jt]x?$/,
 
-      // required output method. can be a function that takes CSS string.
+      // Required output method. Can be a function that takes CSS string.
       output: { filename: "dist/index.css", append: true },
     }),
   ],
