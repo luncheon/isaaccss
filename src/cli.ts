@@ -3,9 +3,13 @@ import fs from "node:fs/promises";
 import { stdin, stdout } from "node:process";
 import readline from "node:readline/promises";
 import { parseArgs } from "node:util";
-import { cssify, IsaacClass, IsaacClasses, IsaacConfig, parseClass, parseHtml, parseScript, presetDefault } from "./index.node.js";
+import { cssify, IsaaccssClass, IsaaccssClasses, IsaaccssConfig, parseClass, parseHtml, parseScript, presetDefault } from "./index.node.js";
 
-const parseFile = async (filename: string, config: IsaacConfig, collectTo = new Map<string, IsaacClass>()): Promise<IsaacClasses> => {
+const parseFile = async (
+  filename: string,
+  config: IsaaccssConfig,
+  collectTo = new Map<string, IsaaccssClass>()
+): Promise<IsaaccssClasses> => {
   if (/\.html?/.test(filename)) {
     return parseHtml(await fs.readFile(filename, "utf8"), config, collectTo);
   }
@@ -49,7 +53,7 @@ if (args) {
     }
     console.log();
   } else {
-    const classes = new Map<string, IsaacClass>();
+    const classes = new Map<string, IsaaccssClass>();
     await Promise.all(args.positionals.flatMap(pattern => glob.sync(pattern)).map(filename => parseFile(filename, config, classes)));
     const css = cssify(classes, cssifyOptions);
     if (args.values.output) {

@@ -1,1 +1,1 @@
-export declare const presetDefault: import("../index.browser.js").IsaacConfig;
+export declare const presetDefault: import("../index.browser.js").IsaaccssConfig;

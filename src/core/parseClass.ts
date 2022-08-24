@@ -1,8 +1,8 @@
-import type { IsaacClass, IsaacClasses, IsaacConfig, IsaacReplacerFunction } from "./types.js";
+import type { IsaaccssClass, IsaaccssClasses, IsaaccssConfig, IsaaccssReplacerFunction } from "./types.js";
 
 const unescape = (s: string) => s.replace(/\\(.)/g, "$1");
 
-const replace = (s: string, config: Map<RegExp, string | IsaacReplacerFunction>) => {
+const replace = (s: string, config: Map<RegExp, string | IsaaccssReplacerFunction>) => {
   s = s.replace(/(^|[^\\])_/g, "$1 ");
   for (const [search, replacer] of config) {
     s = typeof replacer === "function" ? s.replace(search, (...args) => replacer(args)) : s.replace(search, replacer);
@@ -10,16 +10,16 @@ const replace = (s: string, config: Map<RegExp, string | IsaacReplacerFunction>)
   return s;
 };
 
-const transformMedia = (media: string | undefined, config: IsaacConfig["value"]): string | undefined =>
+const transformMedia = (media: string | undefined, config: IsaaccssConfig["value"]): string | undefined =>
   media && unescape(replace(media, config.replace).replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3"));
 
-const transformSelector = (selector: string | undefined, config: IsaacConfig["selector"]): string | undefined =>
+const transformSelector = (selector: string | undefined, config: IsaaccssConfig["selector"]): string | undefined =>
   selector && unescape(replace(selector, config.replace));
 
-const transformValue = (value: string, config: IsaacConfig["value"]): string =>
+const transformValue = (value: string, config: IsaaccssConfig["value"]): string =>
   unescape(replace(value, config.replace).replace(/(^|[^\\])\$([a-zA-Z_-]+)/g, "$1var(--$2)"));
 
-const transformProperty = (property: string, config: IsaacConfig["property"]): string | undefined => {
+const transformProperty = (property: string, config: IsaaccssConfig["property"]): string | undefined => {
   for (const [search, replacer] of config.replace) {
     property = property.replace(search, replacer);
   }
@@ -28,7 +28,7 @@ const transformProperty = (property: string, config: IsaacConfig["property"]): s
   }
 };
 
-export const parseClass = (className: string, config: IsaacConfig, collectTo = new Map<string, IsaacClass>()): IsaacClasses => {
+export const parseClass = (className: string, config: IsaaccssConfig, collectTo = new Map<string, IsaaccssClass>()): IsaaccssClasses => {
   for (const s of className.split(" ")) {
     const match =
       !collectTo.has(s) &&

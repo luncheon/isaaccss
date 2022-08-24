@@ -1,4 +1,4 @@
-import type { IsaacClass, IsaacClasses } from "./types.js";
+import type { IsaaccssClass, IsaaccssClasses } from "./types.js";
 
 const groupToMap = <T, K>(array: readonly T[] | Iterable<T>, keySelector: (element: T) => K): Map<K, T[]> => {
   const map = new Map<K, T[]>();
@@ -23,12 +23,12 @@ const joinGroup = <T, K>(
     .join(separator);
 };
 
-const mediaSelector = (c: IsaacClass) => c.media ?? "";
-const layerSelector = (c: IsaacClass) => c.layer;
-const selectorSelector = (c: IsaacClass) => `.${CSS.escape(c.className)}${":not(#\\0)".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
-const propertyListSelector = (c: IsaacClass) => `${c.property}:${c.value}${c.important ? "!important" : ""}`;
+const mediaSelector = (c: IsaaccssClass) => c.media ?? "";
+const layerSelector = (c: IsaaccssClass) => c.layer;
+const selectorSelector = (c: IsaaccssClass) => `.${CSS.escape(c.className)}${":not(#\\0)".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
+const propertyListSelector = (c: IsaaccssClass) => `${c.property}:${c.value}${c.important ? "!important" : ""}`;
 
-export const cssify = (classes: IsaacClasses, options?: { pretty?: boolean }): string => {
+export const cssify = (classes: IsaaccssClasses, options?: { pretty?: boolean }): string => {
   const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
   return joinGroup(newline, classes.values(), mediaSelector, (media, mediaRecords) => {
     const indent1 = media ? singleIndent : "";

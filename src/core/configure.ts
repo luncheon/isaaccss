@@ -1,6 +1,6 @@
-import type { IsaacConfig, IsaacConfigSource } from "./types.js";
+import type { IsaaccssConfig, IsaaccssConfigSource } from "./types.js";
 
-export const configure = (config: IsaacConfigSource, ...configs: readonly IsaacConfigSource[]): IsaacConfig => {
+export const configure = (config: IsaaccssConfigSource, ...configs: readonly IsaaccssConfigSource[]): IsaaccssConfig => {
   const result = {
     media: { replace: new Map(config.media?.replace) },
     selector: { replace: new Map(config.selector?.replace) },
