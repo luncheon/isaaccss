@@ -60,10 +60,4 @@ export const presetDefault = configure({
       [/-t\b/, "-top"],
     ],
   },
-  value: {
-    replace: [
-      [/^i-flex$/, "inline-flex"],
-      [/^i-grid$/, "inline-grid"],
-    ],
-  },
 });
