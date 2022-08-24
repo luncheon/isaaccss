@@ -17,15 +17,16 @@ const Details = ({ open, summary, children }: { open?: boolean; summary: string;
 
 const [htmlContent, setHtmlContent] = createSignal(sampleHtml);
 const classes = createMemo(() => parseHtml(htmlContent(), presetDefault));
-const classesJson = createMemo(() => JSON.stringify(classes()));
+const classesJson = createMemo(() => JSON.stringify([...classes().values()], undefined, 2));
 const css = createMemo(() => cssify(classes()));
 const beautifiedCss = createMemo(() => cssify(classes(), { pretty: true }));
 
 const App = () => {
   return (
     <>
-      <header class="p-b:1em f-family:logo">
-        <h1>isaaccss playground</h1>
+      <header class="p-b:1em f-family:logo d:inline-flex flex-direction:column a-items:center">
+        <h1 class="f-sz:2.5rem f-style:oblique">isaaccss</h1>
+        <h2 class="f-sz:1rem c:gray letter-spacing:0.375em">playground</h2>
       </header>
 
       <main class="d:flex flex-direction:column gap:1rem _textarea/f-family:'Source_Code_Pro',monospace _textarea/f-sz:0.9375rem">
@@ -33,7 +34,7 @@ const App = () => {
           <textarea rows="10" value={htmlContent()} onInput={e => setHtmlContent(e.currentTarget.value)} />
         </Details>
 
-        <Details summary="JSON">
+        <Details summary="Parsed Classes">
           <textarea rows="10" readonly value={classesJson()} />
         </Details>
 

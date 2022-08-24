@@ -1,5 +1,10 @@
 @font-face {
   font-family: logo;
+  src: url(./octarine/Octarine-Light.otf);
+}
+
+@font-face {
+  font-family: logo;
   font-style: oblique;
   src: url(./octarine/Octarine-LightOblique.otf);
 }
