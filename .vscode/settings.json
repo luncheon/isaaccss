@@ -4,8 +4,10 @@
   },
   "editor.formatOnSave": true,
   "search.exclude": {
+    "**/.*": true,
     "**/node_modules": true,
-    "/core": true
+    "**/package-lock.json": true,
+    "lib/": true
   },
-  "cSpell.words": ["cssify", "isaaccss", "positionals"]
+  "cSpell.words": ["combinators", "cssify", "isaaccss", "positionals"]
 }
