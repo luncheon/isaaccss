@@ -1,5 +1,5 @@
-import type { IsaaccssClass, IsaaccssClasses, IsaaccssConfig } from "./types.js";
-export declare const parseScript: (code: string, config: IsaaccssConfig, options?: {
+import type { Replacements, Style } from "./types.js";
+export declare const parseScript: (code: string, replacements: Replacements, options?: {
     readonly jsx?: boolean;
     readonly typescript?: boolean;
-}, collectTo?: Map<string, IsaaccssClass>) => IsaaccssClasses;
+}, collectTo?: Map<string, Style>) => Map<string, Style>;

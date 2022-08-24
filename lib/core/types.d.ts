@@ -1,41 +1,11 @@
-export declare type IsaaccssReplacerFunction = (match: [string, ...any[]]) => string;
-export interface IsaaccssConfigSource {
-    readonly media?: {
-        readonly replace?: Iterable<readonly [RegExp, string | IsaaccssReplacerFunction]>;
-    };
-    readonly selector?: {
-        readonly replace?: Iterable<readonly [RegExp, string | IsaaccssReplacerFunction]>;
-    };
-    readonly property?: {
-        readonly replace?: Iterable<readonly [RegExp, string]>;
-        readonly known?: Iterable<string>;
-    };
-    readonly value?: {
-        readonly replace?: Iterable<readonly [RegExp, string | IsaaccssReplacerFunction]>;
-    };
-    readonly specificity?: {
-        readonly default?: number;
-    };
+export declare type ReplacerFunction = (match: [string, ...any[]]) => string;
+export interface Replacements {
+    readonly media?: readonly (readonly [RegExp, string | ReplacerFunction])[];
+    readonly selector?: readonly (readonly [RegExp, string | ReplacerFunction])[];
+    readonly property?: readonly (readonly [RegExp, string])[];
+    readonly value?: readonly (readonly [RegExp, string | ReplacerFunction])[];
 }
-export interface IsaaccssConfig extends IsaaccssConfigSource {
-    readonly media: {
-        readonly replace: Map<RegExp, string | IsaaccssReplacerFunction>;
-    };
-    readonly selector: {
-        readonly replace: Map<RegExp, string | IsaaccssReplacerFunction>;
-    };
-    readonly property: {
-        readonly replace: Map<RegExp, string>;
-        readonly known: Set<string>;
-    };
-    readonly value: {
-        readonly replace: Map<RegExp, string | IsaaccssReplacerFunction>;
-    };
-    readonly specificity: {
-        readonly default: number;
-    };
-}
-export interface IsaaccssClass {
+export interface Style {
     readonly className: string;
     readonly media?: string;
     readonly layer?: string;
@@ -45,4 +15,3 @@ export interface IsaaccssClass {
     readonly specificity?: number;
     readonly important?: boolean;
 }
-export declare type IsaaccssClasses = Map<string, IsaaccssClass>;

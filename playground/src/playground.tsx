@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 import { JSX } from "solid-js/types/jsx";
 import { render } from "solid-js/web";
-import { cssify, parseHtml, presetDefault } from "../../src/index.browser.js";
+import { cssify, defaultReplacements, parseHtml } from "../../src/index.browser.js";
 import "./font.css";
 import "./reset.css";
 import sampleHtml from "./sample.html";
@@ -16,7 +16,7 @@ const Details = ({ open, summary, children }: { open?: boolean; summary: string;
 );
 
 const [htmlContent, setHtmlContent] = createSignal(sampleHtml);
-const classes = createMemo(() => parseHtml(htmlContent(), presetDefault));
+const classes = createMemo(() => parseHtml(htmlContent(), defaultReplacements));
 const classesJson = createMemo(() => JSON.stringify([...classes().values()], undefined, 2));
 const css = createMemo(() => cssify(classes()));
 const beautifiedCss = createMemo(() => cssify(classes(), { pretty: true }));

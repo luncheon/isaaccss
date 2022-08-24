@@ -1,6 +1,6 @@
 import type { OnLoadArgs, OnLoadResult, Plugin, PluginBuild } from "esbuild";
 import fs from "node:fs/promises";
-import { cssify, IsaaccssClass, parseScript, presetDefault } from "./index.node.js";
+import { cssify, defaultReplacements, parseScript, Style } from "./index.node.js";
 
 interface EsbuildPipeableTransformArgs {
   readonly args: OnLoadArgs;
@@ -22,11 +22,11 @@ const isaaccssEsbuildPlugin = (options: IsaaccssEsbuildPluginOptions): EsbuildPi
     throw Error('isaaccss esbuild plugin: "output" option is required');
   }
   const pluginName = "isaaccss";
-  const config = presetDefault;
-  const classes = new Map<string, IsaaccssClass>();
+  const replacements = defaultReplacements;
+  const classes = new Map<string, Style>();
   const transform = (filename: string, contents: string) => {
     const match = filename.match(/\.[cm]?([jt])s(x?)/);
-    match && parseScript(contents, config, { jsx: !!match[2], typescript: match[1] === "t" }, classes);
+    match && parseScript(contents, replacements, { jsx: !!match[2], typescript: match[1] === "t" }, classes);
     return { contents };
   };
   return {
