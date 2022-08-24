@@ -18,10 +18,10 @@ or using some replacements:
 </button>
 ```
 
-- unlike inline style:
-  - media queries and selectors (combinators, pseudo-class, pseudo-elements, etc.) can be described
+- unlike inline styles:
+  - media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
   - specificity can be adjusted
-  - aliases (replacements) can be used
+  - short aliases can be used
   - [`Content-Security-Policy`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy): no need `style-src 'unsafe-inline'` or `style-src 'nonce-a682b15c'`
 - unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
   - a class name description rule, not a predefined property set, therefore:
@@ -29,6 +29,8 @@ or using some replacements:
     - simple and flexible: any media, any selector, any property and any value can be described as is
   - high specificity by default
   - specificity can be adjusted
+- unlike [Linaria](https://linaria.dev/):
+  - short aliases can be used
 
 ## Class Format
 
