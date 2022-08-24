@@ -62,8 +62,8 @@ export const abbreviationReplacements: Replacements = {
 };
 
 export const nthChildReplacements: Replacements = {
-  // :1/ :2/ :3/ :2n/ :2n+1/
-  selector: [[/:(\d+(?:n(?:\+\d+)?)?)\b/g, ":nth-child($1)"]],
+  // >1/ >2/ >3/ >2n/ >2n+1/
+  selector: [[/>(-?\d+(?:n(?:\+\d+)?)?)\b/g, ">:nth-child($1)"]],
 };
 
 export const defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements, nthChildReplacements);
