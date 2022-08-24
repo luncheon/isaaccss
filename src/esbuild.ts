@@ -1,6 +1,6 @@
 import type { OnLoadArgs, OnLoadResult, Plugin, PluginBuild } from "esbuild";
 import fs from "node:fs/promises";
-import { cssify, defaultReplacements, parseScript, Style } from "./index.node.js";
+import { cssify, defaultReplacements, parseScript, Replacements, Style } from "./index.node.js";
 
 interface EsbuildPipeableTransformArgs {
   readonly args: OnLoadArgs;
@@ -15,6 +15,7 @@ interface EsbuildPipeablePlugin extends Plugin {
 interface IsaaccssEsbuildPluginOptions {
   readonly filter?: RegExp;
   readonly output: { readonly filename: string; readonly append: boolean } | ((css: string) => void | Promise<void>);
+  readonly config?: { readonly replacements?: Replacements };
 }
 
 const isaaccssEsbuildPlugin = (options: IsaaccssEsbuildPluginOptions): EsbuildPipeablePlugin => {
@@ -22,7 +23,7 @@ const isaaccssEsbuildPlugin = (options: IsaaccssEsbuildPluginOptions): EsbuildPi
     throw Error('isaaccss esbuild plugin: "output" option is required');
   }
   const pluginName = "isaaccss";
-  const replacements = defaultReplacements;
+  const replacements = options.config?.replacements ?? defaultReplacements;
   const classes = new Map<string, Style>();
   const transform = (filename: string, contents: string) => {
     const match = filename.match(/\.[cm]?([jt])s(x?)/);

@@ -82,6 +82,7 @@ isaaccss [--pretty] [-o output.css] [target...]
 ```js
 import esbuild from "esbuild";
 import isaaccss from "isaaccss/lib/esbuild";
+import { defaultReplacements, mergeReplacements } from "isaaccss";
 
 esbuild.build({
   entryPoints: ["src/index.ts"],
@@ -90,11 +91,20 @@ esbuild.build({
   minify: true,
   plugins: [
     isaaccss({
+      // Required output method. Can be a function that takes CSS string.
+      output: { filename: "dist/index.css", append: true },
+
       // Optional filename filter. Default is following.
       filter: /\.[cm][jt]x?$/,
 
-      // Required output method. Can be a function that takes CSS string.
-      output: { filename: "dist/index.css", append: true },
+      // Optional isaaccss config.
+      config: {
+        // Default is `defaultReplacements`. But if specified, it will be overwritten.
+        // If you want to extend the default, use `mergeReplacements()`.
+        replacements: mergeReplacements(defaultReplacements, {
+          // Custom replacements
+        }),
+      },
     }),
   ],
 });

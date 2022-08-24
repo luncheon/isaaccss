@@ -1,4 +1,5 @@
 import type { OnLoadArgs, OnLoadResult, Plugin, PluginBuild } from "esbuild";
+import { Replacements } from "./index.node.js";
 interface EsbuildPipeableTransformArgs {
     readonly args: OnLoadArgs;
     readonly contents: string;
@@ -15,6 +16,9 @@ interface IsaaccssEsbuildPluginOptions {
         readonly filename: string;
         readonly append: boolean;
     } | ((css: string) => void | Promise<void>);
+    readonly config?: {
+        readonly replacements?: Replacements;
+    };
 }
 declare const isaaccssEsbuildPlugin: (options: IsaaccssEsbuildPluginOptions) => EsbuildPipeablePlugin;
 export default isaaccssEsbuildPlugin;
