@@ -1,4 +1,4 @@
-# isaaccss: Inline Style as a Class CSS
+# isaaccss: Inline Style as a Class CSS Framework
 
 A CSS class DSL like inline styles.
 
@@ -63,11 +63,9 @@ or using some replacements:
 - optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
 - an underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
 
-## Configuration
+## Usage
 
-T.B.D.
-
-## CLI
+### CLI
 
 ```
 isaaccss [--pretty] [-o output.css] [target...]
@@ -77,7 +75,30 @@ isaaccss [--pretty] [-o output.css] [target...]
 - `--output`, `-o`: output css filename
 - `target`: glob pattern with `/\.html/` or `/\.[cm]?[jt]sx?/` extension
 
-## API
+### [esbuild](https://esbuild.github.io/)
+
+```js
+import esbuild from "esbuild";
+import isaaccss from "isaaccss/lib/esbuild";
+
+esbuild.build({
+  entryPoints: ["src/index.ts"],
+  outdir: "dist",
+  bundle: true,
+  minify: true,
+  plugins: [
+    isaaccss({
+      // optional filename filter. default is following.
+      filter: /\.[cm][jt]x?$/,
+
+      // required output method. can be a function that takes CSS string.
+      output: { filename: "dist/index.css", append: true },
+    }),
+  ],
+});
+```
+
+### API
 
 ### `configure(...partialConfigurations): IsaacConfig`
 
