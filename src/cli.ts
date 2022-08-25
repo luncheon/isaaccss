@@ -6,6 +6,26 @@ import readline from "node:readline/promises";
 import { parseArgs } from "node:util";
 import { Configuration, cssify, defaultReplacements, parseClass, parseHtml, ParserOptions, parseScript, Style } from "./index.node.js";
 
+const defaultConfigFilename = ["isaaccss.config.mjs", "isaaccss.config.js"];
+
+const resolveConfig = async (args: { config?: string; pretty?: boolean }): Promise<Configuration> => {
+  const dirname = process.cwd();
+  let importedConfig;
+  if (args.config) {
+    importedConfig = await import(path.resolve(dirname, args.config));
+  } else {
+    const defaultConfigPath = defaultConfigFilename.map(filename => path.join(dirname, filename)).find(filepath => fs.existsSync(filepath));
+    if (defaultConfigPath) {
+      importedConfig = await import(defaultConfigPath);
+    }
+  }
+  importedConfig = importedConfig?.default ?? importedConfig;
+  return {
+    replacements: importedConfig?.replacements ?? defaultReplacements,
+    pretty: importedConfig?.pretty || args.pretty,
+  };
+};
+
 const parseFile = async (filename: string, config?: ParserOptions, collectTo = new Map<string, Style>()) => {
   if (/\.html?/.test(filename)) {
     return parseHtml(await fs.promises.readFile(filename, "utf8"), config, collectTo);
@@ -42,7 +62,7 @@ try {
 isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
 
   --config, -c      Configuration script filename.
-                    If unspecified, "isaaccss.config.js" of the current directory is used.
+                    If unspecified, ${defaultConfigFilename.map(f => `"${f}"`).join(" or ")} of the current directory is used.
   --output, -o      Output css filename. Console if unspecified.
   --pretty          Pretty print.
   target            Glob pattern with /\\.html/ or /\\.[cm]?[jt]sx?/ extension.
@@ -51,12 +71,7 @@ isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
 }
 
 if (args) {
-  const configFilename = path.join(process.cwd(), args.values.config || "isaaccss.config.js");
-  const importedConfig = args.values.config || fs.existsSync(configFilename) ? (await import(configFilename)).default : undefined;
-  const config: Configuration = {
-    replacements: importedConfig?.replacements ?? defaultReplacements,
-    pretty: importedConfig?.pretty || args.values.pretty,
-  };
+  const config = await resolveConfig(args.values);
   if (args.positionals.length === 0) {
     interact(config);
   } else {
