@@ -1,7 +1,7 @@
 {
   "name": "isaaccss",
   "version": "0.0.0",
-  "description": "Inline Style as a Class CSS utility",
+  "description": "Inline-Style-as-a-Class CSS utility",
   "license": "WTFPL",
   "bin": "lib/cli.js",
   "type": "module",
@@ -11,6 +11,22 @@
   "files": [
     "lib",
     "src"
+  ],
+  "keywords": [
+    "css",
+    "css-in-js",
+    "css-framework",
+    "css-generator",
+    "css-utilities",
+    "stylesheet",
+    "media-query",
+    "custom-properties",
+    "inline-css",
+    "inline-style",
+    "inline-styles",
+    "dsl",
+    "utility-classes",
+    "tailwindcss"
   ],
   "prettier": {
     "printWidth": 140,

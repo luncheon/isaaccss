@@ -1,4 +1,4 @@
-# isaaccss: Inline Style as a Class CSS utility
+# isaaccss: Inline-Style-as-a-Class CSS utility
 
 A CSS class DSL like inline styles.
 
