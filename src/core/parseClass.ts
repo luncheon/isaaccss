@@ -6,11 +6,10 @@ const knownCssPropertySet = new Set(__knownCssProperties);
 const unescape = (s: string) => s.replace(/\\(.)/g, "$1");
 
 const replace = (s: string, replacements?: Iterable<readonly [RegExp, string | ReplacerFunction]>) => {
-  s = s.replace(/(^|[^\\])_/g, "$1 ");
   for (const [search, replacer] of replacements ?? []) {
     s = typeof replacer === "function" ? s.replace(search, (...args) => replacer(args)) : s.replace(search, replacer);
   }
-  return s;
+  return s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
 };
 
 const transformMedia = (media: string | undefined, replacements?: Replacements["value"]): string | undefined =>
@@ -20,7 +19,7 @@ const transformSelector = (selector: string | undefined, replacements?: Replacem
   selector && unescape(replace(selector, replacements));
 
 const transformValue = (value: string, replacements?: Replacements["value"]): string =>
-  unescape(replace(value, replacements).replace(/(^|[^\\])\$([a-zA-Z_-]+)/g, "$1var(--$2)"));
+  unescape(replace(value, replacements).replace(/\$([a-zA-Z-]+[a-zA-Z])/g, "var(--$1)"));
 
 const transformProperty = (property: string, replacements?: Replacements["property"]): string | undefined => {
   for (const [search, replacer] of replacements ?? []) {
