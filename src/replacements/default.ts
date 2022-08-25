@@ -1,11 +1,5 @@
-import type { Replacements } from "./types.js";
-
-export const mergeReplacements = (...replacements: readonly Replacements[]): Replacements => ({
-  media: replacements.flatMap(r => r.media ?? []),
-  selector: replacements.flatMap(r => r.selector ?? []),
-  property: replacements.flatMap(r => r.property ?? []),
-  value: replacements.flatMap(r => r.value ?? []),
-});
+import type { Replacements } from "../core/types.js";
+import { mergeReplacements } from "./merge.js";
 
 export const mediaOperatorReplacements: Replacements = {
   media: [

@@ -16,7 +16,7 @@ const Details = ({ open, summary, children }: { open?: boolean; summary: string;
 );
 
 const [htmlContent, setHtmlContent] = createSignal(sampleHtml);
-const classes = createMemo(() => parseHtml(htmlContent(), defaultReplacements));
+const classes = createMemo(() => parseHtml(htmlContent(), { replacements: defaultReplacements }));
 const classesJson = createMemo(() => JSON.stringify([...classes().values()], undefined, 2));
 const css = createMemo(() => cssify(classes()));
 const beautifiedCss = createMemo(() => cssify(classes(), { pretty: true }));

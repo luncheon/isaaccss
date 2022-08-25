@@ -1,4 +1,4 @@
-# isaaccss: Inline Style as a Class CSS Framework
+# isaaccss: Inline Style as a Class CSS utility
 
 A CSS class DSL like inline styles.
 
@@ -58,6 +58,7 @@ Or using some replacements:
   - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
 - Required `value` indicates the property value
   - `$bar` will be replaced with `var(--bar)`
+    - Custom property set libraries, such as [Open Props](https://open-props.style/), can help with design themes
 - Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
   - For example, add `*` to the preferred style between `:hover` and `:active`
 - Optional trailing `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
@@ -70,12 +71,52 @@ Or using some replacements:
 ### CLI
 
 ```
-isaaccss [--pretty] [-o output.css] [target...]
+isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
+
+  --config, -c      Configuration script filename.
+                    If unspecified, "isaaccss.config.js" of the current directory is used.
+  --output, -o      Output css filename. Console if unspecified.
+  --pretty          Pretty print.
+  target            Glob pattern with /\\.html/ or /\\.[cm]?[jt]sx?/ extension.
+                    Interactive mode if unspecified.
 ```
 
-- `--pretty`: pretty print
-- `--output`, `-o`: output css filename
-- `target`: glob pattern with `/\.html/` or `/\.[cm]?[jt]sx?/` extension
+Example configuration script:
+
+```js
+import { defaultReplacements, mergeReplacements } from "isaaccss";
+
+export default {
+  // Whether to pretty-print. Default is `false`.
+  pretty: true,
+
+  // Replacements. Default is `defaultReplacements`. But if specified, it will be overwritten.
+  // If you want to extend the default, use `mergeReplacements()`.
+  replacements: mergeReplacements(defaultReplacements, {
+    // Custom replacements
+    media: [
+      [/\bdark\b/g, "prefers-color-scheme:dark"],
+      [/\blight\b/g, "prefers-color-scheme:light"],
+    ],
+    selector: [
+      [/(^|\b)::a\b/g, "::after"],
+      [/(^|\b)::b\b/g, "::before"],
+      [/(^|\b):h\b/g, ":hover"],
+      [/(^|\b):f\b/g, ":focus"],
+    ],
+    property: [
+      [/^ff$/, "font-family"],
+      [/^fw$/, "font-weight"],
+    ],
+    value: [
+      [/^abs$/, "absolute"],
+      [/^rel$/, "relative"],
+    ],
+  }),
+};
+```
+
+See [src/replacements/default.ts](src/replacements/default.ts) for `defaultReplacements`.
 
 ### [esbuild](https://esbuild.github.io/)
 
@@ -98,12 +139,10 @@ esbuild.build({
       filter: /\.[cm][jt]x?$/,
 
       // Optional isaaccss config.
+      // See example configuration scripts in the CLI section above.
       config: {
-        // Default is `defaultReplacements`. But if specified, it will be overwritten.
-        // If you want to extend the default, use `mergeReplacements()`.
-        replacements: mergeReplacements(defaultReplacements, {
-          // Custom replacements
-        }),
+        pretty: true,
+        replacements: mergeReplacements(defaultReplacements, {}),
       },
     }),
   ],

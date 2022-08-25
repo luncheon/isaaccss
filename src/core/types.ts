@@ -7,6 +7,16 @@ export interface Replacements {
   readonly value?: readonly (readonly [RegExp, string | ReplacerFunction])[];
 }
 
+export interface ParserOptions {
+  readonly replacements?: Replacements;
+}
+
+export interface CssOptions {
+  readonly pretty?: boolean;
+}
+
+export interface Configuration extends ParserOptions, CssOptions {}
+
 export interface Style {
   readonly className: string;
   readonly media?: string;

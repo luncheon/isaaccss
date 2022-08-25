@@ -1,5 +1,5 @@
 import { all as __knownCssProperties } from "known-css-properties";
-import { Replacements, ReplacerFunction, Style } from "./types.js";
+import type { ParserOptions, Replacements, ReplacerFunction, Style } from "./types.js";
 
 const knownCssPropertySet = new Set(__knownCssProperties);
 
@@ -31,21 +31,22 @@ const transformProperty = (property: string, replacements?: Replacements["proper
   }
 };
 
-export const parseClass = (className: string, replacements: Replacements, collectTo = new Map<string, Style>()) => {
+export const parseClass = (className: string, options?: ParserOptions, collectTo = new Map<string, Style>()) => {
+  const replacements = options?.replacements;
   for (const s of className.split(" ")) {
     const match =
       !collectTo.has(s) &&
       //        @media/                   selector/                property:value specificity
       s.match(/^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/);
-    const property = match && transformProperty(match[3], replacements.property);
+    const property = match && transformProperty(match[3], replacements?.property);
     property &&
       collectTo.set(s, {
         className: s,
-        media: transformMedia(match[1], replacements.media),
+        media: transformMedia(match[1], replacements?.media),
         layer: match[7] === "?" ? "" : undefined,
-        selector: transformSelector(match[2], replacements.selector),
+        selector: transformSelector(match[2], replacements?.selector),
         property,
-        value: transformValue(match[4], replacements.value),
+        value: transformValue(match[4], replacements?.value),
         specificity: (match[7] === "?" ? 0 : 1) + match[5].length,
         important: match[6] === "!" || undefined,
       });
