@@ -116,7 +116,7 @@ export default {
 };
 ```
 
-See [src/replacements/default.ts](src/replacements/default.ts) for `defaultReplacements`.
+See [src/replacements/default.ts](https://github.com/luncheon/isaaccss/blob/main/src/replacements/default.ts) for `defaultReplacements`.
 
 ### [esbuild](https://esbuild.github.io/)
 
