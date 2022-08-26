@@ -77,7 +77,7 @@ isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
                     If unspecified, "isaaccss.config.js" of the current directory is used.
   --output, -o      Output css filename. Console if unspecified.
   --pretty          Pretty print.
-  target            Glob pattern with /\\.html/ or /\\.[cm]?[jt]sx?/ extension.
+  target            Glob pattern with /\\.html?$/ or /\\.[cm]?[jt]sx?$/ extension.
                     Interactive mode if unspecified.
 ```
 
@@ -129,12 +129,9 @@ esbuild.build({
   entryPoints: ["src/index.ts"],
   outdir: "dist",
   bundle: true,
-  minify: true,
+  inject: [isaaccss.inject],
   plugins: [
-    isaaccss({
-      // Required output method. Can be a function that takes CSS string.
-      output: { filename: "dist/index.css", append: true },
-
+    isaaccss.plugin({
       // Optional filename filter. Default is following.
       filter: /\.[cm][jt]x?$/,
 
@@ -142,7 +139,9 @@ esbuild.build({
       // See example configuration scripts in the CLI section above.
       config: {
         pretty: true,
-        replacements: mergeReplacements(defaultReplacements, {}),
+        replacements: mergeReplacements(defaultReplacements, {
+          // Custom replacements
+        }),
       },
     }),
   ],

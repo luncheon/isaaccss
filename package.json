@@ -38,13 +38,13 @@
     "build:lib": "tsc -p .",
     "build:browser": "esbuild src/index.browser.ts --bundle --minify --format=esm --outfile=lib/bundle.browser.js",
     "build:playground": "cd playground && npm run build",
-    "start": "cd playground && npm run watch"
+    "start": "cd playground && npm start"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
     "@types/node": "^18.7.13",
     "esbuild": "^0.15.5",
-    "typescript": "^4.7.4"
+    "typescript": "^4.8.2"
   },
   "dependencies": {
     "@babel/parser": "^7.18.13",

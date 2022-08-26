@@ -1,2 +1,93 @@
-@font-face{font-family:logo;src:url(./Octarine-Light.otf)}@font-face{font-family:logo;font-style:oblique;src:url(./Octarine-LightOblique.otf)}:where(*){margin:0}:where(*,::before,::after){box-sizing:border-box;flex:none;border:0 solid currentColor}:where(textarea,iframe){display:block;width:100%;resize:vertical}
-.a-items\:center:not(#\0){align-items:center}.b-c\:\#ccc:not(#\0){border-color:#ccc}.b-w\:1px:not(#\0){border-width:1px}.box-shadow\:0_0_4px_\#bbb\,_0_2px_8px_\#bbb:not(#\0){box-shadow:0 0 4px #bbb, 0 2px 8px #bbb}.c\:gray:not(#\0){color:gray}.cursor\:pointer:not(#\0){cursor:pointer}.d\:flex:not(#\0){display:flex}.d\:inline-flex:not(#\0){display:inline-flex}.flex-direction\:column:not(#\0){flex-direction:column}._textarea\/f-family\:\'Source_Code_Pro\'\,monospace:not(#\0) textarea{font-family:'Source Code Pro',monospace}.f-family\:logo:not(#\0){font-family:logo}._textarea\/f-sz\:0\.9375rem:not(#\0) textarea{font-size:0.9375rem}.f-sz\:1rem:not(#\0){font-size:1rem}.f-sz\:2\.5rem:not(#\0){font-size:2.5rem}.f-style\:oblique:not(#\0){font-style:oblique}.f-weight\:bold:not(#\0){font-weight:bold}.gap\:1rem:not(#\0){gap:1rem}.letter-spacing\:0\.375em:not(#\0){letter-spacing:0.375em}.p-b\:1em:not(#\0){padding-bottom:1em}.p\:0\.5rem:not(#\0){padding:0.5rem}.p\:1rem:not(#\0){padding:1rem}.user-select\:none:not(#\0){user-select:none}
+/* isaaccss:css:isaaccss:css */
+.a-items\:center:not(#\fffd) {
+  align-items: center;
+}
+.b-c\:\#ccc:not(#\fffd) {
+  border-color: #ccc;
+}
+.b-w\:1px:not(#\fffd) {
+  border-width: 1px;
+}
+.box-shadow\:0_0_4px_\#bbb\,_0_2px_8px_\#bbb:not(#\fffd) {
+  box-shadow: 0 0 4px #bbb, 0 2px 8px #bbb;
+}
+.c\:gray:not(#\fffd) {
+  color: gray;
+}
+.cursor\:pointer:not(#\fffd) {
+  cursor: pointer;
+}
+.d\:flex:not(#\fffd) {
+  display: flex;
+}
+.d\:inline-flex:not(#\fffd) {
+  display: inline-flex;
+}
+.flex-direction\:column:not(#\fffd) {
+  flex-direction: column;
+}
+._textarea\/f-family\:\'Source_Code_Pro\'\,monospace:not(#\fffd) textarea {
+  font-family: "Source Code Pro", monospace;
+}
+.f-family\:logo:not(#\fffd) {
+  font-family: logo;
+}
+._textarea\/f-sz\:0\.9375rem:not(#\fffd) textarea {
+  font-size: 0.9375rem;
+}
+.f-sz\:1rem:not(#\fffd) {
+  font-size: 1rem;
+}
+.f-sz\:2\.5rem:not(#\fffd) {
+  font-size: 2.5rem;
+}
+.f-style\:oblique:not(#\fffd) {
+  font-style: oblique;
+}
+.f-weight\:bold:not(#\fffd) {
+  font-weight: bold;
+}
+.gap\:1rem:not(#\fffd) {
+  gap: 1rem;
+}
+.letter-spacing\:0\.375em:not(#\fffd) {
+  letter-spacing: 0.375em;
+}
+.p-b\:1em:not(#\fffd) {
+  padding-bottom: 1em;
+}
+.p\:0\.5rem:not(#\fffd) {
+  padding: 0.5rem;
+}
+.p\:1rem:not(#\fffd) {
+  padding: 1rem;
+}
+.user-select\:none:not(#\fffd) {
+  user-select: none;
+}
+
+/* src/font.css */
+@font-face {
+  font-family: logo;
+  src: url(./Octarine-Light.otf);
+}
+@font-face {
+  font-family: logo;
+  font-style: oblique;
+  src: url(./Octarine-LightOblique.otf);
+}
+
+/* src/reset.css */
+:where(*) {
+  margin: 0;
+}
+:where(*, ::before, ::after) {
+  box-sizing: border-box;
+  flex: none;
+  border: 0 solid currentColor;
+}
+:where(textarea, iframe) {
+  display: block;
+  width: 100%;
+  resize: vertical;
+}
