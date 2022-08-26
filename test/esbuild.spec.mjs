@@ -25,4 +25,5 @@ const build = options =>
 describe("esbuild", () => {
   it("default config", async () => assert.equal(await build(), expected.default));
   it("no replacements", async () => assert.equal(await build({ config: { replacements: [] } }), expected.noReplacements));
+  it("a,b,c", async () => assert.equal(await build({ filter: /\.(js|tsx?)$/ }), expected.abc));
 });
