@@ -25,7 +25,7 @@ const joinGroup = <T, K>(
 
 const mediaSelector = (c: Style) => c.media ?? "";
 const layerSelector = (c: Style) => c.layer;
-const selectorSelector = (c: Style) => `.${CSS.escape(c.className)}${":not(#\\0)".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
+const selectorSelector = (c: Style) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
 const propertySelector = (c: Style) => `${c.property}:${c.value}${c.important ? "!important" : ""}`;
 
 export const cssify = (classes: ReadonlyMap<string, Style>, options?: CssOptions): string => {

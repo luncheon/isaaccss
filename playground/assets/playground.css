@@ -1,68 +1,68 @@
 /* virtual:isaaccss:css:virtual:isaaccss.css */
-.a-items\:center:not(#\fffd) {
+.a-items\:center:not(#\ ) {
   align-items: center;
 }
-.b-c\:\#ccc:not(#\fffd) {
+.b-c\:\#ccc:not(#\ ) {
   border-color: #ccc;
 }
-.b-w\:1px:not(#\fffd) {
+.b-w\:1px:not(#\ ) {
   border-width: 1px;
 }
-.box-shadow\:0_0_4px_\#bbb\,_0_2px_8px_\#bbb:not(#\fffd) {
+.box-shadow\:0_0_4px_\#bbb\,_0_2px_8px_\#bbb:not(#\ ) {
   box-shadow: 0 0 4px #bbb, 0 2px 8px #bbb;
 }
-.c\:gray:not(#\fffd) {
+.c\:gray:not(#\ ) {
   color: gray;
 }
-.cursor\:pointer:not(#\fffd) {
+.cursor\:pointer:not(#\ ) {
   cursor: pointer;
 }
-.d\:flex:not(#\fffd) {
+.d\:flex:not(#\ ) {
   display: flex;
 }
-.d\:inline-flex:not(#\fffd) {
+.d\:inline-flex:not(#\ ) {
   display: inline-flex;
 }
-.flex-direction\:column:not(#\fffd) {
+.flex-direction\:column:not(#\ ) {
   flex-direction: column;
 }
-._textarea\/f-family\:\'Source_Code_Pro\'\,monospace:not(#\fffd) textarea {
+._textarea\/f-family\:\'Source_Code_Pro\'\,monospace:not(#\ ) textarea {
   font-family: "Source Code Pro", monospace;
 }
-.f-family\:logo:not(#\fffd) {
+.f-family\:logo:not(#\ ) {
   font-family: logo;
 }
-._textarea\/f-sz\:0\.9375rem:not(#\fffd) textarea {
+._textarea\/f-sz\:0\.9375rem:not(#\ ) textarea {
   font-size: 0.9375rem;
 }
-.f-sz\:1rem:not(#\fffd) {
+.f-sz\:1rem:not(#\ ) {
   font-size: 1rem;
 }
-.f-sz\:2\.5rem:not(#\fffd) {
+.f-sz\:2\.5rem:not(#\ ) {
   font-size: 2.5rem;
 }
-.f-style\:oblique:not(#\fffd) {
+.f-style\:oblique:not(#\ ) {
   font-style: oblique;
 }
-.f-weight\:bold:not(#\fffd) {
+.f-weight\:bold:not(#\ ) {
   font-weight: bold;
 }
-.gap\:1rem:not(#\fffd) {
+.gap\:1rem:not(#\ ) {
   gap: 1rem;
 }
-.letter-spacing\:0\.375em:not(#\fffd) {
+.letter-spacing\:0\.375em:not(#\ ) {
   letter-spacing: 0.375em;
 }
-.p-b\:1em:not(#\fffd) {
+.p-b\:1em:not(#\ ) {
   padding-bottom: 1em;
 }
-.p\:0\.5rem:not(#\fffd) {
+.p\:0\.5rem:not(#\ ) {
   padding: 0.5rem;
 }
-.p\:1rem:not(#\fffd) {
+.p\:1rem:not(#\ ) {
   padding: 1rem;
 }
-.user-select\:none:not(#\fffd) {
+.user-select\:none:not(#\ ) {
   user-select: none;
 }
 

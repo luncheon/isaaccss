@@ -38,7 +38,8 @@
     "build:lib": "tsc -p .",
     "build:browser": "esbuild src/index.browser.ts --bundle --minify --format=esm --outfile=lib/bundle.browser.js",
     "build:playground": "cd playground && npm run build",
-    "start": "cd playground && npm start"
+    "start": "cd playground && npm start",
+    "test": "node test/index.mjs"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",

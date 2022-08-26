@@ -32,7 +32,7 @@ const resolveConfig = async (args: { config?: string; pretty?: boolean }): Promi
   importedConfig = importedConfig?.default ?? importedConfig;
   return {
     parser: {
-      replacements: importedConfig?.replacements ? mergeReplacements(importedConfig?.replacements) : defaultReplacements,
+      replacements: importedConfig?.replacements ? mergeReplacements(importedConfig.replacements) : defaultReplacements,
     },
     cssify: {
       pretty: importedConfig?.pretty || args.pretty,
@@ -64,6 +64,7 @@ const interact = async (parserOptions: ParserOptions, cssOptions: CssOptions) =>
 let args;
 try {
   args = parseArgs({
+    strict: true,
     allowPositionals: true,
     options: {
       config: { type: "string", short: "c" },

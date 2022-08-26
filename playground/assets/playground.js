@@ -16272,7 +16272,7 @@
   };
   var mediaSelector = (c) => c.media ?? "";
   var layerSelector = (c) => c.layer;
-  var selectorSelector = (c) => `.${CSS.escape(c.className)}${":not(#\\0)".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
+  var selectorSelector = (c) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
   var propertySelector = (c) => `${c.property}:${c.value}${c.important ? "!important" : ""}`;
   var cssify = (classes2, options) => {
     const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
@@ -16306,10 +16306,13 @@
   var transformSelector = (selector, replacements) => selector && unescape(replace(selector, replacements));
   var transformValue = (value, replacements) => unescape(replace(value, replacements).replace(/\$([a-zA-Z-]+[a-zA-Z])/g, "var(--$1)"));
   var transformProperty = (property, replacements) => {
+    if (property.startsWith("--")) {
+      return property;
+    }
     for (const [search, replacer] of replacements ?? []) {
       property = property.replace(search, replacer);
     }
-    if (property.startsWith("--") || knownCssPropertySet.has(property)) {
+    if (knownCssPropertySet.has(property)) {
       return property;
     }
   };

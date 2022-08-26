@@ -22,10 +22,13 @@ const transformValue = (value: string, replacements?: Replacements["value"]): st
   unescape(replace(value, replacements).replace(/\$([a-zA-Z-]+[a-zA-Z])/g, "var(--$1)"));
 
 const transformProperty = (property: string, replacements?: Replacements["property"]): string | undefined => {
+  if (property.startsWith("--")) {
+    return property;
+  }
   for (const [search, replacer] of replacements ?? []) {
     property = property.replace(search, replacer);
   }
-  if (property.startsWith("--") || knownCssPropertySet.has(property)) {
+  if (knownCssPropertySet.has(property)) {
     return property;
   }
 };

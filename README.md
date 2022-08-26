@@ -134,6 +134,7 @@ esbuild.build({
   entryPoints: ["src/index.ts"],
   outdir: "dist",
   bundle: true,
+  // Inject `isaaccss.inject`.
   inject: [isaaccss.inject],
   plugins: [
     isaaccss.plugin({
