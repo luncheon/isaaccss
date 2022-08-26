@@ -4,11 +4,21 @@ import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline/promises";
 import { parseArgs } from "node:util";
-import { Configuration, cssify, defaultReplacements, parseClass, parseHtml, ParserOptions, parseScript, Style } from "./index.node.js";
+import {
+  cssify,
+  CssOptions,
+  defaultReplacements,
+  mergeReplacements,
+  parseClass,
+  parseHtml,
+  ParserOptions,
+  parseScript,
+  Style,
+} from "./index.node.js";
 
 const defaultConfigFilename = ["isaaccss.config.mjs", "isaaccss.config.js"];
 
-const resolveConfig = async (args: { config?: string; pretty?: boolean }): Promise<Configuration> => {
+const resolveConfig = async (args: { config?: string; pretty?: boolean }): Promise<{ parser: ParserOptions; cssify: CssOptions }> => {
   const dirname = process.cwd();
   let importedConfig;
   if (args.config) {
@@ -21,8 +31,12 @@ const resolveConfig = async (args: { config?: string; pretty?: boolean }): Promi
   }
   importedConfig = importedConfig?.default ?? importedConfig;
   return {
-    replacements: importedConfig?.replacements ?? defaultReplacements,
-    pretty: importedConfig?.pretty || args.pretty,
+    parser: {
+      replacements: importedConfig?.replacements ? mergeReplacements(importedConfig?.replacements) : defaultReplacements,
+    },
+    cssify: {
+      pretty: importedConfig?.pretty || args.pretty,
+    },
   };
 };
 
@@ -38,10 +52,10 @@ const parseFile = async (filename: string, config?: ParserOptions, collectTo = n
   return collectTo;
 };
 
-const interact = async (config: Configuration) => {
+const interact = async (parserOptions: ParserOptions, cssOptions: CssOptions) => {
   process.stdout.write("> ");
   for await (const line of readline.createInterface({ input: process.stdin, output: process.stdout })) {
-    console.log(cssify(parseClass(line, config), config));
+    console.log(cssify(parseClass(line, parserOptions), cssOptions));
     process.stdout.write("> ");
   }
   console.log();
@@ -73,11 +87,11 @@ isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
 if (args) {
   const config = await resolveConfig(args.values);
   if (args.positionals.length === 0) {
-    interact(config);
+    interact(config.parser, config.cssify);
   } else {
     const classes = new Map<string, Style>();
-    await Promise.all(args.positionals.flatMap(pattern => glob.sync(pattern)).map(filename => parseFile(filename, config, classes)));
-    const css = cssify(classes, config);
+    await Promise.all(args.positionals.flatMap(pattern => glob.sync(pattern)).map(filename => parseFile(filename, config.parser, classes)));
+    const css = cssify(classes, config.cssify);
     if (args.values.output) {
       await fs.promises.writeFile(args.values.output, css, "utf8");
     } else {

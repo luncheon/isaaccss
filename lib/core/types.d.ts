@@ -11,8 +11,6 @@ export interface ParserOptions {
 export interface CssOptions {
     readonly pretty?: boolean;
 }
-export interface Configuration extends ParserOptions, CssOptions {
-}
 export interface Style {
     readonly className: string;
     readonly media?: string;

@@ -84,35 +84,40 @@ isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
 Example configuration script:
 
 ```js
-import { defaultReplacements, mergeReplacements } from "isaaccss";
+import { defaultReplacements } from "isaaccss";
 
 export default {
   // Whether to pretty-print. Default is `false`.
   pretty: true,
 
-  // Replacements. Default is `defaultReplacements`. But if specified, it will be overwritten.
-  // If you want to extend the default, use `mergeReplacements()`.
-  replacements: mergeReplacements(defaultReplacements, {
-    // Custom replacements
-    media: [
-      [/\bdark\b/g, "prefers-color-scheme:dark"],
-      [/\blight\b/g, "prefers-color-scheme:light"],
-    ],
-    selector: [
-      [/(^|\b)::a\b/g, "::after"],
-      [/(^|\b)::b\b/g, "::before"],
-      [/(^|\b):h\b/g, ":hover"],
-      [/(^|\b):f\b/g, ":focus"],
-    ],
-    property: [
-      [/^ff$/, "font-family"],
-      [/^fw$/, "font-weight"],
-    ],
-    value: [
-      [/^abs$/, "absolute"],
-      [/^rel$/, "relative"],
-    ],
-  }),
+  // Replacements. Default is `defaultReplacements`.
+  // But if specified, it will be overwritten.
+  replacements: [
+    // Custom replacements.
+    {
+      media: [
+        [/\bdark\b/g, "prefers-color-scheme:dark"],
+        [/\blight\b/g, "prefers-color-scheme:light"],
+      ],
+      selector: [
+        [/(^|\b)::a\b/g, "::after"],
+        [/(^|\b)::b\b/g, "::before"],
+        [/(^|\b):h\b/g, ":hover"],
+        [/(^|\b):f\b/g, ":focus"],
+      ],
+      property: [
+        [/^ff$/, "font-family"],
+        [/^fw$/, "font-weight"],
+      ],
+      value: [
+        [/^abs$/, "absolute"],
+        [/^rel$/, "relative"],
+      ],
+    },
+
+    // If you want to extend the default, pass `defaultReplacements`.
+    defaultReplacements,
+  ],
 };
 ```
 
@@ -123,7 +128,7 @@ See [src/replacements/default.ts](https://github.com/luncheon/isaaccss/blob/main
 ```js
 import esbuild from "esbuild";
 import isaaccss from "isaaccss/lib/esbuild";
-import { defaultReplacements, mergeReplacements } from "isaaccss";
+import { defaultReplacements } from "isaaccss";
 
 esbuild.build({
   entryPoints: ["src/index.ts"],
@@ -139,9 +144,12 @@ esbuild.build({
       // See example configuration scripts in the CLI section above.
       config: {
         pretty: true,
-        replacements: mergeReplacements(defaultReplacements, {
-          // Custom replacements
-        }),
+        replacements: [
+          {
+            // Custom replacements...
+          },
+          defaultReplacements,
+        ],
       },
     }),
   ],

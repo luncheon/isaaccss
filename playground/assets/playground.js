@@ -25,9 +25,9 @@
     mod
   ));
 
-  // isaaccss:css:isaaccss:css
+  // virtual:isaaccss:css:virtual:isaaccss.css
   var init_ = __esm({
-    "isaaccss:css:isaaccss:css"() {
+    "virtual:isaaccss:css:virtual:isaaccss.css"() {
     }
   });
 
@@ -17630,12 +17630,15 @@
 
   // ../src/replacements/merge.ts
   init_inject();
-  var mergeReplacements = (...replacements) => ({
-    media: replacements.flatMap((r) => r.media ?? []),
-    selector: replacements.flatMap((r) => r.selector ?? []),
-    property: replacements.flatMap((r) => r.property ?? []),
-    value: replacements.flatMap((r) => r.value ?? [])
-  });
+  var mergeReplacements = (...replacements) => {
+    const rs = [].concat(...replacements);
+    return {
+      media: rs.flatMap((r) => r.media ?? []),
+      selector: rs.flatMap((r) => r.selector ?? []),
+      property: rs.flatMap((r) => r.property ?? []),
+      value: rs.flatMap((r) => r.value ?? [])
+    };
+  };
 
   // ../src/replacements/default.ts
   var mediaOperatorReplacements = {

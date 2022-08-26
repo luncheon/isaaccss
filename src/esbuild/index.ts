@@ -1,13 +1,24 @@
 import type { Plugin } from "esbuild";
 import fs from "node:fs/promises";
 import { createRequire } from "node:module";
-import { Configuration, cssify, defaultReplacements, ParserOptions, parseScript, Style } from "../index.node.js";
+import {
+  cssify,
+  CssOptions,
+  defaultReplacements,
+  mergeReplacements,
+  ParserOptions,
+  parseScript,
+  Replacements,
+  Style,
+} from "../index.node.js";
 
 const inject = createRequire(import.meta.url).resolve("./inject.js");
 
 interface IsaaccssEsbuildPluginOptions {
   readonly filter?: RegExp;
-  readonly config?: Configuration;
+  readonly config?: CssOptions & {
+    readonly replacements?: Replacements | readonly Replacements[];
+  };
 }
 
 const parseFile = async (filename: string, options: ParserOptions, classes: Map<string, Style>) => {
@@ -16,13 +27,14 @@ const parseFile = async (filename: string, options: ParserOptions, classes: Map<
 };
 
 const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
-  const pluginName = "isaaccss";
-  const config: Configuration = { replacements: options?.config?.replacements ?? defaultReplacements, pretty: options?.config?.pretty };
+  const parserOptions: ParserOptions = {
+    replacements: options?.config?.replacements ? mergeReplacements(options?.config?.replacements) : defaultReplacements,
+  };
   return {
-    name: pluginName,
+    name: "isaaccss",
     setup: async build => {
-      const virtualFilter = /^isaaccss:css$/;
-      const virtualNamespace = "isaaccss:css";
+      const virtualFilter = /^virtual:isaaccss\.css$/;
+      const virtualNamespace = "virtual:isaaccss:css";
 
       let css: string | undefined;
       build.onStart(async () => {
@@ -36,7 +48,7 @@ const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
               if (args.pluginData !== resolving) {
                 const resolved = await build.resolve(path, { ...args, pluginData: resolving });
                 if (resolved.errors.length === 0 && (!options?.filter || options.filter.test(resolved.path))) {
-                  promises.push(parseFile(resolved.path, config, classes));
+                  promises.push(parseFile(resolved.path, parserOptions, classes));
                 }
               }
               return undefined;
@@ -53,7 +65,7 @@ const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
           sourcemap: false,
         });
         await Promise.all(promises);
-        css = cssify(classes, config);
+        css = cssify(classes, options?.config);
       });
 
       build.onResolve({ filter: virtualFilter }, ({ path }) => ({ path, namespace: virtualNamespace }));

@@ -1,8 +1,10 @@
 import type { Plugin } from "esbuild";
-import { Configuration } from "../index.node.js";
+import { CssOptions, Replacements } from "../index.node.js";
 interface IsaaccssEsbuildPluginOptions {
     readonly filter?: RegExp;
-    readonly config?: Configuration;
+    readonly config?: CssOptions & {
+        readonly replacements?: Replacements | readonly Replacements[];
+    };
 }
 declare const _default: {
     inject: string;

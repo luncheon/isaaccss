@@ -1,1 +1,1 @@
-import "isaaccss:css";
+import "virtual:isaaccss.css";
