@@ -5,8 +5,9 @@ import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { rollup } from "rollup";
+import css from "rollup-plugin-css-only";
 import isaaccssPlugin from "../lib/rollup/index.js";
-import expected from "./sample/e.css.mjs";
+import expected from "./sample/expected.css.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolvePath = (...segments) => path.resolve(__dirname, ...segments);
@@ -18,9 +19,9 @@ describe("rollup", () => {
   it("default config", async () => {
     assert.deepEqual(
       await rollup({ input, plugins: [isaaccssPlugin(), ...plugins] })
-        .then(result => result.generate({}))
-        .then(({ output }) => [output[1].fileName, output[1].source]),
-      ["a.css", expected.default]
+        .then(result => result.generate({ file: "a.js" }))
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "a.css", expected.default]
     );
   });
 
@@ -28,17 +29,35 @@ describe("rollup", () => {
     assert.deepEqual(
       await rollup({ input, plugins: [isaaccssPlugin(), ...plugins] })
         .then(result => result.generate({ file: "b.js" }))
-        .then(({ output }) => [output[1].fileName, output[1].source]),
-      ["b.css", expected.default]
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "b.css", expected.default]
     );
   });
 
   it("output filename can be specified", async () => {
     assert.deepEqual(
       await rollup({ input, plugins: [isaaccssPlugin({ output: "c.css" }), ...plugins] })
-        .then(result => result.generate({}))
-        .then(({ output }) => [output[1].fileName, output[1].source]),
-      ["c.css", expected.default]
+        .then(result => result.generate({ file: "a.js" }))
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "c.css", expected.default]
+    );
+  });
+
+  it("bundle with other css", async () => {
+    assert.deepEqual(
+      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin(), ...plugins] })
+        .then(result => result.generate({ file: "a.js" }))
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "a.css", expected.reset + expected.default]
+    );
+  });
+
+  it("bundle with other css, another output filename", async () => {
+    assert.deepEqual(
+      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin({ output: "b.css" }), ...plugins] })
+        .then(result => result.generate({ file: "a.js" }))
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source, output[2].fileName, output[2].source]),
+      [3, "a.css", expected.reset, "b.css", expected.default]
     );
   });
 
@@ -46,8 +65,8 @@ describe("rollup", () => {
     assert.deepEqual(
       await rollup({ input, plugins: [isaaccssPlugin({ config: { replacements: [] } }), ...plugins] })
         .then(result => result.generate({}))
-        .then(({ output }) => [output[1].fileName, output[1].source]),
-      ["a.css", expected.noReplacements]
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "a.css", expected.noReplacements]
     );
   });
 
@@ -55,8 +74,8 @@ describe("rollup", () => {
     assert.deepEqual(
       await rollup({ input, plugins: [isaaccssPlugin({ include: ["**/*.{js,ts,tsx}"] }), ...plugins] })
         .then(result => result.generate({}))
-        .then(({ output }) => [output[1].fileName, output[1].source]),
-      ["a.css", expected.abc]
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "a.css", expected.abc]
     );
   });
 
@@ -64,8 +83,8 @@ describe("rollup", () => {
     assert.deepEqual(
       await rollup({ input, plugins: [isaaccssPlugin({ exclude: ["**/*.jsx"] }), ...plugins] })
         .then(result => result.generate({}))
-        .then(({ output }) => [output[1].fileName, output[1].source]),
-      ["a.css", expected.abc]
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "a.css", expected.abc]
     );
   });
 });

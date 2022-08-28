@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
-import expected from "./sample/e.css.mjs";
+import expected from "./sample/expected.css.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = (...segments) => path.resolve(__dirname, ...segments);
