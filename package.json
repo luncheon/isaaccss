@@ -42,14 +42,19 @@
     "test": "node test/index.mjs"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-sucrase": "^4.0.4",
     "@types/glob": "^7.2.0",
     "@types/node": "^18.7.13",
     "esbuild": "^0.15.5",
+    "rollup": "^2.78.1",
     "typescript": "^4.8.2"
   },
   "dependencies": {
     "@babel/parser": "^7.18.13",
     "@babel/types": "^7.18.13",
+    "@rollup/pluginutils": "^4.2.1",
+    "acorn-walk": "^8.2.0",
     "css.escape": "^1.5.1",
     "glob": "^8.0.3",
     "htmlparser2": "^8.0.1",
