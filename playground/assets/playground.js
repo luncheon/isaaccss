@@ -15379,7 +15379,6 @@
   };
   var ERROR = null;
   var runEffects = runQueue;
-  var NOTPENDING = {};
   var STALE = 1;
   var PENDING = 2;
   var UNOWNED = {
@@ -15388,23 +15387,22 @@
     context: null,
     owner: null
   };
-  var [transPending, setTransPending] = /* @__PURE__ */ createSignal(false);
   var Owner = null;
   var Transition = null;
   var Scheduler = null;
   var ExternalSourceFactory = null;
   var Listener = null;
-  var Pending = null;
   var Updates = null;
   var Effects = null;
   var ExecCount = 0;
+  var [transPending, setTransPending] = /* @__PURE__ */ createSignal(false);
   function createRoot(fn, detachedOwner) {
     const listener = Listener, owner = Owner, unowned = fn.length === 0, root = unowned && true ? UNOWNED : {
       owned: null,
       cleanups: null,
       context: null,
       owner: detachedOwner || owner
-    }, updateFn = unowned ? fn : () => fn(() => cleanNode(root));
+    }, updateFn = unowned ? fn : () => fn(() => untrack(() => cleanNode(root)));
     Owner = root;
     Listener = null;
     try {
@@ -15420,26 +15418,18 @@
       value,
       observers: null,
       observerSlots: null,
-      pending: NOTPENDING,
       comparator: options.equals || void 0
     };
     const setter = (value2) => {
       if (typeof value2 === "function") {
         if (Transition && Transition.running && Transition.sources.has(s))
-          value2 = value2(s.pending !== NOTPENDING ? s.pending : s.tValue);
+          value2 = value2(s.tValue);
         else
-          value2 = value2(s.pending !== NOTPENDING ? s.pending : s.value);
+          value2 = value2(s.value);
       }
       return writeSignal(s, value2);
     };
     return [readSignal.bind(s), setter];
-  }
-  function createComputed(fn, value, options) {
-    const c = createComputation(fn, value, true, STALE);
-    if (Scheduler && Transition && Transition.running)
-      Updates.push(c);
-    else
-      updateComputation(c);
   }
   function createRenderEffect(fn, value, options) {
     const c = createComputation(fn, value, false, STALE);
@@ -15451,7 +15441,6 @@
   function createMemo(fn, value, options) {
     options = options ? Object.assign({}, signalOptions, options) : signalOptions;
     const c = createComputation(fn, value, true, 0);
-    c.pending = NOTPENDING;
     c.observers = null;
     c.observerSlots = null;
     c.comparator = options.equals || void 0;
@@ -15461,28 +15450,6 @@
     } else
       updateComputation(c);
     return readSignal.bind(c);
-  }
-  function batch(fn) {
-    if (Pending)
-      return fn();
-    let result;
-    const q = Pending = [];
-    try {
-      result = fn();
-    } finally {
-      Pending = null;
-    }
-    runUpdates(() => {
-      for (let i = 0; i < q.length; i += 1) {
-        const data = q[i];
-        if (data.pending !== NOTPENDING) {
-          const pending = data.pending;
-          data.pending = NOTPENDING;
-          writeSignal(data, pending);
-        }
-      }
-    }, false);
-    return result;
   }
   function untrack(fn) {
     let result, listener = Listener;
@@ -15523,7 +15490,7 @@
         t.done || (t.done = new Promise((res) => t.resolve = res));
         t.running = true;
       }
-      batch(fn);
+      runUpdates(fn, false);
       Listener = Owner = null;
       return t ? t.done : void 0;
     });
@@ -15538,16 +15505,25 @@
   }
   function children(fn) {
     const children2 = createMemo(fn);
-    return createMemo(() => resolveChildren(children2()));
+    const memo = createMemo(() => resolveChildren(children2()));
+    memo.toArray = () => {
+      const c = memo();
+      return Array.isArray(c) ? c : c != null ? [c] : [];
+    };
+    return memo;
   }
   var SuspenseContext;
   function readSignal() {
     const runningTransition = Transition && Transition.running;
     if (this.sources && (!runningTransition && this.state || runningTransition && this.tState)) {
-      const updates = Updates;
-      Updates = null;
-      !runningTransition && this.state === STALE || runningTransition && this.tState === STALE ? updateComputation(this) : lookUpstream(this);
-      Updates = updates;
+      if (!runningTransition && this.state === STALE || runningTransition && this.tState === STALE)
+        updateComputation(this);
+      else {
+        const updates = Updates;
+        Updates = null;
+        runUpdates(() => lookUpstream(this), false);
+        Updates = updates;
+      }
     }
     if (Listener) {
       const sSlot = this.observers ? this.observers.length : 0;
@@ -15571,56 +15547,46 @@
     return this.value;
   }
   function writeSignal(node, value, isComp) {
-    if (Pending) {
-      if (node.pending === NOTPENDING)
-        Pending.push(node);
-      node.pending = value;
-      return value;
-    }
-    if (node.comparator) {
-      if (Transition && Transition.running && Transition.sources.has(node)) {
-        if (node.comparator(node.tValue, value))
-          return value;
-      } else if (node.comparator(node.value, value))
-        return value;
-    }
-    let TransitionRunning = false;
-    if (Transition) {
-      TransitionRunning = Transition.running;
-      if (TransitionRunning || !isComp && Transition.sources.has(node)) {
-        Transition.sources.add(node);
-        node.tValue = value;
-      }
-      if (!TransitionRunning)
+    let current = Transition && Transition.running && Transition.sources.has(node) ? node.tValue : node.value;
+    if (!node.comparator || !node.comparator(current, value)) {
+      if (Transition) {
+        const TransitionRunning = Transition.running;
+        if (TransitionRunning || !isComp && Transition.sources.has(node)) {
+          Transition.sources.add(node);
+          node.tValue = value;
+        }
+        if (!TransitionRunning)
+          node.value = value;
+      } else
         node.value = value;
-    } else
-      node.value = value;
-    if (node.observers && node.observers.length) {
-      runUpdates(() => {
-        for (let i = 0; i < node.observers.length; i += 1) {
-          const o = node.observers[i];
-          if (TransitionRunning && Transition.disposed.has(o))
-            continue;
-          if (TransitionRunning && !o.tState || !TransitionRunning && !o.state) {
-            if (o.pure)
-              Updates.push(o);
+      if (node.observers && node.observers.length) {
+        runUpdates(() => {
+          for (let i = 0; i < node.observers.length; i += 1) {
+            const o = node.observers[i];
+            const TransitionRunning = Transition && Transition.running;
+            if (TransitionRunning && Transition.disposed.has(o))
+              continue;
+            if (TransitionRunning && !o.tState || !TransitionRunning && !o.state) {
+              if (o.pure)
+                Updates.push(o);
+              else
+                Effects.push(o);
+              if (o.observers)
+                markDownstream(o);
+            }
+            if (TransitionRunning)
+              o.tState = STALE;
             else
-              Effects.push(o);
-            if (o.observers)
-              markDownstream(o);
+              o.state = STALE;
           }
-          if (TransitionRunning)
-            o.tState = STALE;
-          else
-            o.state = STALE;
-        }
-        if (Updates.length > 1e6) {
-          Updates = [];
-          if (false)
-            ;
-          throw new Error();
-        }
-      }, false);
+          if (Updates.length > 1e6) {
+            Updates = [];
+            if (false)
+              ;
+            throw new Error();
+          }
+        }, false);
+      }
     }
     return value;
   }
@@ -15647,10 +15613,12 @@
     try {
       nextValue = node.fn(value);
     } catch (err) {
+      if (node.pure)
+        Transition && Transition.running ? node.tState = STALE : node.state = STALE;
       handleError(err);
     }
     if (!node.updatedAt || node.updatedAt <= time) {
-      if (node.observers && node.observers.length) {
+      if (node.updatedAt != null && "observers" in node) {
         writeSignal(node, nextValue, true);
       } else if (Transition && Transition.running && node.pure) {
         Transition.sources.add(node);
@@ -15737,7 +15705,7 @@
       } else if (!runningTransition && node.state === PENDING || runningTransition && node.tState === PENDING) {
         const updates = Updates;
         Updates = null;
-        lookUpstream(node, ancestors[0]);
+        runUpdates(() => lookUpstream(node, ancestors[0]), false);
         Updates = updates;
       }
     }
@@ -15785,12 +15753,12 @@
       const sources = Transition.sources;
       const disposed = Transition.disposed;
       res = Transition.resolve;
-      for (const e of Effects) {
-        "tState" in e && (e.state = e.tState);
-        delete e.tState;
+      for (const e2 of Effects) {
+        "tState" in e2 && (e2.state = e2.tState);
+        delete e2.tState;
       }
       Transition = null;
-      batch(() => {
+      runUpdates(() => {
         for (const d of disposed)
           cleanNode(d);
         for (const v of sources) {
@@ -15806,16 +15774,12 @@
           v.tState = 0;
         }
         setTransPending(false);
-      });
+      }, false);
     }
-    if (Effects.length)
-      batch(() => {
-        runEffects(Effects);
-        Effects = null;
-      });
-    else {
-      Effects = null;
-    }
+    const e = Effects;
+    Effects = null;
+    if (e.length)
+      runUpdates(() => runEffects(e), false);
     if (res)
       res();
   }
@@ -15926,7 +15890,13 @@
         reset(node.owned[i]);
     }
   }
+  function castError(err) {
+    if (err instanceof Error || typeof err === "string")
+      return err;
+    return new Error("Unknown error");
+  }
   function handleError(err) {
+    err = castError(err);
     const fns = ERROR && lookup(Owner, ERROR);
     if (!fns)
       throw err;
@@ -15952,7 +15922,7 @@
   function createProvider(id) {
     return function provider(props) {
       let res;
-      createComputed(() => res = untrack(() => {
+      createRenderEffect(() => res = untrack(() => {
         Owner.context = {
           [id]: props.value
         };
@@ -16156,6 +16126,8 @@
         return () => current;
       }
       if (sharedConfig.context) {
+        if (!array.length)
+          return current;
         for (let i = 0; i < array.length; i++) {
           if (array[i].parentNode)
             return current = array;
