@@ -34,13 +34,12 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
       classes.clear();
     },
     moduleParsed(moduleInfo) {
-      if (!filter(moduleInfo.id) || !moduleInfo.ast) {
-        return;
+      if (filter(moduleInfo.id) && moduleInfo.ast) {
+        walkAst(moduleInfo.ast, {
+          Literal: node => parseClass(node.value, parserOptions, classes),
+          TemplateElement: node => parseClass(node.value.cooked, parserOptions, classes),
+        });
       }
-      walkAst(moduleInfo.ast, {
-        Literal: node => parseClass(node.value, parserOptions, classes),
-        TemplateElement: node => parseClass(node.value.cooked, parserOptions, classes),
-      });
     },
     generateBundle: {
       order: "post",
@@ -51,20 +50,20 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
             .find(([, item]) => item.type === "chunk" && item.isEntry)?.[0]
             .replace(/\.[cm]?jsx?$/, "")
             .concat(".css");
-        const css = cssify(classes, cssifyOptions);
+        const source = cssify(classes, cssifyOptions);
         if (!fileName) {
-          console.log(css);
+          console.log(source);
           return;
         }
         const bundledCss = bundle[fileName];
         if (bundledCss) {
           if (bundledCss.type === "asset") {
-            bundledCss.source += css;
+            bundledCss.source += source;
           } else {
             throw Error(`isaaccss: can't output to script file "${fileName}"`);
           }
         } else {
-          this.emitFile({ type: "asset", fileName: fileName, source: css });
+          this.emitFile({ type: "asset", fileName, source });
         }
       },
     },

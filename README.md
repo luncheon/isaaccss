@@ -201,6 +201,20 @@ export default {
 };
 ```
 
+When you want to merge other CSS files with isaaccss CSS, use [`rollup-plugin-import-css`](https://github.com/jleeson/rollup-plugin-import-css) instead of [`rollup-plugin-css-only`](https://github.com/thgh/rollup-plugin-css-only).
+
+```js
+// rollup.config.js
+import css from "rollup-plugin-import-css";
+import isaaccss from "isaaccss/lib/rollup";
+
+export default {
+  input: "src/index.js",
+  output: { file: "dist/index.js" },
+  plugins: [css(), isaaccss()],
+};
+```
+
 ## License
 
 [WTFPL](http://www.wtfpl.net/)

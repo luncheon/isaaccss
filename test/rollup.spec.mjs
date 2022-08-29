@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import resolve from "@rollup/plugin-node-resolve";
 import sucrase from "@rollup/plugin-sucrase";
 import { rollup } from "rollup";
-import css from "rollup-plugin-css-only";
+import css from "rollup-plugin-import-css";
 import isaaccssPlugin from "../lib/rollup/index.js";
 import expected from "./sample/expected.css.mjs";
 
