@@ -30,6 +30,9 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
   const filter = createFilter(options?.include, options?.exclude);
   return {
     name: "isaaccss",
+    buildStart() {
+      classes.clear();
+    },
     moduleParsed(moduleInfo) {
       if (!filter(moduleInfo.id) || !moduleInfo.ast) {
         return;
