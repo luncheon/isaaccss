@@ -1,9 +1,12 @@
-import resolve from "@rollup/plugin-node-resolve";
-import sucrase from "@rollup/plugin-sucrase";
-import assert from "assert/strict";
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+
+import resolve from "@rollup/plugin-node-resolve";
+import sucrase from "@rollup/plugin-sucrase";
 import { rollup } from "rollup";
 import css from "rollup-plugin-css-only";
 import isaaccssPlugin from "../lib/rollup/index.js";
@@ -86,5 +89,11 @@ describe("rollup", () => {
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.abc]
     );
+  });
+
+  it("rollup cli", { only: true }, async () => {
+    fs.rmSync(resolvePath(".dist/rollup/"), { force: true, recursive: true });
+    execFileSync("npx", ["rollup", "-c"], { cwd: __dirname });
+    assert.equal(fs.readFileSync(resolvePath(".dist/rollup/bundle.css"), "utf8"), expected.reset + expected.default);
   });
 });

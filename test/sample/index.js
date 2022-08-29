@@ -1,2 +1,2 @@
-import "./a";
+export * from "./a";
 import "./reset.css";

@@ -39,28 +39,31 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
         TemplateElement: node => parseClass(node.value.cooked, parserOptions, classes),
       });
     },
-    generateBundle(_, bundle) {
-      const fileName =
-        options?.output ||
-        Object.entries(bundle)
-          .find(([, item]) => item.type === "chunk" && item.isEntry)?.[0]
-          .replace(/\.[cm]?jsx?$/, "")
-          .concat(".css");
-      const css = cssify(classes, cssifyOptions);
-      if (!fileName) {
-        console.log(css);
-        return;
-      }
-      const bundledCss = bundle[fileName];
-      if (bundledCss) {
-        if (bundledCss.type === "asset") {
-          bundledCss.source += css;
-        } else {
-          throw Error(`isaaccss: can't output to script file "${fileName}"`);
+    generateBundle: {
+      order: "post",
+      handler(_, bundle) {
+        const fileName =
+          options?.output ||
+          Object.entries(bundle)
+            .find(([, item]) => item.type === "chunk" && item.isEntry)?.[0]
+            .replace(/\.[cm]?jsx?$/, "")
+            .concat(".css");
+        const css = cssify(classes, cssifyOptions);
+        if (!fileName) {
+          console.log(css);
+          return;
         }
-      } else {
-        this.emitFile({ type: "asset", fileName: fileName, source: css });
-      }
+        const bundledCss = bundle[fileName];
+        if (bundledCss) {
+          if (bundledCss.type === "asset") {
+            bundledCss.source += css;
+          } else {
+            throw Error(`isaaccss: can't output to script file "${fileName}"`);
+          }
+        } else {
+          this.emitFile({ type: "asset", fileName: fileName, source: css });
+        }
+      },
     },
   };
 };
