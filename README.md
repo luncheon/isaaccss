@@ -66,6 +66,12 @@ Or using some replacements:
 - Optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
 - An underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
 
+## Installation
+
+```
+npm i -D isaaccss
+```
+
 ## Usage
 
 ### CLI
@@ -155,6 +161,44 @@ esbuild.build({
     }),
   ],
 });
+```
+
+### [Rollup](https://rollupjs.org/)
+
+```js
+// rollup.config.js
+import isaaccss from "isaaccss/lib/rollup";
+import { defaultReplacements } from "isaaccss";
+
+export default {
+  input: "src/index.js",
+  output: { file: "dist/index.js" },
+  plugins: [
+    isaaccss({
+      // Optional include filter. By default, all bundled scripts are included.
+      include: ["**/*.js"],
+
+      // Optional exclude filter. By default, nothing is excluded.
+      exclude: ["node_modules/**"],
+
+      // Optional output filename.
+      // Default is the output script filename with extension ".css".
+      output: "styles.js",
+
+      // Optional isaaccss config.
+      // See example configuration scripts in the CLI section above.
+      config: {
+        pretty: true,
+        replacements: [
+          {
+            // Custom replacements...
+          },
+          defaultReplacements,
+        ],
+      },
+    }),
+  ],
+};
 ```
 
 ## License
