@@ -27,7 +27,7 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
   };
   const cssifyOptions = options?.config;
   const classes = new Map<string, Style>();
-  const filter = createFilter(options?.include, options?.exclude);
+  const filter = createFilter(options?.include, options?.exclude ?? "**/node_modules/**");
   return {
     name: "isaaccss",
     buildStart() {
@@ -36,7 +36,7 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
     moduleParsed(moduleInfo) {
       if (filter(moduleInfo.id) && moduleInfo.ast) {
         walkAst(moduleInfo.ast, {
-          Literal: node => parseClass(node.value, parserOptions, classes),
+          Literal: node => typeof node.value === "string" && parseClass(node.value, parserOptions, classes),
           TemplateElement: node => parseClass(node.value.cooked, parserOptions, classes),
         });
       }

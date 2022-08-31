@@ -3,6 +3,7 @@ import sucrase from "@rollup/plugin-sucrase";
 import css from "rollup-plugin-import-css";
 import isaaccss from "../lib/rollup/index.js";
 
+/** @type {import("rollup").RollupOptions} */
 export default {
   input: "sample/index.js",
   output: { file: ".dist/rollup/bundle.js" },

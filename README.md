@@ -170,6 +170,7 @@ esbuild.build({
 import isaaccss from "isaaccss/lib/rollup";
 import { defaultReplacements } from "isaaccss";
 
+/** @type {import("rollup").RollupOptions} */
 export default {
   input: "src/index.js",
   output: { file: "dist/index.js" },
@@ -178,8 +179,8 @@ export default {
       // Optional include filter. By default, all bundled scripts are included.
       include: ["**/*.js"],
 
-      // Optional exclude filter. By default, nothing is excluded.
-      exclude: ["node_modules/**"],
+      // Optional exclude filter. By default, `**/node_modules/**` are excluded.
+      exclude: ["**/node_modules/**"],
 
       // Optional output filename.
       // Default is the output script filename with extension ".css".
@@ -212,6 +213,22 @@ export default {
   input: "src/index.js",
   output: { file: "dist/index.js" },
   plugins: [css(), isaaccss()],
+};
+```
+
+### [Vite](https://vitejs.dev/)
+
+```js
+// vite.config.js
+import isaaccssPlugin from "isaaccss/lib/vite/index.js";
+
+/** @type {import("vite").UserConfig} */
+export default {
+  plugins: [
+    isaaccssPlugin({
+      // Options are same as for Rollup isaaccss plugin above.
+    }),
+  ],
 };
 ```
 

@@ -91,7 +91,7 @@ describe("rollup", () => {
     );
   });
 
-  it("rollup cli", { only: true }, async () => {
+  it("rollup cli", async () => {
     fs.rmSync(resolvePath(".dist/rollup/"), { force: true, recursive: true });
     execFileSync("npx", ["rollup", "-c"], { cwd: __dirname });
     assert.equal(fs.readFileSync(resolvePath(".dist/rollup/bundle.css"), "utf8"), expected.reset + expected.default);

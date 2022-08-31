@@ -1,3 +1,4 @@
+import { d } from "./d";
 export { d } from "./d";
 
 const a = "@a/:b/c:0**!?";
