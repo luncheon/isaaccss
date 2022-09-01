@@ -7,8 +7,8 @@ import { fileURLToPath } from "node:url";
 
 import { build } from "vite";
 import isaaccssPlugin from "../lib/vite/index.js";
-import expected from "./sample/expected.css.mjs";
-import viteConfig from "./vite.config.mjs";
+import expected from "./sample/expected.css.js";
+import viteConfig from "./vite.config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolvePath = (...segments) => path.resolve(__dirname, ...segments);

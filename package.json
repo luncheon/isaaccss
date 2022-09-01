@@ -39,7 +39,7 @@
     "build:lib": "tsc -p .",
     "build:playground": "cd playground && npm run build",
     "start": "cd playground && npm start",
-    "test": "node test/index.mjs"
+    "test": "cd test/ && npm t"
   },
   "devDependencies": {
     "@types/babel__traverse": "^7.18.1",

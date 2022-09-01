@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "license": "WTFPL",
+  "type": "module",
   "scripts": {
-    "build": "node build.mjs",
-    "start": "node build.mjs --serve"
+    "build": "node build.js",
+    "start": "node build.js --serve"
   },
   "devDependencies": {
     "@babel/core": "^7.18.13",

@@ -10,7 +10,7 @@ import sucrase from "@rollup/plugin-sucrase";
 import { rollup } from "rollup";
 import css from "rollup-plugin-import-css";
 import isaaccssPlugin from "../lib/rollup/index.js";
-import expected from "./sample/expected.css.mjs";
+import expected from "./sample/expected.css.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolvePath = (...segments) => path.resolve(__dirname, ...segments);

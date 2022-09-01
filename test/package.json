@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "license": "WTFPL",
+  "type": "module",
   "scripts": {
-    "test": "node index.mjs"
+    "test": "node index.js"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",

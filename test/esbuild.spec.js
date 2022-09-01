@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import isaaccss from "../lib/esbuild/index.js";
-import expected from "./sample/expected.css.mjs";
+import expected from "./sample/expected.css.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = (...segments) => path.resolve(__dirname, ...segments);
