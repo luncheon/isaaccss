@@ -48019,7 +48019,7 @@ ${rootStack}`;
   };
   var transformMedia = (media, replacements) => media && unescape(replace(media, replacements).replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3"));
   var transformSelector = (selector, replacements) => selector && unescape(replace(selector, replacements));
-  var transformValue = (value, replacements) => unescape(replace(value, replacements).replace(/\$([a-zA-Z-]*[a-zA-Z])/g, "var(--$1)"));
+  var transformValue = (value, replacements) => unescape(replace(value, replacements).replace(/\$([_a-zA-Z0-9-]*[a-zA-Z0-9])/g, "var(--$1)"));
   var transformProperty = (property, replacements) => {
     if (property.startsWith("--")) {
       return property;

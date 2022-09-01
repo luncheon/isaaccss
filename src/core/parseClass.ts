@@ -19,7 +19,7 @@ const transformSelector = (selector: string | undefined, replacements?: Replacem
   selector && unescape(replace(selector, replacements));
 
 const transformValue = (value: string, replacements?: Replacements["value"]): string =>
-  unescape(replace(value, replacements).replace(/\$([a-zA-Z-]*[a-zA-Z])/g, "var(--$1)"));
+  unescape(replace(value, replacements).replace(/\$([_a-zA-Z0-9-]*[a-zA-Z0-9])/g, "var(--$1)"));
 
 const transformProperty = (property: string, replacements?: Replacements["property"]): string | undefined => {
   if (property.startsWith("--")) {
