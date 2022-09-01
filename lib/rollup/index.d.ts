@@ -9,5 +9,14 @@ export interface IsaaccssRollupPluginOptions {
         readonly replacements?: Replacements | readonly Replacements[];
     };
 }
+export declare const resolveIsaaccssRollupPluginOptions: (options?: IsaaccssRollupPluginOptions) => {
+    filter: (id: unknown) => boolean;
+    parserOptions: {
+        replacements: Replacements;
+    };
+    cssifyOptions: (CssOptions & {
+        readonly replacements?: Replacements | readonly Replacements[] | undefined;
+    }) | undefined;
+};
 declare const isaaccssRollupPlugin: (options?: IsaaccssRollupPluginOptions) => Plugin;
 export default isaaccssRollupPlugin;

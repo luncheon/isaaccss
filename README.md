@@ -3,19 +3,27 @@
 A CSS class DSL like inline styles.
 
 <!-- prettier-ignore -->
-```html
-<button class="--hue:210 padding:4px_8px @width>=768px/padding:8px_16px border-radius:8px color:white border:3px_solid_hsl(var(--hue),100%,80%) background:hsl(var(--hue),100%,50%) :hover/background:hsl(var(--hue),100%,60%) :active/background:hsl(var(--hue),100%,40%)* @hover:hover/:hover/scale:1.1">
-  Submit
-</button>
+```jsx
+import { is } from "isaaccss";
+
+const Button = () => (
+  <button class={is`--H:210 --S:100% --L:50% padding:4px_8px @width>=768px/padding:8px_16px border-radius:8px color:white border:3px_solid_hsl(var(--H),var(--S),80%) background:hsl(var(--H),var(--S),var(--L)) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1`}>
+    Submit
+  </button>
+);
 ```
 
 Or using some replacements:
 
 <!-- prettier-ignore -->
-```html
-<button class="--hue:210 p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($hue,100%,80%) bg:hsl($hue,100%,50%) :hover/bg:hsl($hue,100%,60%) :active/bg:hsl($hue,100%,40%)* @hover:hover/:hover/scale:1.1">
-  Submit
-</button>
+```jsx
+import { is } from "isaaccss";
+
+const Button = () => (
+  <button class={is`--H:210 --S:100% --L:50% p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($H,$S,80%) bg:hsl($H,$S,$L) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1`}>
+    Submit
+  </button>
+)
 ```
 
 - Unlike inline styles:
@@ -29,6 +37,7 @@ Or using some replacements:
     - Simple and flexible: any media, any selector, any property and any value can be described as is
   - High specificity (ID-specificity = 1) by default to override styles from other CSS libraries
   - Specificity can be adjusted
+  - Invalid class names can be detected
 - Unlike [Linaria](https://linaria.dev/):
   - Short aliases can be used
 

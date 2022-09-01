@@ -5,12 +5,13 @@
   "license": "WTFPL",
   "bin": "lib/cli.js",
   "type": "module",
-  "main": "lib/index.node.js",
-  "types": "lib/index.node.d.ts",
-  "browser": "lib/bundle.browser.js",
+  "main": "index.js",
+  "types": "index.d.ts",
   "files": [
     "lib",
-    "src"
+    "src",
+    "index.d.ts",
+    "index.js"
   ],
   "keywords": [
     "css",
@@ -34,29 +35,26 @@
   },
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('lib',{recursive:true,force:true})\"",
-    "build": "npm run clean && npm run build:lib && npm run build:browser && npm run build:playground",
+    "build": "npm run clean && npm run build:lib && npm run build:playground",
     "build:lib": "tsc -p .",
-    "build:browser": "esbuild src/index.browser.ts --bundle --minify --format=esm --outfile=lib/bundle.browser.js",
     "build:playground": "cd playground && npm run build",
     "start": "cd playground && npm start",
     "test": "node test/index.mjs"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "@rollup/plugin-sucrase": "^4.0.4",
+    "@types/babel__traverse": "^7.18.1",
     "@types/glob": "^8.0.0",
     "@types/node": "^18.7.14",
     "esbuild": "^0.15.6",
     "rollup": "^2.79.0",
-    "rollup-plugin-import-css": "^3.0.3",
     "typescript": "^4.8.2",
     "vite": "^3.0.9"
   },
   "dependencies": {
     "@babel/parser": "^7.18.13",
+    "@babel/traverse": "^7.18.13",
     "@babel/types": "^7.18.13",
     "@rollup/pluginutils": "^4.2.1",
-    "acorn-walk": "^8.2.0",
     "css.escape": "^1.5.1",
     "glob": "^8.0.3",
     "htmlparser2": "^8.0.1",

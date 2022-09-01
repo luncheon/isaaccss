@@ -1,1 +1,1 @@
-export const d: string;
+export const d: () => any;

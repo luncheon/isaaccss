@@ -1,5 +1,5 @@
 import { all as __knownCssProperties } from "known-css-properties";
-import type { ParserOptions, Replacements, ReplacerFunction, Style } from "./types.js";
+import type { ParserOptions, Replacements, ReplacerFunction } from "./types.js";
 
 const knownCssPropertySet = new Set(__knownCssProperties);
 
@@ -19,7 +19,7 @@ const transformSelector = (selector: string | undefined, replacements?: Replacem
   selector && unescape(replace(selector, replacements));
 
 const transformValue = (value: string, replacements?: Replacements["value"]): string =>
-  unescape(replace(value, replacements).replace(/\$([a-zA-Z-]+[a-zA-Z])/g, "var(--$1)"));
+  unescape(replace(value, replacements).replace(/\$([a-zA-Z-]*[a-zA-Z])/g, "var(--$1)"));
 
 const transformProperty = (property: string, replacements?: Replacements["property"]): string | undefined => {
   if (property.startsWith("--")) {
@@ -33,17 +33,16 @@ const transformProperty = (property: string, replacements?: Replacements["proper
   }
 };
 
-export const parseClass = (className: string, options?: ParserOptions, collectTo = new Map<string, Style>()) => {
+export const parseClass = (className: string, options?: ParserOptions) => {
   const replacements = options?.replacements;
-  for (const s of className.split(" ")) {
-    const match =
-      !collectTo.has(s) &&
-      //        @media/                   selector/                property:value specificity
-      s.match(/^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/);
-    const property = match && transformProperty(match[3], replacements?.property);
-    property &&
-      collectTo.set(s, {
-        className: s,
+  const match = className.match(
+    // @media/                   selector/                property:value specificity
+    /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/
+  );
+  const property = match && transformProperty(match[3], replacements?.property);
+  return property
+    ? {
+        className,
         media: transformMedia(match[1], replacements?.media),
         layer: match[7] === "?" ? "" : undefined,
         selector: transformSelector(match[2], replacements?.selector),
@@ -51,7 +50,6 @@ export const parseClass = (className: string, options?: ParserOptions, collectTo
         value: transformValue(match[4], replacements?.value),
         specificity: (match[7] === "?" ? 0 : 1) + match[5].length,
         important: match[6] === "!" || undefined,
-      });
-  }
-  return collectTo;
+      }
+    : undefined;
 };

@@ -7,7 +7,7 @@ import {
   defaultReplacements,
   mergeReplacements,
   ParserOptions,
-  parseScript,
+  parseTaggedTemplates,
   Replacements,
   Style,
 } from "../index.node.js";
@@ -23,7 +23,14 @@ interface IsaaccssEsbuildPluginOptions {
 
 const parseFile = async (filename: string, options: ParserOptions, classes: Map<string, Style>) => {
   const match = filename.match(/\.[cm]?([jt])s(x?)$/);
-  match && parseScript(await fs.readFile(filename, "utf8"), options, { jsx: !!match[2], typescript: match[1] === "t" }, classes);
+  if (match) {
+    const babelParserPlugins = [...(match[2] ? ["jsx" as const] : []), ...(match[1] === "t" ? ["typescript" as const] : [])];
+    const [, invalidClasses] = parseTaggedTemplates(await fs.readFile(filename, "utf8"), options, babelParserPlugins, classes);
+    invalidClasses.forEach((nodes, className) => {
+      const start = nodes[0].loc?.start;
+      console.warn(`isaaccss: ${filename}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
+    });
+  }
 };
 
 const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
@@ -65,7 +72,7 @@ const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
           sourcemap: false,
         });
         await Promise.all(promises);
-        css = cssify(classes, options?.config);
+        css = cssify(classes.values(), options?.config);
       });
 
       build.onResolve({ filter: virtualFilter }, ({ path }) => ({ path, namespace: virtualNamespace }));

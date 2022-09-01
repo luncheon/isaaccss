@@ -9,8 +9,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = (...pathSegments) => path.resolve(__dirname, ...pathSegments);
 const resolveOutput = (...pathSegments) => resolve("assets", ...pathSegments);
 
-fs.rmSync(resolveOutput(), { recursive: true, force: true });
-
 /** @type esbuild.BuildOptions */
 const buildOptions = {
   entryPoints: [resolve("src/playground.tsx")],
@@ -20,6 +18,7 @@ const buildOptions = {
   loader: { ".html": "text", ".otf": "copy" },
   assetNames: "[name]",
   inject: [isaaccss.inject],
+  define: { "process.env.BABEL_TYPES_8_BREAKING": false, "process.platform": "''", "Buffer.isBuffer": "Function" },
   plugins: [
     isaaccss.plugin({
       filter: /\.tsx$/,
@@ -35,5 +34,6 @@ const buildOptions = {
 if (process.argv.includes("--serve")) {
   esbuild.serve({ servedir: "." }, buildOptions).then(({ port }) => console.log(`http://localhost:${port}`));
 } else {
+  fs.rmSync(resolveOutput(), { recursive: true, force: true });
   esbuild.build(buildOptions);
 }

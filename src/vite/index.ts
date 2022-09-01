@@ -1,8 +1,6 @@
-import { createFilter } from "@rollup/pluginutils";
-import type { ModuleParsedHook } from "rollup";
 import type { Plugin } from "vite";
-import { cssify, defaultReplacements, mergeReplacements, ParserOptions, parseScript } from "../index.node.js";
-import isaaccssRollupPlugin, { IsaaccssRollupPluginOptions } from "../rollup/index.js";
+import { cssify, parseTaggedTemplates } from "../index.node.js";
+import isaaccssRollupPlugin, { IsaaccssRollupPluginOptions, resolveIsaaccssRollupPluginOptions } from "../rollup/index.js";
 
 export interface IsaaccssVitePluginOptions extends IsaaccssRollupPluginOptions {}
 
@@ -13,43 +11,35 @@ const isaaccssVitePlugin = (options?: IsaaccssVitePluginOptions): Plugin[] => {
     plugins.push({
       name: "isaaccss:build",
       apply: "build",
-      moduleParsed: rollupPlugin.moduleParsed as ModuleParsedHook,
+      transform: (rollupPlugin.transform as { handler: Plugin["transform"] }).handler,
       generateBundle: (rollupPlugin.generateBundle as { handler: Plugin["generateBundle"] }).handler,
     });
   }
   {
-    const filter = createFilter(
-      options?.include ?? "**/*.{js,cjs,mjs,jsx,cjsx,mjsx,ts,cts,mts,tsx,ctsx,mtsx}",
-      options?.exclude ?? "**/node_modules/**"
-    );
-    const parserOptions: ParserOptions = {
-      replacements: options?.config?.replacements ? mergeReplacements(options?.config?.replacements) : defaultReplacements,
-    };
+    const { filter, parserOptions, cssifyOptions } = resolveIsaaccssRollupPluginOptions(options);
     const cssMap = new Map<string, string>();
     const virtualCssPrefix = "virtual:isaaccss:";
     const virtualCssSuffix = ".css";
     plugins.push({
       name: "isaaccss:serve",
       apply: "serve",
-      resolveId(source) {
-        if (source.startsWith(virtualCssPrefix)) {
-          return source;
-        }
-      },
-      load(id) {
-        if (id.startsWith(virtualCssPrefix)) {
-          return cssMap.get(id);
-        }
-      },
+      resolveId: source => (source.startsWith(virtualCssPrefix) ? source : undefined),
+      load: id => (id.startsWith(virtualCssPrefix) ? cssMap.get(id) : undefined),
       transform(code, id) {
-        if (!id.startsWith(virtualCssPrefix) && filter(id)) {
-          const css = cssify(parseScript(code, parserOptions), options?.config);
-          if (css) {
-            const virtualCss = virtualCssPrefix + id + virtualCssSuffix;
-            cssMap.set(virtualCss, css);
-            return `import "${virtualCss}";${code}`;
-          }
+        if (id.startsWith(virtualCssPrefix) || !filter(id)) {
+          return;
         }
+        const [classes, invalidClasses] = parseTaggedTemplates(code, parserOptions);
+        const css = cssify(classes.values(), cssifyOptions);
+        if (css) {
+          const virtualCss = virtualCssPrefix + id + virtualCssSuffix;
+          cssMap.set(virtualCss, css);
+          return `import "${virtualCss}";${code}`;
+        }
+        invalidClasses.forEach((nodes, className) => {
+          const start = nodes[0].loc?.start;
+          console.warn(`isaaccss: ${id}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
+        });
       },
     });
   }

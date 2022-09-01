@@ -12,7 +12,7 @@ import {
   parseClass,
   parseHtml,
   ParserOptions,
-  parseScript,
+  parseTaggedTemplates,
   Style,
 } from "./index.node.js";
 
@@ -46,16 +46,23 @@ const parseFile = async (filename: string, config?: ParserOptions, collectTo = n
   }
   const match = filename.match(/\.[cm]?([jt])s(x?)/);
   if (match) {
-    return parseScript(await fs.promises.readFile(filename, "utf8"), config, { jsx: !!match[2], typescript: match[1] === "t" }, collectTo);
+    const babelParserPlugins = [...(match[2] ? ["jsx" as const] : []), ...(match[1] === "t" ? ["typescript" as const] : [])];
+    const [, invalidClasses] = parseTaggedTemplates(await fs.promises.readFile(filename, "utf8"), config, babelParserPlugins, collectTo);
+    invalidClasses.forEach((nodes, className) => {
+      const start = nodes[0].loc?.start;
+      console.warn(`isaaccss: ${filename}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
+    });
+  } else {
+    console.warn(`ignore file: ${filename}`);
   }
-  console.warn(`ignore file: ${filename}`);
   return collectTo;
 };
 
 const interact = async (parserOptions: ParserOptions, cssOptions: CssOptions) => {
   process.stdout.write("> ");
   for await (const line of readline.createInterface({ input: process.stdin, output: process.stdout })) {
-    console.log(cssify(parseClass(line, parserOptions), cssOptions));
+    const parsed = parseClass(line, parserOptions);
+    parsed && console.log(cssify([parsed], cssOptions));
     process.stdout.write("> ");
   }
   console.log();
@@ -92,7 +99,7 @@ if (args) {
   } else {
     const classes = new Map<string, Style>();
     await Promise.all(args.positionals.flatMap(pattern => glob.sync(pattern)).map(filename => parseFile(filename, config.parser, classes)));
-    const css = cssify(classes, config.cssify);
+    const css = cssify(classes.values(), config.cssify);
     if (args.values.output) {
       await fs.promises.writeFile(args.values.output, css, "utf8");
     } else {

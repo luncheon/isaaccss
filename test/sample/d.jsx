@@ -1,1 +1,3 @@
-export const d = () => <div className="d:4!" />;
+import { is } from "isaaccss";
+
+export const d = () => <div className={is`d:4!`} />;

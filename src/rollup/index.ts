@@ -1,16 +1,6 @@
 import { createFilter, FilterPattern } from "@rollup/pluginutils";
-import { simple as walkAst } from "acorn-walk";
 import type { Plugin } from "rollup";
-import {
-  cssify,
-  CssOptions,
-  defaultReplacements,
-  mergeReplacements,
-  parseClass,
-  ParserOptions,
-  Replacements,
-  Style,
-} from "../index.node.js";
+import { cssify, CssOptions, defaultReplacements, mergeReplacements, parseTaggedTemplates, Replacements, Style } from "../index.node.js";
 
 export interface IsaaccssRollupPluginOptions {
   readonly include: FilterPattern;
@@ -21,25 +11,33 @@ export interface IsaaccssRollupPluginOptions {
   };
 }
 
-const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => {
-  const parserOptions: ParserOptions = {
+export const resolveIsaaccssRollupPluginOptions = (options?: IsaaccssRollupPluginOptions) => ({
+  filter: createFilter(
+    options?.include ?? "**/*.{js,cjs,mjs,jsx,cjsx,mjsx,ts,cts,mts,tsx,ctsx,mtsx}",
+    options?.exclude ?? "**/node_modules/**"
+  ),
+  parserOptions: {
     replacements: options?.config?.replacements ? mergeReplacements(options?.config?.replacements) : defaultReplacements,
-  };
-  const cssifyOptions = options?.config;
+  },
+  cssifyOptions: options?.config,
+});
+
+const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => {
+  const { filter, parserOptions, cssifyOptions } = resolveIsaaccssRollupPluginOptions(options);
   const classes = new Map<string, Style>();
-  const filter = createFilter(options?.include, options?.exclude ?? "**/node_modules/**");
   return {
     name: "isaaccss",
-    buildStart() {
-      classes.clear();
-    },
-    moduleParsed(moduleInfo) {
-      if (filter(moduleInfo.id) && moduleInfo.ast) {
-        walkAst(moduleInfo.ast, {
-          Literal: node => typeof node.value === "string" && parseClass(node.value, parserOptions, classes),
-          TemplateElement: node => parseClass(node.value.cooked, parserOptions, classes),
-        });
-      }
+    transform: {
+      order: "post",
+      handler(code, id) {
+        if (filter(id)) {
+          const [, invalidClasses] = parseTaggedTemplates(code, parserOptions, undefined, classes);
+          invalidClasses.forEach((nodes, className) => {
+            const start = nodes[0].loc?.start;
+            console.warn(`isaaccss: ${id}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
+          });
+        }
+      },
     },
     generateBundle: {
       order: "post",
@@ -50,7 +48,7 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
             .find(([, item]) => item.type === "chunk" && item.isEntry)?.[0]
             .replace(/\.[cm]?jsx?$/, "")
             .concat(".css");
-        const source = cssify(classes, cssifyOptions);
+        const source = cssify(classes.values(), cssifyOptions);
         if (!fileName) {
           console.log(source);
           return;

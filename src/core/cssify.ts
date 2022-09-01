@@ -28,9 +28,9 @@ const layerSelector = (c: Style) => c.layer;
 const selectorSelector = (c: Style) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
 const propertySelector = (c: Style) => `${c.property}:${c.value}${c.important ? "!important" : ""}`;
 
-export const cssify = (classes: ReadonlyMap<string, Style>, options?: CssOptions): string => {
+export const cssify = (classes: Iterable<Style>, options?: CssOptions): string => {
   const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
-  return joinGroup(newline, classes.values(), mediaSelector, (media, mediaRecords) => {
+  return joinGroup(newline, classes, mediaSelector, (media, mediaRecords) => {
     const indent1 = media ? singleIndent : "";
     const content = joinGroup(newline, mediaRecords, layerSelector, (layer, layerRecords) => {
       const hasLayer = layer !== undefined;
