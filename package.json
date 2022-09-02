@@ -5,8 +5,14 @@
   "license": "WTFPL",
   "bin": "lib/cli.js",
   "type": "module",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./lib/*": "./lib/*",
+    "./src/*": "./src/*",
+    "./esbuild": "./lib/esbuild/index.js",
+    "./rollup": "./lib/rollup/index.js",
+    "./vite": "./lib/vite/index.js"
+  },
   "files": [
     "lib",
     "src",
@@ -58,6 +64,7 @@
     "css.escape": "^1.5.1",
     "glob": "^8.0.3",
     "htmlparser2": "^8.0.1",
-    "known-css-properties": "^0.25.0"
+    "known-css-properties": "^0.25.0",
+    "postcss": "^8.4.16"
   }
 }

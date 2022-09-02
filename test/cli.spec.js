@@ -17,5 +17,6 @@ const run = (...options) =>
 describe("cli", () => {
   it("show usage when unknown options exists", () => assert.match(run("-a"), /^isaaccss \[/));
   it("default config", () => assert.equal(run(), expected.default));
-  it("no replacements", () => assert.equal(run("-c", resolve("sample/empty.config.js")), expected.noReplacements));
+  it("no replacements", () => assert.equal(run("-c", resolve("sample/isaaccss.config.no-replacements.js")), expected.noReplacements));
+  it("open props", () => assert.equal(run("-c", resolve("sample/isaaccss.config.open-props.js")), expected.openProps));
 });

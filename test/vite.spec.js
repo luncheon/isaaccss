@@ -5,8 +5,10 @@ import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
+import isaaccssPlugin from "isaaccss/vite";
+import OpenProps from "open-props";
+import postcssJitProps from "postcss-jit-props";
 import { build } from "vite";
-import isaaccssPlugin from "../lib/vite/index.js";
 import expected from "./sample/expected.css.js";
 import viteConfig from "./vite.config.js";
 
@@ -26,8 +28,13 @@ describe("vite", () => {
   });
 
   it("no replacements", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ config: { replacements: [] } })] });
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ replacements: [] })] });
     assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.noReplacements);
+  });
+
+  it("open props", async () => {
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ postcss: { plugins: [postcssJitProps(OpenProps)] } })] });
+    assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.openProps);
   });
 
   it("a,b,c", async () => {

@@ -17,4 +17,7 @@ export default {
   get noReplacements() {
     return fs.readFileSync(require.resolve("./expected-no-replacements.css"), "utf8");
   },
+  get openProps() {
+    return fs.readFileSync(require.resolve("./expected-open-props.css"), "utf8");
+  },
 };

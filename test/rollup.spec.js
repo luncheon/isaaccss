@@ -7,9 +7,11 @@ import { fileURLToPath } from "node:url";
 
 import resolve from "@rollup/plugin-node-resolve";
 import sucrase from "@rollup/plugin-sucrase";
+import isaaccssPlugin from "isaaccss/rollup";
+import OpenProps from "open-props";
+import postcssJitProps from "postcss-jit-props";
 import { rollup } from "rollup";
 import css from "rollup-plugin-import-css";
-import isaaccssPlugin from "../lib/rollup/index.js";
 import expected from "./sample/expected.css.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -66,10 +68,19 @@ describe("rollup", () => {
 
   it("no replacements", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin({ config: { replacements: [] } }), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ replacements: [] }), ...plugins] })
         .then(result => result.generate({}))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.noReplacements]
+    );
+  });
+
+  it("open props", async () => {
+    assert.deepEqual(
+      await rollup({ input, plugins: [isaaccssPlugin({ postcss: { plugins: [postcssJitProps(OpenProps)] } }), ...plugins] })
+        .then(result => result.generate({}))
+        .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
+      [2, "a.css", expected.openProps]
     );
   });
 

@@ -1,1 +1,1 @@
-@layer{.--a\:1\?{--a:1}.--b\:2\?{--b:2}}.--c\:3\*:not(#\ ):not(#\ ){--c:3}.d\:4\!:not(#\ ){display:4!important}@media a{@layer{.\@a\/\:b\/c\:0\*\*\!\?:not(#\ ):not(#\ ):b{color:0!important}}}
+@layer{.--a\:1\?{--a:1}.--b\:2\?{--b:2}}.--c\:3\*:not(#\ ):not(#\ ){--c:3}.d\:4\!:not(#\ ){display:4!important}@media a{@layer{.\@a\/\:b\/c\:\$blue-1\*\*\!\?:not(#\ ):not(#\ ):b{color:var(--blue-1)!important}}}

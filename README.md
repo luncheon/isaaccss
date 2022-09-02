@@ -100,6 +100,8 @@ Example configuration script:
 
 ```js
 import { defaultReplacements } from "isaaccss";
+import OpenProps from "open-props";
+import postcssJitProps from "postcss-jit-props";
 
 export default {
   // Whether to pretty-print. Default is `false`.
@@ -108,7 +110,7 @@ export default {
   // Replacements. Default is `defaultReplacements`.
   // But if specified, it will be overwritten.
   replacements: [
-    // Custom replacements.
+    // Custom replacements. For example:
     {
       media: [
         [/\bdark\b/g, "prefers-color-scheme:dark"],
@@ -133,6 +135,12 @@ export default {
     // If you want to extend the default, pass `defaultReplacements`.
     defaultReplacements,
   ],
+
+  // Optional PostCSS config. The only field is `plugins`.
+  // For example, to use Open Props such as `color:$blue-1`:
+  postcss: {
+    plugins: [postcssJitProps(OpenProps)],
+  },
 };
 ```
 
@@ -142,8 +150,7 @@ See [src/replacements/default.ts](https://github.com/luncheon/isaaccss/blob/main
 
 ```js
 import esbuild from "esbuild";
-import isaaccss from "isaaccss/lib/esbuild";
-import { defaultReplacements } from "isaaccss";
+import isaaccss from "isaaccss/esbuild";
 
 esbuild.build({
   entryPoints: ["src/index.ts"],
@@ -158,15 +165,9 @@ esbuild.build({
 
       // Optional isaaccss config.
       // See example configuration scripts in the CLI section above.
-      config: {
-        pretty: true,
-        replacements: [
-          {
-            // Custom replacements...
-          },
-          defaultReplacements,
-        ],
-      },
+      pretty: true,
+      replacements: [],
+      postcss: { plugins: [] },
     }),
   ],
 });
@@ -176,8 +177,7 @@ esbuild.build({
 
 ```js
 // rollup.config.js
-import isaaccss from "isaaccss/lib/rollup";
-import { defaultReplacements } from "isaaccss";
+import isaaccss from "isaaccss/rollup";
 
 /** @type {import("rollup").RollupOptions} */
 export default {
@@ -197,15 +197,9 @@ export default {
 
       // Optional isaaccss config.
       // See example configuration scripts in the CLI section above.
-      config: {
-        pretty: true,
-        replacements: [
-          {
-            // Custom replacements...
-          },
-          defaultReplacements,
-        ],
-      },
+      pretty: true,
+      replacements: [],
+      postcss: { plugins: [] },
     }),
   ],
 };
@@ -216,8 +210,9 @@ When you want to merge other CSS files with isaaccss CSS, use [`rollup-plugin-im
 ```js
 // rollup.config.js
 import css from "rollup-plugin-import-css";
-import isaaccss from "isaaccss/lib/rollup";
+import isaaccss from "isaaccss/rollup";
 
+/** @type {import("rollup").RollupOptions} */
 export default {
   input: "src/index.js",
   output: { file: "dist/index.js" },
@@ -229,7 +224,7 @@ export default {
 
 ```js
 // vite.config.js
-import isaaccssPlugin from "isaaccss/lib/vite/index.js";
+import isaaccssPlugin from "isaaccss/vite";
 
 /** @type {import("vite").UserConfig} */
 export default {

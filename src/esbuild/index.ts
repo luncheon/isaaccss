@@ -1,6 +1,8 @@
 import type { Plugin } from "esbuild";
 import fs from "node:fs/promises";
 import { createRequire } from "node:module";
+import { AcceptedPlugin } from "postcss";
+import { applyPostcss } from "../applyPostcss.js";
 import {
   cssify,
   CssOptions,
@@ -14,11 +16,10 @@ import {
 
 const inject = createRequire(import.meta.url).resolve("./inject.js");
 
-interface IsaaccssEsbuildPluginOptions {
+interface IsaaccssEsbuildPluginOptions extends CssOptions {
   readonly filter?: RegExp;
-  readonly config?: CssOptions & {
-    readonly replacements?: Replacements | readonly Replacements[];
-  };
+  readonly replacements?: Replacements | readonly Replacements[];
+  readonly postcss?: { readonly plugins?: AcceptedPlugin[] };
 }
 
 const parseFile = async (filename: string, options: ParserOptions, classes: Map<string, Style>) => {
@@ -35,7 +36,7 @@ const parseFile = async (filename: string, options: ParserOptions, classes: Map<
 
 const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
   const parserOptions: ParserOptions = {
-    replacements: options?.config?.replacements ? mergeReplacements(options?.config?.replacements) : defaultReplacements,
+    replacements: options?.replacements ? mergeReplacements(options?.replacements) : defaultReplacements,
   };
   return {
     name: "isaaccss",
@@ -72,7 +73,7 @@ const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
           sourcemap: false,
         });
         await Promise.all(promises);
-        css = cssify(classes.values(), options?.config);
+        css = await applyPostcss(cssify(classes.values(), options), options?.postcss);
       });
 
       build.onResolve({ filter: virtualFilter }, ({ path }) => ({ path, namespace: virtualNamespace }));

@@ -9,5 +9,6 @@
     "**/package-lock.json": true,
     "lib/": true
   },
-  "cSpell.words": ["combinators", "cssify", "isaaccss", "positionals"]
+  "cSpell.words": ["combinators", "cssify", "isaaccss", "positionals"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

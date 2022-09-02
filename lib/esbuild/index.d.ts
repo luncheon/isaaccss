@@ -1,9 +1,11 @@
 import type { Plugin } from "esbuild";
+import { AcceptedPlugin } from "postcss";
 import { CssOptions, Replacements } from "../index.node.js";
-interface IsaaccssEsbuildPluginOptions {
+interface IsaaccssEsbuildPluginOptions extends CssOptions {
     readonly filter?: RegExp;
-    readonly config?: CssOptions & {
-        readonly replacements?: Replacements | readonly Replacements[];
+    readonly replacements?: Replacements | readonly Replacements[];
+    readonly postcss?: {
+        readonly plugins?: AcceptedPlugin[];
     };
 }
 declare const _default: {
