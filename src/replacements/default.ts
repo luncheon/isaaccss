@@ -17,47 +17,34 @@ export const abbreviationReplacements: Replacements = {
   property: [
     [/^b$/, "border"],
     [/^bg$/, "background"],
+    [/^c$/, "color"],
     [/^d$/, "display"],
-    [/^f$/, "font"],
+    [/^h$/, "height"],
     [/^m$/, "margin"],
     [/^p$/, "padding"],
+    [/^pos$/, "position"],
+    [/^w$/, "width"],
     [/^z$/, "z-index"],
-
-    [/^a-content$/, "align-content"],
-    [/^a-items$/, "align-items"],
-    [/^a-self$/, "align-self"],
-    [/^j-content$/, "justify-content"],
-    [/^j-items$/, "justify-items"],
-    [/^j-self$/, "justify-self"],
-    [/^p-content$/, "place-content"],
-    [/^p-items$/, "place-items"],
-    [/^p-self$/, "place-self"],
-    [/^v-align$/, "vertical-align"],
-
-    [/\bsz\b/, "size"],
-    [/\bpos\b/, "position"],
-
-    [/\bc$/, "color"],
-    [/\bh$/, "height"],
-    [/\bw$/, "width"],
 
     [/^b-/, "border-"],
     [/^bg-/, "background-"],
-    [/^f-/, "font-"],
     [/^m-/, "margin-"],
     [/^p-/, "padding-"],
-    [/^t-/, "text-"],
 
-    [/-b\b/, "-bottom"],
-    [/-l\b/, "-left"],
-    [/-r\b/, "-right"],
-    [/-t\b/, "-top"],
+    [/-b$/, "-bottom"],
+    [/-c$/, "-color"],
+    [/-h$/, "-height"],
+    [/-l$/, "-left"],
+    [/-r$/, "-right"],
+    [/-t$/, "-top"],
+    [/-pos$/, "-position"],
+    [/-w$/, "-width"],
+
+    [/-b-/, "-bottom-"],
+    [/-l-/, "-left-"],
+    [/-r-/, "-right-"],
+    [/-t-/, "-top-"],
   ],
 };
 
-export const nthChildReplacements: Replacements = {
-  // >1/ >2/ >3/ >2n/ >2n+1/
-  selector: [[/>(-?\d+(?:n(?:\+\d+)?)?)\b/g, ">:nth-child($1)"]],
-};
-
-export const defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements, nthChildReplacements);
+export const defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements);

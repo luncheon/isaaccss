@@ -1,5 +1,5 @@
 /* virtual:isaaccss:css:virtual:isaaccss.css */
-.a-items\:center:not(#\ ) {
+.align-items\:center:not(#\ ) {
   align-items: center;
 }
 .b-c\:\#ccc:not(#\ ) {
@@ -26,25 +26,25 @@
 .flex-direction\:column:not(#\ ) {
   flex-direction: column;
 }
-._textarea\/f-family\:\'Source_Code_Pro\'\,monospace:not(#\ ) textarea {
+._textarea\/font-family\:\'Source_Code_Pro\'\,monospace:not(#\ ) textarea {
   font-family: "Source Code Pro", monospace;
 }
-.f-family\:logo:not(#\ ) {
+.font-family\:logo:not(#\ ) {
   font-family: logo;
 }
-._textarea\/f-sz\:0\.9375rem:not(#\ ) textarea {
+._textarea\/font-size\:0\.9375rem:not(#\ ) textarea {
   font-size: 0.9375rem;
 }
-.f-sz\:1rem:not(#\ ) {
+.font-size\:1rem:not(#\ ) {
   font-size: 1rem;
 }
-.f-sz\:2\.5rem:not(#\ ) {
+.font-size\:2\.5rem:not(#\ ) {
   font-size: 2.5rem;
 }
-.f-style\:oblique:not(#\ ) {
+.font-style\:oblique:not(#\ ) {
   font-style: oblique;
 }
-.f-weight\:bold:not(#\ ) {
+.font-weight\:bold:not(#\ ) {
   font-weight: bold;
 }
 .gap\:1rem:not(#\ ) {

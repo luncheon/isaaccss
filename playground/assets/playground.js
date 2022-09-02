@@ -49634,15 +49634,12 @@ ${rootStack}`;
   };
   var abbreviationReplacements = {
     media: [[/\bh\b/g, "height"], [/\bw\b/g, "width"]],
-    property: [[/^b$/, "border"], [/^bg$/, "background"], [/^d$/, "display"], [/^f$/, "font"], [/^m$/, "margin"], [/^p$/, "padding"], [/^z$/, "z-index"], [/^a-content$/, "align-content"], [/^a-items$/, "align-items"], [/^a-self$/, "align-self"], [/^j-content$/, "justify-content"], [/^j-items$/, "justify-items"], [/^j-self$/, "justify-self"], [/^p-content$/, "place-content"], [/^p-items$/, "place-items"], [/^p-self$/, "place-self"], [/^v-align$/, "vertical-align"], [/\bsz\b/, "size"], [/\bpos\b/, "position"], [/\bc$/, "color"], [/\bh$/, "height"], [/\bw$/, "width"], [/^b-/, "border-"], [/^bg-/, "background-"], [/^f-/, "font-"], [/^m-/, "margin-"], [/^p-/, "padding-"], [/^t-/, "text-"], [/-b\b/, "-bottom"], [/-l\b/, "-left"], [/-r\b/, "-right"], [/-t\b/, "-top"]]
+    property: [[/^b$/, "border"], [/^bg$/, "background"], [/^c$/, "color"], [/^d$/, "display"], [/^h$/, "height"], [/^m$/, "margin"], [/^p$/, "padding"], [/^pos$/, "position"], [/^w$/, "width"], [/^z$/, "z-index"], [/^b-/, "border-"], [/^bg-/, "background-"], [/^m-/, "margin-"], [/^p-/, "padding-"], [/-b$/, "-bottom"], [/-c$/, "-color"], [/-h$/, "-height"], [/-l$/, "-left"], [/-r$/, "-right"], [/-t$/, "-top"], [/-pos$/, "-position"], [/-w$/, "-width"], [/-b-/, "-bottom-"], [/-l-/, "-left-"], [/-r-/, "-right-"], [/-t-/, "-top-"]]
   };
-  var nthChildReplacements = {
-    selector: [[/>(-?\d+(?:n(?:\+\d+)?)?)\b/g, ">:nth-child($1)"]]
-  };
-  var defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements, nthChildReplacements);
+  var defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements);
 
   // src/sample.html
-  var sample_default = '<form onsubmit="arguments[0].preventDefault()">\n  <label class="cursor:pointer user-select:none d:inline-flex a-items:center gap:4px :has(>:checked)/c:rebeccapurple :has(>:checked)/accent-c:rebeccapurple">\n    <input type="checkbox" class="cursor:inherit" />\n    Checkbox\n  </label>\n\n  <button class="--H:210 --S:100% --L:50% p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($H,$S,80%) bg:hsl($H,$S,$L) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1">\n    Submit\n  </button>\n</form>\n';
+  var sample_default = '<form onsubmit="arguments[0].preventDefault()">\n  <label class="cursor:pointer user-select:none d:inline-flex align-items:center gap:4px :has(>:checked)/c:rebeccapurple :has(>:checked)/accent-c:rebeccapurple">\n    <input type="checkbox" class="cursor:inherit" />\n    Checkbox\n  </label>\n\n  <button class="--H:210 --S:100% --L:50% p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($H,$S,80%) bg:hsl($H,$S,$L) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1">\n    Submit\n  </button>\n</form>\n';
 
   // src/App.tsx
   var _tmpl$ = /* @__PURE__ */ template(`<header><h1>isaaccss</h1><h2>playground</h2></header>`, 6);
@@ -49653,9 +49650,9 @@ ${rootStack}`;
   var _tmpl$6 = /* @__PURE__ */ template(`<main></main>`, 2);
   var Header = () => (() => {
     const _el$ = _tmpl$.cloneNode(true), _el$2 = _el$.firstChild, _el$3 = _el$2.nextSibling;
-    className(_el$, is`p-b:1em f-family:logo d:inline-flex flex-direction:column a-items:center`);
-    className(_el$2, is`f-sz:2.5rem f-style:oblique`);
-    className(_el$3, is`f-sz:1rem c:gray letter-spacing:0.375em`);
+    className(_el$, is`p-b:1em font-family:logo d:inline-flex flex-direction:column align-items:center`);
+    className(_el$2, is`font-size:2.5rem font-style:oblique`);
+    className(_el$3, is`font-size:1rem c:gray letter-spacing:0.375em`);
     return _el$;
   })();
   var Details = ({
@@ -49666,7 +49663,7 @@ ${rootStack}`;
     const _el$4 = _tmpl$2.cloneNode(true), _el$5 = _el$4.firstChild, _el$6 = _el$5.nextSibling;
     className(_el$4, is`p:0.5rem box-shadow:0_0_4px_#bbb,_0_2px_8px_#bbb`);
     _el$4.open = open;
-    className(_el$5, is`cursor:pointer user-select:none f-weight:bold`);
+    className(_el$5, is`cursor:pointer user-select:none font-weight:bold`);
     insert(_el$5, summary);
     className(_el$6, is`b-w:1px b-c:#ccc`);
     insert(_el$6, children2);
@@ -49674,7 +49671,7 @@ ${rootStack}`;
   })();
   var Main = () => (() => {
     const _el$7 = _tmpl$6.cloneNode(true);
-    className(_el$7, is`d:flex flex-direction:column gap:1rem _textarea/f-family:'Source_Code_Pro',monospace _textarea/f-sz:0.9375rem`);
+    className(_el$7, is`d:flex flex-direction:column gap:1rem _textarea/font-family:'Source_Code_Pro',monospace _textarea/font-size:0.9375rem`);
     insert(_el$7, createComponent(Details, {
       summary: "HTML",
       open: true,

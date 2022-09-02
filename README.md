@@ -30,7 +30,7 @@ const Button = () => (
   - Media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
   - Specificity can be adjusted
   - Short aliases can be used
-  - [`Content-Security-Policy`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy): no need `style-src 'unsafe-inline'` or `style-src 'nonce-a682b15c'`
+  - [`Content-Security-Policy`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy): no need `'unsafe-inline'` or `'nonce-a682b15c'` for [`style-src`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy/style-src)
 - Unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
   - This is a class name description rule, not a predefined property set, therefore:
     - Less to remember
@@ -123,8 +123,8 @@ export default {
         [/\b:f\b/g, ":focus"],
       ],
       property: [
-        [/^ff$/, "font-family"],
-        [/^fw$/, "font-weight"],
+        [/^items$/, "align-items"],
+        [/^justify$/, "justify-content"],
       ],
       value: [
         [/^abs$/, "absolute"],

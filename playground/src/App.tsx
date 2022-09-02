@@ -5,21 +5,21 @@ import { cssify, defaultReplacements, parseHtml } from "../../src/index.browser.
 import sampleHtml from "./sample.html";
 
 const Header = () => (
-  <header class={is`p-b:1em f-family:logo d:inline-flex flex-direction:column a-items:center`}>
-    <h1 class={is`f-sz:2.5rem f-style:oblique`}>isaaccss</h1>
-    <h2 class={is`f-sz:1rem c:gray letter-spacing:0.375em`}>playground</h2>
+  <header class={is`p-b:1em font-family:logo d:inline-flex flex-direction:column align-items:center`}>
+    <h1 class={is`font-size:2.5rem font-style:oblique`}>isaaccss</h1>
+    <h2 class={is`font-size:1rem c:gray letter-spacing:0.375em`}>playground</h2>
   </header>
 );
 
 const Details = ({ open, summary, children }: { open?: boolean; summary: string; children: JSX.Element }) => (
   <details class={is`p:0.5rem box-shadow:0_0_4px_#bbb,_0_2px_8px_#bbb`} open={open}>
-    <summary class={is`cursor:pointer user-select:none f-weight:bold`}>{summary}</summary>
+    <summary class={is`cursor:pointer user-select:none font-weight:bold`}>{summary}</summary>
     <div class={is`b-w:1px b-c:#ccc`}>{children}</div>
   </details>
 );
 
 const Main = () => (
-  <main class={is`d:flex flex-direction:column gap:1rem _textarea/f-family:'Source_Code_Pro',monospace _textarea/f-sz:0.9375rem`}>
+  <main class={is`d:flex flex-direction:column gap:1rem _textarea/font-family:'Source_Code_Pro',monospace _textarea/font-size:0.9375rem`}>
     <Details summary="HTML" open>
       <textarea rows="10" value={htmlContent()} onInput={e => setHtmlContent(e.currentTarget.value)} />
     </Details>
