@@ -88,9 +88,9 @@ npm i -D isaaccss
 ```
 isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
 
-  --config, -c      Configuration script filename.
-                    If unspecified, "isaaccss.config.js" of the current directory is used.
-  --output, -o      Output css filename. Console if unspecified.
+  -c, --config      Configuration script filename.
+                    If unspecified, "isaaccss.config.mjs" or "isaaccss.config.js" of the current directory is used.
+  -o, --output      Output css filename. Console if unspecified.
   --pretty          Pretty print.
   target            Glob pattern with /\\.html?$/ or /\\.[cm]?[jt]sx?$/ extension.
                     Interactive mode if unspecified.
@@ -115,10 +115,10 @@ export default {
         [/\blight\b/g, "prefers-color-scheme:light"],
       ],
       selector: [
-        [/(^|\b)::a\b/g, "::after"],
-        [/(^|\b)::b\b/g, "::before"],
-        [/(^|\b):h\b/g, ":hover"],
-        [/(^|\b):f\b/g, ":focus"],
+        [/\b::a\b/g, "::after"],
+        [/\b::b\b/g, "::before"],
+        [/\b:h\b/g, ":hover"],
+        [/\b:f\b/g, ":focus"],
       ],
       property: [
         [/^ff$/, "font-family"],
@@ -193,7 +193,7 @@ export default {
 
       // Optional output filename.
       // Default is the output script filename with extension ".css".
-      output: "styles.js",
+      output: "dist/index.css",
 
       // Optional isaaccss config.
       // See example configuration scripts in the CLI section above.
