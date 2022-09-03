@@ -1,7 +1,7 @@
 import assert from "assert/strict";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
-import { describe, it } from "node:test";
+import { it } from "node:test";
 import { fileURLToPath } from "node:url";
 import expected from "./sample/expected.css.js";
 
@@ -14,9 +14,9 @@ const run = (...options) =>
     .toString()
     .trim();
 
-describe("cli", () => {
-  it("show usage when unknown options exists", () => assert.match(run("-a"), /^isaaccss \[/));
-  it("default config", () => assert.equal(run(), expected.default));
-  it("no replacements", () => assert.equal(run("-c", resolve("sample/isaaccss.config.no-replacements.js")), expected.noReplacements));
-  it("open props", () => assert.equal(run("-c", resolve("sample/isaaccss.config.open-props.js")), expected.openProps));
+it("cli", () => {
+  assert.match(run("-a"), /^isaaccss \[/);
+  assert.equal(run(), expected.default);
+  assert.equal(run("-c", resolve("sample/isaaccss.config.no-replacements.js")), expected.noReplacements);
+  assert.equal(run("-c", resolve("sample/isaaccss.config.open-props.js")), expected.openProps);
 });

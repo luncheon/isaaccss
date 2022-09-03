@@ -4,6 +4,10 @@
   "private": true,
   "license": "WTFPL",
   "type": "module",
+  "prettier": {
+    "printWidth": 200,
+    "arrowParens": "avoid"
+  },
   "scripts": {
     "test": "node index.js"
   },

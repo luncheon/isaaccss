@@ -110,30 +110,32 @@ export default {
   // Replacements. Default is `defaultReplacements`.
   // But if specified, it will be overwritten.
   replacements: [
-    // Custom replacements. For example:
-    {
-      media: [
-        [/\bdark\b/g, "prefers-color-scheme:dark"],
-        [/\blight\b/g, "prefers-color-scheme:light"],
-      ],
-      selector: [
-        [/\b::a\b/g, "::after"],
-        [/\b::b\b/g, "::before"],
-        [/\b:h\b/g, ":hover"],
-        [/\b:f\b/g, ":focus"],
-      ],
-      property: [
-        [/^items$/, "align-items"],
-        [/^justify$/, "justify-content"],
-      ],
-      value: [
-        [/^abs$/, "absolute"],
-        [/^rel$/, "relative"],
-      ],
-    },
-
     // If you want to extend the default, pass `defaultReplacements`.
     defaultReplacements,
+
+    // Custom replacements. For example:
+    {
+      media: {
+        dark: "prefers-color-scheme:dark",
+        light: "prefers-color-scheme:light",
+        sm: "640px", // use breakpoints like `@w<sm/d:none`
+        md: "768px",
+      },
+      selector: {
+        "::a": "::after",
+        "::b": "::before",
+        ":f": ":focus",
+        ":h": ":hover",
+      },
+      property: {
+        items: "align-items",
+        justify: "justify-content",
+      },
+      value: {
+        abs: "absolute",
+        rel: "relative",
+      },
+    },
   ],
 
   // Optional PostCSS config. The only field is `plugins`.

@@ -10,21 +10,27 @@ export const mediaOperatorReplacements: Replacements = {
 };
 
 export const abbreviationReplacements: Replacements = {
-  media: [
-    [/\bh\b/g, "height"],
-    [/\bw\b/g, "width"],
-  ],
+  media: {
+    h: "height",
+    "min-h": "min-height",
+    "max-h": "max-height",
+    w: "width",
+    "min-w": "min-width",
+    "max-w": "max-width",
+  },
   property: [
-    [/^b$/, "border"],
-    [/^bg$/, "background"],
-    [/^c$/, "color"],
-    [/^d$/, "display"],
-    [/^h$/, "height"],
-    [/^m$/, "margin"],
-    [/^p$/, "padding"],
-    [/^pos$/, "position"],
-    [/^w$/, "width"],
-    [/^z$/, "z-index"],
+    {
+      b: "border",
+      bg: "background",
+      c: "color",
+      d: "display",
+      h: "height",
+      m: "margin",
+      p: "padding",
+      pos: "position",
+      w: "width",
+      z: "z-index",
+    },
 
     [/^b-/, "border-"],
     [/^bg-/, "background-"],

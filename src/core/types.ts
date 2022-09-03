@@ -1,10 +1,12 @@
-export type ReplacerFunction = (match: [string, ...any[]]) => string;
+export type Replacer = string | Parameters<string["replace"]>[1];
+export type ReplacementElement = { readonly [token in string]: string } | readonly [RegExp, Replacer];
+export type Replacement = ReplacementElement | Replacement[] | undefined | null | false;
 
 export interface Replacements {
-  readonly media?: readonly (readonly [RegExp, string | ReplacerFunction])[];
-  readonly selector?: readonly (readonly [RegExp, string | ReplacerFunction])[];
-  readonly property?: readonly (readonly [RegExp, string])[];
-  readonly value?: readonly (readonly [RegExp, string | ReplacerFunction])[];
+  readonly media?: Replacement;
+  readonly selector?: Replacement;
+  readonly property?: Replacement;
+  readonly value?: Replacement;
 }
 
 export interface ParserOptions {

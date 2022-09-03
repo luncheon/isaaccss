@@ -42431,7 +42431,7 @@ ${" ".repeat(indentSize)}`);
       var STRING_REGEX = /^(['"])((?:\\.|(?!\1)[^\\])*)\1$/;
       var ESCAPE_REGEX = /\\(u[a-f\d]{4}|x[a-f\d]{2}|.)|([^\\])/gi;
       var ESCAPES = /* @__PURE__ */ new Map([["n", "\n"], ["r", "\r"], ["t", "	"], ["b", "\b"], ["f", "\f"], ["v", "\v"], ["0", "\0"], ["\\", "\\"], ["e", "\x1B"], ["a", "\x07"]]);
-      function unescape2(c) {
+      function unescape(c) {
         if (c[0] === "u" && c.length === 5 || c[0] === "x" && c.length === 3) {
           return String.fromCharCode(parseInt(c.slice(1), 16));
         }
@@ -42445,7 +42445,7 @@ ${" ".repeat(indentSize)}`);
           if (!isNaN(chunk)) {
             results.push(Number(chunk));
           } else if (matches = chunk.match(STRING_REGEX)) {
-            results.push(matches[2].replace(ESCAPE_REGEX, (m, escape2, chr) => escape2 ? unescape2(escape2) : chr));
+            results.push(matches[2].replace(ESCAPE_REGEX, (m, escape2, chr) => escape2 ? unescape(escape2) : chr));
           } else {
             throw new Error(`Invalid Chalk template style argument: ${chunk} (in style '${name}')`);
           }
@@ -42495,7 +42495,7 @@ ${" ".repeat(indentSize)}`);
         let chunk = [];
         tmp.replace(TEMPLATE_REGEX, (m, escapeChar, inverse, style, close, chr) => {
           if (escapeChar) {
-            chunk.push(unescape2(escapeChar));
+            chunk.push(unescape(escapeChar));
           } else if (style) {
             const str = chunk.join("");
             chunk = [];
@@ -48010,23 +48010,56 @@ ${rootStack}`;
   init_inject();
   var import_known_css_properties = __toESM(require_known_css_properties(), 1);
   var knownCssPropertySet = new Set(import_known_css_properties.all);
-  var unescape = (s) => s.replace(/\\(.)/g, "$1");
-  var replace = (s, replacements) => {
-    for (const [search, replacer] of replacements ?? []) {
-      s = typeof replacer === "function" ? s.replace(search, (...args) => replacer(args)) : s.replace(search, replacer);
+  var unescapeBackslash = (s) => s.replace(/\\(.)/g, "$1");
+  var unescapeWhitespace = (s) => s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
+  var replaceTokens = (source, replacement, tokenPattern) => {
+    if (!replacement) {
+      return source;
     }
-    return s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
+    if (Array.isArray(replacement)) {
+      if (replacement[0] instanceof RegExp) {
+        return source.replace(replacement[0], replacement[1]);
+      } else {
+        return replacement.reduce((s, r) => replaceTokens(s, r, tokenPattern), source);
+      }
+    }
+    return source.replaceAll(tokenPattern, (token) => replacement[token] ?? token);
   };
-  var transformMedia = (media, replacements) => media && unescape(replace(media, replacements).replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3"));
-  var transformSelector = (selector, replacements) => selector && unescape(replace(selector, replacements));
-  var transformValue = (value, replacements) => unescape(replace(value, replacements).replace(/\$([_a-zA-Z0-9-]*[a-zA-Z0-9])/g, "var(--$1)"));
+  var replaceProperty = (property, replacement) => {
+    if (!replacement) {
+      return property;
+    }
+    if (Array.isArray(replacement)) {
+      if (replacement[0] instanceof RegExp) {
+        return property.replace(replacement[0], replacement[1]);
+      } else {
+        return replacement.reduce(replaceProperty, property);
+      }
+    }
+    return replacement[property] || property;
+  };
+  var transformMedia = (media, replacements) => {
+    media = replaceTokens(media, replacements, /[\w$#-]+/g);
+    media = unescapeWhitespace(media);
+    media = media.replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3");
+    return unescapeBackslash(media);
+  };
+  var transformSelector = (selector, replacements) => {
+    selector = replaceTokens(selector, replacements, /([:>+~_]|::)[\w$#-]+/g);
+    selector = unescapeWhitespace(selector);
+    return unescapeBackslash(selector);
+  };
+  var transformValue = (value, replacements) => {
+    value = replaceTokens(value, replacements, /[\w$#-]+/g);
+    value = unescapeWhitespace(value);
+    value = value.replace(/\$([_a-zA-Z0-9-]*[a-zA-Z0-9])/g, "var(--$1)");
+    return unescapeBackslash(value);
+  };
   var transformProperty = (property, replacements) => {
     if (property.startsWith("--")) {
       return property;
     }
-    for (const [search, replacer] of replacements ?? []) {
-      property = property.replace(search, replacer);
-    }
+    property = replaceProperty(property, replacements);
     if (knownCssPropertySet.has(property)) {
       return property;
     }
@@ -48039,9 +48072,9 @@ ${rootStack}`;
     const property = match && transformProperty(match[3], replacements?.property);
     return property ? {
       className: className2,
-      media: transformMedia(match[1], replacements?.media),
+      media: match[1] ? transformMedia(match[1], replacements?.media) : void 0,
       layer: match[7] === "?" ? "" : void 0,
-      selector: transformSelector(match[2], replacements?.selector),
+      selector: match[2] ? transformSelector(match[2], replacements?.selector) : void 0,
       property,
       value: transformValue(match[4], replacements?.value),
       specificity: (match[7] === "?" ? 0 : 1) + match[5].length,
@@ -49621,10 +49654,10 @@ ${rootStack}`;
   var mergeReplacements = (...replacements) => {
     const rs = [].concat(...replacements);
     return {
-      media: rs.flatMap((r) => r.media ?? []),
-      selector: rs.flatMap((r) => r.selector ?? []),
-      property: rs.flatMap((r) => r.property ?? []),
-      value: rs.flatMap((r) => r.value ?? [])
+      media: rs.map((r) => r.media),
+      selector: rs.map((r) => r.selector),
+      property: rs.map((r) => r.property),
+      value: rs.map((r) => r.value)
     };
   };
 
@@ -49633,8 +49666,26 @@ ${rootStack}`;
     media: [[/!/g, "not "], [/&/g, " and "], [/\|/g, " or "]]
   };
   var abbreviationReplacements = {
-    media: [[/\bh\b/g, "height"], [/\bw\b/g, "width"]],
-    property: [[/^b$/, "border"], [/^bg$/, "background"], [/^c$/, "color"], [/^d$/, "display"], [/^h$/, "height"], [/^m$/, "margin"], [/^p$/, "padding"], [/^pos$/, "position"], [/^w$/, "width"], [/^z$/, "z-index"], [/^b-/, "border-"], [/^bg-/, "background-"], [/^m-/, "margin-"], [/^p-/, "padding-"], [/-b$/, "-bottom"], [/-c$/, "-color"], [/-h$/, "-height"], [/-l$/, "-left"], [/-r$/, "-right"], [/-t$/, "-top"], [/-pos$/, "-position"], [/-w$/, "-width"], [/-b-/, "-bottom-"], [/-l-/, "-left-"], [/-r-/, "-right-"], [/-t-/, "-top-"]]
+    media: {
+      h: "height",
+      "min-h": "min-height",
+      "max-h": "max-height",
+      w: "width",
+      "min-w": "min-width",
+      "max-w": "max-width"
+    },
+    property: [{
+      b: "border",
+      bg: "background",
+      c: "color",
+      d: "display",
+      h: "height",
+      m: "margin",
+      p: "padding",
+      pos: "position",
+      w: "width",
+      z: "z-index"
+    }, [/^b-/, "border-"], [/^bg-/, "background-"], [/^m-/, "margin-"], [/^p-/, "padding-"], [/-b$/, "-bottom"], [/-c$/, "-color"], [/-h$/, "-height"], [/-l$/, "-left"], [/-r$/, "-right"], [/-t$/, "-top"], [/-pos$/, "-position"], [/-w$/, "-width"], [/-b-/, "-bottom-"], [/-l-/, "-left-"], [/-r-/, "-right-"], [/-t-/, "-top-"]]
   };
   var defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements);
 
