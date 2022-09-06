@@ -6,7 +6,7 @@
   "type": "module",
   "prettier": {
     "arrowParens": "avoid",
-    "printWidth": 200,
+    "printWidth": 320,
     "trailingComma": "all"
   },
   "scripts": {

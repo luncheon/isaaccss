@@ -47913,7 +47913,7 @@ ${rootStack}`;
   var mediaSelector = (c) => c.media ?? "";
   var layerSelector = (c) => c.layer;
   var selectorSelector = (c) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
-  var propertySelector = (c) => `${c.property}:${c.value}${c.important ? "!important" : ""}`;
+  var propertiesSelector = (indent, newline) => (c) => c.properties.map((p) => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(newline);
   var cssify = (classes2, options) => {
     const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
     return joinGroup(newline, classes2, mediaSelector, (media, mediaRecords) => {
@@ -47921,9 +47921,10 @@ ${rootStack}`;
       const content = joinGroup(newline, mediaRecords, layerSelector, (layer, layerRecords) => {
         const hasLayer = layer !== void 0;
         const indent2 = indent1 + (hasLayer ? singleIndent : "");
-        const content2 = joinGroup(newline, layerRecords, propertySelector, (propertyList, selectorRecords) => {
+        const indent3 = indent2 + singleIndent;
+        const content2 = joinGroup(newline, layerRecords, propertiesSelector(indent3, newline), (properties, selectorRecords) => {
           const selector = selectorRecords.sort().map(selectorSelector).join(`,${newline}${indent2}`);
-          return `${indent2}${selector}{${newline}${indent2}${singleIndent}${propertyList}${newline}${indent2}}${newline}`;
+          return `${indent2}${selector}{${newline}${properties}${newline}${indent2}}${newline}`;
         });
         return hasLayer ? `${indent1}@layer${layer ? " " : ""}${layer}{${newline}${content2}${indent1}}${newline}` : content2;
       });
@@ -48000,10 +48001,14 @@ ${rootStack}`;
       media: match[1] ? transformMedia(match[1], replacements?.media) : void 0,
       layer: match[7] === "?" ? "" : void 0,
       selector: match[2] ? transformSelector(match[2], replacements?.selector) : void 0,
-      property,
-      value: transformValue(match[4], replacements?.value),
       specificity: (match[7] === "?" ? 0 : 1) + match[5].length,
-      important: match[6] === "!" || void 0
+      properties: [
+        {
+          name: property,
+          value: transformValue(match[4], replacements?.value),
+          important: match[6] === "!"
+        }
+      ]
     } : void 0;
   };
 

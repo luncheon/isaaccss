@@ -77,10 +77,14 @@ export const parseClass = (className: string, options?: ParserOptions) => {
         media: match[1] ? transformMedia(match[1], replacements?.media) : undefined,
         layer: match[7] === "?" ? "" : undefined,
         selector: match[2] ? transformSelector(match[2], replacements?.selector) : undefined,
-        property,
-        value: transformValue(match[4], replacements?.value),
         specificity: (match[7] === "?" ? 0 : 1) + match[5].length,
-        important: match[6] === "!" || undefined,
+        properties: [
+          {
+            name: property,
+            value: transformValue(match[4], replacements?.value),
+            important: match[6] === "!",
+          },
+        ],
       }
     : undefined;
 };

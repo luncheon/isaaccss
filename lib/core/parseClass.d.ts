@@ -4,8 +4,10 @@ export declare const parseClass: (className: string, options?: ParserOptions) =>
     media: string | undefined;
     layer: string | undefined;
     selector: string | undefined;
-    property: string;
-    value: string;
     specificity: number;
-    important: true | undefined;
+    properties: {
+        name: string;
+        value: string;
+        important: boolean;
+    }[];
 } | undefined;

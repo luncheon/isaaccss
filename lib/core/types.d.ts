@@ -25,8 +25,11 @@ export interface Style {
     readonly media?: string;
     readonly layer?: string;
     readonly selector?: string;
-    readonly property: string;
-    readonly value: string;
     readonly specificity?: number;
-    readonly important?: boolean;
+    readonly properties: readonly StyleProperty[];
+}
+export interface StyleProperty {
+    readonly name: string;
+    readonly value: string;
+    readonly important: boolean;
 }
