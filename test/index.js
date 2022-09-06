@@ -1,4 +1,3 @@
-import "./cli.spec.js";
 import "./esbuild.spec.js";
 import "./parseClass.spec.js";
 import "./replacements.spec.js";

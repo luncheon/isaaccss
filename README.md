@@ -83,20 +83,7 @@ npm i -D isaaccss
 
 ## Usage
 
-### CLI
-
-```
-isaaccss [-c config.js] [-o output.css] [--pretty] [target...]
-
-  -c, --config      Configuration script filename.
-                    If unspecified, "isaaccss.config.mjs" or "isaaccss.config.js" of the current directory is used.
-  -o, --output      Output css filename. Console if unspecified.
-  --pretty          Pretty print.
-  target            Glob pattern with /\\.html?$/ or /\\.[cm]?[jt]sx?$/ extension.
-                    Interactive mode if unspecified.
-```
-
-Example configuration script:
+### Configuration Example
 
 ```js
 import { defaultReplacements } from "isaaccss";
@@ -165,8 +152,7 @@ esbuild.build({
       // Optional filename filter. Default is following.
       filter: /\.[cm][jt]x?$/,
 
-      // Optional isaaccss config.
-      // See example configuration scripts in the CLI section above.
+      // Optional isaaccss config. See `Configuration Example` section above.
       pretty: true,
       replacements: [],
       postcss: { plugins: [] },
@@ -197,8 +183,7 @@ export default {
       // Default is the output script filename with extension ".css".
       output: "dist/index.css",
 
-      // Optional isaaccss config.
-      // See example configuration scripts in the CLI section above.
+      // Optional isaaccss config. See `Configuration Example` section above.
       pretty: true,
       replacements: [],
       postcss: { plugins: [] },
