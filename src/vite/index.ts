@@ -30,7 +30,7 @@ const isaaccssVitePlugin = (options?: IsaaccssVitePluginOptions): Plugin[] => {
         if (id.startsWith(virtualCssPrefix) || !filter(id)) {
           return;
         }
-        const result = transform(code, id, transformOptions);
+        const result = transform(code, id, { ...transformOptions, compress: false });
         const css = await applyPostcss(cssify(result.classes.values(), cssifyOptions), options?.postcss);
         if (css) {
           const virtualCss = virtualCssPrefix + id + virtualCssSuffix;
