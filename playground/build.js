@@ -1,10 +1,10 @@
 import esbuild from "esbuild";
 import babel from "esbuild-plugin-babel";
 import pipe from "esbuild-plugin-pipe";
+import isaaccss from "isaaccss/esbuild";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "url";
-import isaaccss from "../lib/esbuild/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = (...pathSegments) => path.resolve(__dirname, ...pathSegments);

@@ -18954,13 +18954,10 @@ Expected ${val.length + 1} quasis but got ${node.quasis.length}`);
         }
       }
       function shouldParenthesizeDecoratorExpression(node) {
-        if (node.type === "CallExpression") {
-          node = node.callee;
-        }
         if (node.type === "ParenthesizedExpression") {
           return false;
         }
-        return !isDecoratorMemberExpression(node);
+        return !isDecoratorMemberExpression(node.type === "CallExpression" ? node.callee : node);
       }
       function Decorator(node) {
         this.tokenChar(64);
@@ -20340,11 +20337,11 @@ Expected ${val.length + 1} quasis but got ${node.quasis.length}`);
         if (this.format.recordAndTupleSyntaxType === "bar") {
           startToken = "{|";
           endToken = "|}";
-        } else if (this.format.recordAndTupleSyntaxType === "hash") {
+        } else if (this.format.recordAndTupleSyntaxType !== "hash" && this.format.recordAndTupleSyntaxType != null) {
+          throw new Error(`The "recordAndTupleSyntaxType" generator option must be "bar" or "hash" (${JSON.stringify(this.format.recordAndTupleSyntaxType)} received).`);
+        } else {
           startToken = "#{";
           endToken = "}";
-        } else {
-          throw new Error(`The "recordAndTupleSyntaxType" generator option must be "bar" or "hash" (${JSON.stringify(this.format.recordAndTupleSyntaxType)} received).`);
         }
         this.token(startToken);
         this.printInnerComments(node);
@@ -22931,6 +22928,7 @@ ${" ".repeat(indentSize)}`);
         DeclarationMissingInitializer: ({
           kind
         }) => `Missing initializer in ${kind} declaration.`,
+        DecoratorArgumentsOutsideParentheses: "Decorator arguments must be moved inside parentheses: use '@(decorator(args))' instead of '@(decorator)(args)'.",
         DecoratorBeforeExport: "Decorators must be placed *before* the 'export' keyword. You can set the 'decoratorsBeforeExport' option to false to use the 'export @decorator class {}' syntax.",
         DecoratorConstructor: "Decorators can't be used with a constructor. Did you mean '@dec class { ... }'?",
         DecoratorExportClass: "Using the export keyword between a decorator and a class is not allowed. Please use `export @dec class` instead.",
@@ -24215,6 +24213,187 @@ ${" ".repeat(indentSize)}`);
       var CLASS_ELEMENT_INSTANCE_GETTER = CLASS_ELEMENT_KIND_GETTER;
       var CLASS_ELEMENT_INSTANCE_SETTER = CLASS_ELEMENT_KIND_SETTER;
       var CLASS_ELEMENT_OTHER = 0;
+      var Scope = class {
+        constructor(flags) {
+          this.var = /* @__PURE__ */ new Set();
+          this.lexical = /* @__PURE__ */ new Set();
+          this.functions = /* @__PURE__ */ new Set();
+          this.flags = flags;
+        }
+      };
+      var ScopeHandler = class {
+        constructor(parser, inModule) {
+          this.parser = void 0;
+          this.scopeStack = [];
+          this.inModule = void 0;
+          this.undefinedExports = /* @__PURE__ */ new Map();
+          this.parser = parser;
+          this.inModule = inModule;
+        }
+        get inFunction() {
+          return (this.currentVarScopeFlags() & SCOPE_FUNCTION) > 0;
+        }
+        get allowSuper() {
+          return (this.currentThisScopeFlags() & SCOPE_SUPER) > 0;
+        }
+        get allowDirectSuper() {
+          return (this.currentThisScopeFlags() & SCOPE_DIRECT_SUPER) > 0;
+        }
+        get inClass() {
+          return (this.currentThisScopeFlags() & SCOPE_CLASS) > 0;
+        }
+        get inClassAndNotInNonArrowFunction() {
+          const flags = this.currentThisScopeFlags();
+          return (flags & SCOPE_CLASS) > 0 && (flags & SCOPE_FUNCTION) === 0;
+        }
+        get inStaticBlock() {
+          for (let i = this.scopeStack.length - 1; ; i--) {
+            const {
+              flags
+            } = this.scopeStack[i];
+            if (flags & SCOPE_STATIC_BLOCK) {
+              return true;
+            }
+            if (flags & (SCOPE_VAR | SCOPE_CLASS)) {
+              return false;
+            }
+          }
+        }
+        get inNonArrowFunction() {
+          return (this.currentThisScopeFlags() & SCOPE_FUNCTION) > 0;
+        }
+        get treatFunctionsAsVar() {
+          return this.treatFunctionsAsVarInScope(this.currentScope());
+        }
+        createScope(flags) {
+          return new Scope(flags);
+        }
+        enter(flags) {
+          this.scopeStack.push(this.createScope(flags));
+        }
+        exit() {
+          this.scopeStack.pop();
+        }
+        treatFunctionsAsVarInScope(scope) {
+          return !!(scope.flags & (SCOPE_FUNCTION | SCOPE_STATIC_BLOCK) || !this.parser.inModule && scope.flags & SCOPE_PROGRAM);
+        }
+        declareName(name, bindingType, loc) {
+          let scope = this.currentScope();
+          if (bindingType & BIND_SCOPE_LEXICAL || bindingType & BIND_SCOPE_FUNCTION) {
+            this.checkRedeclarationInScope(scope, name, bindingType, loc);
+            if (bindingType & BIND_SCOPE_FUNCTION) {
+              scope.functions.add(name);
+            } else {
+              scope.lexical.add(name);
+            }
+            if (bindingType & BIND_SCOPE_LEXICAL) {
+              this.maybeExportDefined(scope, name);
+            }
+          } else if (bindingType & BIND_SCOPE_VAR) {
+            for (let i = this.scopeStack.length - 1; i >= 0; --i) {
+              scope = this.scopeStack[i];
+              this.checkRedeclarationInScope(scope, name, bindingType, loc);
+              scope.var.add(name);
+              this.maybeExportDefined(scope, name);
+              if (scope.flags & SCOPE_VAR)
+                break;
+            }
+          }
+          if (this.parser.inModule && scope.flags & SCOPE_PROGRAM) {
+            this.undefinedExports.delete(name);
+          }
+        }
+        maybeExportDefined(scope, name) {
+          if (this.parser.inModule && scope.flags & SCOPE_PROGRAM) {
+            this.undefinedExports.delete(name);
+          }
+        }
+        checkRedeclarationInScope(scope, name, bindingType, loc) {
+          if (this.isRedeclaredInScope(scope, name, bindingType)) {
+            this.parser.raise(Errors.VarRedeclaration, {
+              at: loc,
+              identifierName: name
+            });
+          }
+        }
+        isRedeclaredInScope(scope, name, bindingType) {
+          if (!(bindingType & BIND_KIND_VALUE))
+            return false;
+          if (bindingType & BIND_SCOPE_LEXICAL) {
+            return scope.lexical.has(name) || scope.functions.has(name) || scope.var.has(name);
+          }
+          if (bindingType & BIND_SCOPE_FUNCTION) {
+            return scope.lexical.has(name) || !this.treatFunctionsAsVarInScope(scope) && scope.var.has(name);
+          }
+          return scope.lexical.has(name) && !(scope.flags & SCOPE_SIMPLE_CATCH && scope.lexical.values().next().value === name) || !this.treatFunctionsAsVarInScope(scope) && scope.functions.has(name);
+        }
+        checkLocalExport(id) {
+          const {
+            name
+          } = id;
+          const topLevelScope = this.scopeStack[0];
+          if (!topLevelScope.lexical.has(name) && !topLevelScope.var.has(name) && !topLevelScope.functions.has(name)) {
+            this.undefinedExports.set(name, id.loc.start);
+          }
+        }
+        currentScope() {
+          return this.scopeStack[this.scopeStack.length - 1];
+        }
+        currentVarScopeFlags() {
+          for (let i = this.scopeStack.length - 1; ; i--) {
+            const {
+              flags
+            } = this.scopeStack[i];
+            if (flags & SCOPE_VAR) {
+              return flags;
+            }
+          }
+        }
+        currentThisScopeFlags() {
+          for (let i = this.scopeStack.length - 1; ; i--) {
+            const {
+              flags
+            } = this.scopeStack[i];
+            if (flags & (SCOPE_VAR | SCOPE_CLASS) && !(flags & SCOPE_ARROW)) {
+              return flags;
+            }
+          }
+        }
+      };
+      var FlowScope = class extends Scope {
+        constructor(...args) {
+          super(...args);
+          this.declareFunctions = /* @__PURE__ */ new Set();
+        }
+      };
+      var FlowScopeHandler = class extends ScopeHandler {
+        createScope(flags) {
+          return new FlowScope(flags);
+        }
+        declareName(name, bindingType, loc) {
+          const scope = this.currentScope();
+          if (bindingType & BIND_FLAGS_FLOW_DECLARE_FN) {
+            this.checkRedeclarationInScope(scope, name, bindingType, loc);
+            this.maybeExportDefined(scope, name);
+            scope.declareFunctions.add(name);
+            return;
+          }
+          super.declareName(name, bindingType, loc);
+        }
+        isRedeclaredInScope(scope, name, bindingType) {
+          if (super.isRedeclaredInScope(scope, name, bindingType))
+            return true;
+          if (bindingType & BIND_FLAGS_FLOW_DECLARE_FN) {
+            return !scope.declareFunctions.has(name) && (scope.lexical.has(name) || scope.functions.has(name));
+          }
+          return false;
+        }
+        checkLocalExport(id) {
+          if (!this.scopeStack[0].declareFunctions.has(id.name)) {
+            super.checkLocalExport(id);
+          }
+        }
+      };
       var BaseParser = class {
         constructor() {
           this.sawUnambiguousESM = false;
@@ -25123,7 +25302,7 @@ ${" ".repeat(indentSize)}`);
           }
           if (next === 123 || next === 91 && this.hasPlugin("recordAndTuple")) {
             this.expectPlugin("recordAndTuple");
-            if (this.getPluginOption("recordAndTuple", "syntaxType") !== "hash") {
+            if (this.getPluginOption("recordAndTuple", "syntaxType") === "bar") {
               throw this.raise(next === 123 ? Errors.RecordExpressionHashIncorrectStartSyntaxType : Errors.TupleExpressionHashIncorrectStartSyntaxType, {
                 at: this.state.curPosition()
               });
@@ -25892,187 +26071,6 @@ ${" ".repeat(indentSize)}`);
           };
         }
       };
-      var Scope = class {
-        constructor(flags) {
-          this.var = /* @__PURE__ */ new Set();
-          this.lexical = /* @__PURE__ */ new Set();
-          this.functions = /* @__PURE__ */ new Set();
-          this.flags = flags;
-        }
-      };
-      var ScopeHandler = class {
-        constructor(parser, inModule) {
-          this.parser = void 0;
-          this.scopeStack = [];
-          this.inModule = void 0;
-          this.undefinedExports = /* @__PURE__ */ new Map();
-          this.parser = parser;
-          this.inModule = inModule;
-        }
-        get inFunction() {
-          return (this.currentVarScopeFlags() & SCOPE_FUNCTION) > 0;
-        }
-        get allowSuper() {
-          return (this.currentThisScopeFlags() & SCOPE_SUPER) > 0;
-        }
-        get allowDirectSuper() {
-          return (this.currentThisScopeFlags() & SCOPE_DIRECT_SUPER) > 0;
-        }
-        get inClass() {
-          return (this.currentThisScopeFlags() & SCOPE_CLASS) > 0;
-        }
-        get inClassAndNotInNonArrowFunction() {
-          const flags = this.currentThisScopeFlags();
-          return (flags & SCOPE_CLASS) > 0 && (flags & SCOPE_FUNCTION) === 0;
-        }
-        get inStaticBlock() {
-          for (let i = this.scopeStack.length - 1; ; i--) {
-            const {
-              flags
-            } = this.scopeStack[i];
-            if (flags & SCOPE_STATIC_BLOCK) {
-              return true;
-            }
-            if (flags & (SCOPE_VAR | SCOPE_CLASS)) {
-              return false;
-            }
-          }
-        }
-        get inNonArrowFunction() {
-          return (this.currentThisScopeFlags() & SCOPE_FUNCTION) > 0;
-        }
-        get treatFunctionsAsVar() {
-          return this.treatFunctionsAsVarInScope(this.currentScope());
-        }
-        createScope(flags) {
-          return new Scope(flags);
-        }
-        enter(flags) {
-          this.scopeStack.push(this.createScope(flags));
-        }
-        exit() {
-          this.scopeStack.pop();
-        }
-        treatFunctionsAsVarInScope(scope) {
-          return !!(scope.flags & (SCOPE_FUNCTION | SCOPE_STATIC_BLOCK) || !this.parser.inModule && scope.flags & SCOPE_PROGRAM);
-        }
-        declareName(name, bindingType, loc) {
-          let scope = this.currentScope();
-          if (bindingType & BIND_SCOPE_LEXICAL || bindingType & BIND_SCOPE_FUNCTION) {
-            this.checkRedeclarationInScope(scope, name, bindingType, loc);
-            if (bindingType & BIND_SCOPE_FUNCTION) {
-              scope.functions.add(name);
-            } else {
-              scope.lexical.add(name);
-            }
-            if (bindingType & BIND_SCOPE_LEXICAL) {
-              this.maybeExportDefined(scope, name);
-            }
-          } else if (bindingType & BIND_SCOPE_VAR) {
-            for (let i = this.scopeStack.length - 1; i >= 0; --i) {
-              scope = this.scopeStack[i];
-              this.checkRedeclarationInScope(scope, name, bindingType, loc);
-              scope.var.add(name);
-              this.maybeExportDefined(scope, name);
-              if (scope.flags & SCOPE_VAR)
-                break;
-            }
-          }
-          if (this.parser.inModule && scope.flags & SCOPE_PROGRAM) {
-            this.undefinedExports.delete(name);
-          }
-        }
-        maybeExportDefined(scope, name) {
-          if (this.parser.inModule && scope.flags & SCOPE_PROGRAM) {
-            this.undefinedExports.delete(name);
-          }
-        }
-        checkRedeclarationInScope(scope, name, bindingType, loc) {
-          if (this.isRedeclaredInScope(scope, name, bindingType)) {
-            this.parser.raise(Errors.VarRedeclaration, {
-              at: loc,
-              identifierName: name
-            });
-          }
-        }
-        isRedeclaredInScope(scope, name, bindingType) {
-          if (!(bindingType & BIND_KIND_VALUE))
-            return false;
-          if (bindingType & BIND_SCOPE_LEXICAL) {
-            return scope.lexical.has(name) || scope.functions.has(name) || scope.var.has(name);
-          }
-          if (bindingType & BIND_SCOPE_FUNCTION) {
-            return scope.lexical.has(name) || !this.treatFunctionsAsVarInScope(scope) && scope.var.has(name);
-          }
-          return scope.lexical.has(name) && !(scope.flags & SCOPE_SIMPLE_CATCH && scope.lexical.values().next().value === name) || !this.treatFunctionsAsVarInScope(scope) && scope.functions.has(name);
-        }
-        checkLocalExport(id) {
-          const {
-            name
-          } = id;
-          const topLevelScope = this.scopeStack[0];
-          if (!topLevelScope.lexical.has(name) && !topLevelScope.var.has(name) && !topLevelScope.functions.has(name)) {
-            this.undefinedExports.set(name, id.loc.start);
-          }
-        }
-        currentScope() {
-          return this.scopeStack[this.scopeStack.length - 1];
-        }
-        currentVarScopeFlags() {
-          for (let i = this.scopeStack.length - 1; ; i--) {
-            const {
-              flags
-            } = this.scopeStack[i];
-            if (flags & SCOPE_VAR) {
-              return flags;
-            }
-          }
-        }
-        currentThisScopeFlags() {
-          for (let i = this.scopeStack.length - 1; ; i--) {
-            const {
-              flags
-            } = this.scopeStack[i];
-            if (flags & (SCOPE_VAR | SCOPE_CLASS) && !(flags & SCOPE_ARROW)) {
-              return flags;
-            }
-          }
-        }
-      };
-      var FlowScope = class extends Scope {
-        constructor(...args) {
-          super(...args);
-          this.declareFunctions = /* @__PURE__ */ new Set();
-        }
-      };
-      var FlowScopeHandler = class extends ScopeHandler {
-        createScope(flags) {
-          return new FlowScope(flags);
-        }
-        declareName(name, bindingType, loc) {
-          const scope = this.currentScope();
-          if (bindingType & BIND_FLAGS_FLOW_DECLARE_FN) {
-            this.checkRedeclarationInScope(scope, name, bindingType, loc);
-            this.maybeExportDefined(scope, name);
-            scope.declareFunctions.add(name);
-            return;
-          }
-          super.declareName(name, bindingType, loc);
-        }
-        isRedeclaredInScope(scope, name, bindingType) {
-          if (super.isRedeclaredInScope(scope, name, bindingType))
-            return true;
-          if (bindingType & BIND_FLAGS_FLOW_DECLARE_FN) {
-            return !scope.declareFunctions.has(name) && (scope.lexical.has(name) || scope.functions.has(name));
-          }
-          return false;
-        }
-        checkLocalExport(id) {
-          if (!this.scopeStack[0].declareFunctions.has(id.name)) {
-            super.checkLocalExport(id);
-          }
-        }
-      };
       var ClassScope = class {
         constructor() {
           this.privateNames = /* @__PURE__ */ new Set();
@@ -26563,7 +26561,7 @@ ${" ".repeat(indentSize)}`);
       var NodePrototype = Node2.prototype;
       {
         NodePrototype.__clone = function() {
-          const newNode = new Node2();
+          const newNode = new Node2(void 0, this.start, this.loc.start);
           const keys = Object.keys(this);
           for (let i = 0, length = keys.length; i < length; i++) {
             const key = keys[i];
@@ -31535,7 +31533,7 @@ ${" ".repeat(indentSize)}`);
                 return this.finishCallExpression(node2, state.optionalChainMember);
               }
               const tokenType = this.state.type;
-              if (tokenType === 48 || tokenType !== 10 && tokenCanStartExpression(tokenType) && !this.hasPrecedingLineBreak()) {
+              if (tokenType === 48 || tokenType === 52 || tokenType !== 10 && tokenCanStartExpression(tokenType) && !this.hasPrecedingLineBreak()) {
                 return;
               }
               const node = this.startNodeAt(startPos, startLoc);
@@ -32724,10 +32722,12 @@ ${" ".repeat(indentSize)}`);
             throw new Error("Cannot use the decorators and decorators-legacy plugin together");
           }
           const decoratorsBeforeExport = getPluginOption(plugins, "decorators", "decoratorsBeforeExport");
-          if (decoratorsBeforeExport == null) {
-            throw new Error("The 'decorators' plugin requires a 'decoratorsBeforeExport' option, whose value must be a boolean. If you are migrating from Babylon/Babel 6 or want to use the old decorators proposal, you should use the 'decorators-legacy' plugin instead of 'decorators'.");
-          } else if (typeof decoratorsBeforeExport !== "boolean") {
+          if (decoratorsBeforeExport != null && typeof decoratorsBeforeExport !== "boolean") {
             throw new Error("'decoratorsBeforeExport' must be a boolean.");
+          }
+          const allowCallParenthesized = getPluginOption(plugins, "decorators", "allowCallParenthesized");
+          if (allowCallParenthesized != null && typeof allowCallParenthesized !== "boolean") {
+            throw new Error("'allowCallParenthesized' must be a boolean.");
           }
         }
         if (hasPlugin(plugins, "flow") && hasPlugin(plugins, "typescript")) {
@@ -32775,8 +32775,8 @@ ${" ".repeat(indentSize)}`);
             }
           }
         }
-        if (hasPlugin(plugins, "recordAndTuple") && !RECORD_AND_TUPLE_SYNTAX_TYPES.includes(getPluginOption(plugins, "recordAndTuple", "syntaxType"))) {
-          throw new Error("'recordAndTuple' requires 'syntaxType' option whose value should be one of: " + RECORD_AND_TUPLE_SYNTAX_TYPES.map((p) => `'${p}'`).join(", "));
+        if (hasPlugin(plugins, "recordAndTuple") && getPluginOption(plugins, "recordAndTuple", "syntaxType") != null && !RECORD_AND_TUPLE_SYNTAX_TYPES.includes(getPluginOption(plugins, "recordAndTuple", "syntaxType"))) {
+          throw new Error("The 'syntaxType' option of the 'recordAndTuple' plugin must be one of: " + RECORD_AND_TUPLE_SYNTAX_TYPES.map((p) => `'${p}'`).join(", "));
         }
         if (hasPlugin(plugins, "asyncDoExpressions") && !hasPlugin(plugins, "doExpressions")) {
           const error = new Error("'asyncDoExpressions' requires 'doExpressions', please add 'doExpressions' to parser plugins.");
@@ -35406,17 +35406,29 @@ ${" ".repeat(indentSize)}`);
               expr = this.parseExpression();
               this.expect(11);
               expr = this.wrapParenthesis(startPos2, startLoc2, expr);
+              const paramsStartLoc = this.state.startLoc;
+              node.expression = this.parseMaybeDecoratorArguments(expr);
+              if (this.getPluginOption("decorators", "allowCallParenthesized") === false && node.expression !== expr) {
+                this.raise(Errors.DecoratorArgumentsOutsideParentheses, {
+                  at: paramsStartLoc
+                });
+              }
             } else {
               expr = this.parseIdentifier(false);
               while (this.eat(16)) {
                 const node2 = this.startNodeAt(startPos, startLoc);
                 node2.object = expr;
-                node2.property = this.parseIdentifier(true);
+                if (this.match(134)) {
+                  this.classScope.usePrivateName(this.state.value, this.state.startLoc);
+                  node2.property = this.parsePrivateName();
+                } else {
+                  node2.property = this.parseIdentifier(true);
+                }
                 node2.computed = false;
                 expr = this.finishNode(node2, "MemberExpression");
               }
+              node.expression = this.parseMaybeDecoratorArguments(expr);
             }
-            node.expression = this.parseMaybeDecoratorArguments(expr);
             this.state.decoratorStack.pop();
           } else {
             node.expression = this.parseExprSubscripts();
@@ -36589,7 +36601,7 @@ ${" ".repeat(indentSize)}`);
             const {
               specifiers
             } = node;
-            if (node.specifiers != null) {
+            if (specifiers != null) {
               const nonDefaultNamedSpecifier = specifiers.find((specifier) => {
                 let imported;
                 if (specifier.type === "ExportSpecifier") {
@@ -37649,76 +37661,6 @@ ${" ".repeat(indentSize)}`);
     }
   });
 
-  // ../node_modules/@babel/traverse/lib/scope/binding.js
-  var require_binding = __commonJS({
-    "../node_modules/@babel/traverse/lib/scope/binding.js"(exports) {
-      "use strict";
-      init_inject();
-      Object.defineProperty(exports, "__esModule", {
-        value: true
-      });
-      exports.default = void 0;
-      var Binding = class {
-        constructor({
-          identifier,
-          scope,
-          path,
-          kind
-        }) {
-          this.identifier = void 0;
-          this.scope = void 0;
-          this.path = void 0;
-          this.kind = void 0;
-          this.constantViolations = [];
-          this.constant = true;
-          this.referencePaths = [];
-          this.referenced = false;
-          this.references = 0;
-          this.identifier = identifier;
-          this.scope = scope;
-          this.path = path;
-          this.kind = kind;
-          this.clearValue();
-        }
-        deoptValue() {
-          this.clearValue();
-          this.hasDeoptedValue = true;
-        }
-        setValue(value) {
-          if (this.hasDeoptedValue)
-            return;
-          this.hasValue = true;
-          this.value = value;
-        }
-        clearValue() {
-          this.hasDeoptedValue = false;
-          this.hasValue = false;
-          this.value = null;
-        }
-        reassign(path) {
-          this.constant = false;
-          if (this.constantViolations.indexOf(path) !== -1) {
-            return;
-          }
-          this.constantViolations.push(path);
-        }
-        reference(path) {
-          if (this.referencePaths.indexOf(path) !== -1) {
-            return;
-          }
-          this.referenced = true;
-          this.references++;
-          this.referencePaths.push(path);
-        }
-        dereference() {
-          this.references--;
-          this.referenced = !!this.references;
-        }
-      };
-      exports.default = Binding;
-    }
-  });
-
   // ../node_modules/@babel/helper-split-export-declaration/lib/index.js
   var require_lib6 = __commonJS({
     "../node_modules/@babel/helper-split-export-declaration/lib/index.js"(exports) {
@@ -37842,7 +37784,6 @@ ${" ".repeat(indentSize)}`);
         value: true
       });
       exports.default = void 0;
-      var _binding = require_binding();
       var _helperSplitExportDeclaration = require_lib6();
       var t2 = require_lib3();
       var _helperEnvironmentVisitor = require_lib7();
@@ -37939,6 +37880,76 @@ ${" ".repeat(indentSize)}`);
         }
       };
       exports.default = Renamer;
+    }
+  });
+
+  // ../node_modules/@babel/traverse/lib/scope/binding.js
+  var require_binding = __commonJS({
+    "../node_modules/@babel/traverse/lib/scope/binding.js"(exports) {
+      "use strict";
+      init_inject();
+      Object.defineProperty(exports, "__esModule", {
+        value: true
+      });
+      exports.default = void 0;
+      var Binding = class {
+        constructor({
+          identifier,
+          scope,
+          path,
+          kind
+        }) {
+          this.identifier = void 0;
+          this.scope = void 0;
+          this.path = void 0;
+          this.kind = void 0;
+          this.constantViolations = [];
+          this.constant = true;
+          this.referencePaths = [];
+          this.referenced = false;
+          this.references = 0;
+          this.identifier = identifier;
+          this.scope = scope;
+          this.path = path;
+          this.kind = kind;
+          this.clearValue();
+        }
+        deoptValue() {
+          this.clearValue();
+          this.hasDeoptedValue = true;
+        }
+        setValue(value) {
+          if (this.hasDeoptedValue)
+            return;
+          this.hasValue = true;
+          this.value = value;
+        }
+        clearValue() {
+          this.hasDeoptedValue = false;
+          this.hasValue = false;
+          this.value = null;
+        }
+        reassign(path) {
+          this.constant = false;
+          if (this.constantViolations.indexOf(path) !== -1) {
+            return;
+          }
+          this.constantViolations.push(path);
+        }
+        reference(path) {
+          if (this.referencePaths.indexOf(path) !== -1) {
+            return;
+          }
+          this.referenced = true;
+          this.references++;
+          this.referencePaths.push(path);
+        }
+        dereference() {
+          this.references--;
+          this.referenced = !!this.references;
+        }
+      };
+      exports.default = Binding;
     }
   });
 
@@ -40441,7 +40452,6 @@ ${" ".repeat(indentSize)}`);
       exports.isAncestor = isAncestor;
       exports.isDescendant = isDescendant;
       var _t = require_lib3();
-      var _index = require_path();
       var {
         VISITOR_KEYS
       } = _t;
@@ -43316,17 +43326,17 @@ ${frame}`;
               return deopt(prop, state);
             }
             const keyPath = prop.get("key");
-            let key = keyPath;
+            let key;
             if (prop.node.computed) {
-              key = key.evaluate();
+              key = keyPath.evaluate();
               if (!key.confident) {
                 return deopt(key.deopt, state);
               }
               key = key.value;
-            } else if (key.isIdentifier()) {
-              key = key.node.name;
+            } else if (keyPath.isIdentifier()) {
+              key = keyPath.node.name;
             } else {
-              key = key.node.value;
+              key = keyPath.node.value;
             }
             const valuePath = prop.get("value");
             let value = valuePath.evaluate();
@@ -45451,7 +45461,6 @@ ${rootStack}`;
         value: true
       });
       exports.hooks = void 0;
-      var _ = require_path();
       var hooks = [function(self2, parent) {
         const removeParent = self2.key === "test" && (parent.isWhile() || parent.isSwitchCase()) || self2.key === "declaration" && parent.isExportDeclaration() || self2.key === "body" && parent.isLabeledStatement() || self2.listKey === "declarations" && parent.isVariableDeclaration() && parent.node.declarations.length === 1 || self2.key === "expression" && parent.isExpressionStatement();
         if (removeParent) {
@@ -47836,7 +47845,7 @@ ${rootStack}`;
         if (unwrap) {
           while (typeof item === "function")
             item = item();
-          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], prev) || dynamic;
+          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], Array.isArray(prev) ? prev : [prev]) || dynamic;
         } else {
           normalized.push(item);
           dynamic = true;
