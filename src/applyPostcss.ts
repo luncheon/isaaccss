@@ -7,7 +7,7 @@ export const applyPostcss = async (css: string, options: undefined | { readonly 
     return css;
   }
   try {
-    const processed = await postcss(options.plugins).process(css);
+    const processed = await postcss(options.plugins).process(css, { from: undefined });
     processed.warnings().forEach(warn => console.warn(warn.toString()));
     return processed.css;
   } catch (error) {

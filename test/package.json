@@ -5,8 +5,9 @@
   "license": "WTFPL",
   "type": "module",
   "prettier": {
+    "arrowParens": "avoid",
     "printWidth": 200,
-    "arrowParens": "avoid"
+    "trailingComma": "all"
   },
   "scripts": {
     "test": "node index.js"

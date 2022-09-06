@@ -12,6 +12,11 @@ export interface Replacements {
 export interface ParserOptions {
     readonly replacements?: Replacements;
 }
+export interface TransformOptions extends ParserOptions {
+    readonly compress?: boolean | {
+        readonly prefix?: string;
+    };
+}
 export interface CssOptions {
     readonly pretty?: boolean;
 }

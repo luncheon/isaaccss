@@ -1,4 +1,4 @@
-import type { Plugin } from "esbuild";
+import type { OnLoadArgs, OnLoadResult, Plugin, PluginBuild } from "esbuild";
 import fs from "node:fs/promises";
 import { createRequire } from "node:module";
 import { AcceptedPlugin } from "postcss";
@@ -8,74 +8,78 @@ import {
   CssOptions,
   defaultReplacements,
   mergeReplacements,
-  ParserOptions,
-  parseTaggedTemplates,
   Replacements,
   Style,
+  TransformOptions,
+  transformTaggedTemplates,
 } from "../index.node.js";
 
 const inject = createRequire(import.meta.url).resolve("./inject.js");
 
 interface IsaaccssEsbuildPluginOptions extends CssOptions {
   readonly filter?: RegExp;
+  readonly compress?: boolean | { readonly prefix?: string };
   readonly replacements?: Replacements | readonly Replacements[];
   readonly postcss?: { readonly plugins?: AcceptedPlugin[] };
 }
 
-const parseFile = async (filename: string, options: ParserOptions, classes: Map<string, Style>) => {
-  const match = filename.match(/\.[cm]?([jt])s(x?)$/);
-  if (match) {
-    const babelParserPlugins = [...(match[2] ? ["jsx" as const] : []), ...(match[1] === "t" ? ["typescript" as const] : [])];
-    const [, invalidClasses] = parseTaggedTemplates(await fs.readFile(filename, "utf8"), options, babelParserPlugins, classes);
-    invalidClasses.forEach((nodes, className) => {
-      const start = nodes[0].loc?.start;
-      console.warn(`isaaccss: ${filename}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
-    });
-  }
-};
+interface EsbuildPipeablePlugin extends Plugin {
+  setup(build: PluginBuild, pipe: { transform: { args: OnLoadArgs; contents: string } }): OnLoadResult | undefined;
+  setup(build: PluginBuild): void;
+}
 
-const plugin = (options?: IsaaccssEsbuildPluginOptions): Plugin => {
-  const parserOptions: ParserOptions = {
+const pathToLoader = (path: string) =>
+  `${path.endsWith("ts") || path.endsWith("tsx") ? "t" : "j"}s${path.endsWith("x") ? "x" : ""}` as const;
+const pathToBabelParserPlugin = (path: string) => [
+  ...(path.endsWith("ts") || path.endsWith("tsx") ? ["typescript" as const] : []),
+  ...(path.endsWith("x") ? ["jsx" as const] : []),
+];
+
+const plugin = (options?: IsaaccssEsbuildPluginOptions): EsbuildPipeablePlugin => {
+  const filter = options?.filter ?? /\.[cm]?[jt]sx?$/;
+  const transformOptions: TransformOptions = {
+    compress: options?.compress,
     replacements: options?.replacements ? mergeReplacements(options?.replacements) : defaultReplacements,
   };
+  const transformedCodeMap = new Map<string, string>();
   return {
     name: "isaaccss",
-    setup: async build => {
+    setup(build: PluginBuild, pipe?: { transform: { args: OnLoadArgs; contents: string } }) {
+      if (pipe?.transform) {
+        const path = pipe.transform.args.path;
+        return { contents: transformedCodeMap.get(path) ?? pipe.transform.contents, loader: pathToLoader(path) };
+      }
+
       const virtualFilter = /^virtual:isaaccss\.css$/;
       const virtualNamespace = "virtual:isaaccss:css";
 
       let css: string | undefined;
       build.onStart(async () => {
+        transformedCodeMap.clear();
         const classes = new Map<string, Style>();
-        const promises: Promise<void>[] = [];
-        const resolving = Symbol();
+        const promises: Promise<unknown>[] = [];
+        const load = async (path: string) => {
+          const code = await fs.readFile(path, "utf8");
+          const transformed = transformTaggedTemplates(code, path, transformOptions, pathToBabelParserPlugin(path), classes);
+          transformedCodeMap.set(path, transformed.code);
+        };
         const plugin: Plugin = {
           name: "isaaccss:prebuild",
           setup: build => {
-            build.onResolve({ filter: /.*/ }, async ({ path, ...args }) => {
-              if (args.pluginData !== resolving) {
-                const resolved = await build.resolve(path, { ...args, pluginData: resolving });
-                if (resolved.errors.length === 0 && (!options?.filter || options.filter.test(resolved.path))) {
-                  promises.push(parseFile(resolved.path, parserOptions, classes));
-                }
-              }
-              return undefined;
-            });
+            build.onLoad({ filter }, ({ path }) => void promises.push(load(path)));
             build.onResolve({ filter: virtualFilter }, ({ path }) => ({ path, namespace: virtualNamespace }));
             build.onLoad({ filter: virtualFilter, namespace: virtualNamespace }, () => ({ contents: "", loader: "js" }));
           },
         };
-
-        await build.esbuild.build({
-          ...build.initialOptions,
-          plugins: [plugin],
-          write: false,
-          sourcemap: false,
-        });
+        await build.esbuild.build({ ...build.initialOptions, plugins: [plugin], write: false, sourcemap: false, logLevel: "error" });
         await Promise.all(promises);
         css = await applyPostcss(cssify(classes.values(), options), options?.postcss);
       });
 
+      build.onLoad({ filter }, async ({ path }) => ({
+        contents: transformedCodeMap.get(path) ?? (await fs.readFile(path, "utf8")),
+        loader: pathToLoader(path),
+      }));
       build.onResolve({ filter: virtualFilter }, ({ path }) => ({ path, namespace: virtualNamespace }));
       build.onLoad({ filter: virtualFilter, namespace: virtualNamespace }, () => ({ contents: css, loader: "css" }));
     },

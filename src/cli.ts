@@ -14,8 +14,8 @@ import {
   parseClass,
   parseHtml,
   ParserOptions,
-  parseTaggedTemplates,
   Style,
+  transformTaggedTemplates,
 } from "./index.node.js";
 
 const defaultConfigFilename = ["isaaccss.config.mjs", "isaaccss.config.js"];
@@ -49,22 +49,19 @@ const resolveConfig = async (args: { config?: string; pretty?: boolean }): Promi
   };
 };
 
-const parseFile = async (filename: string, config?: ParserOptions, collectTo = new Map<string, Style>()) => {
+const parseFile = async (filename: string, config?: ParserOptions, classes = new Map<string, Style>()) => {
   if (/\.html?/.test(filename)) {
-    return parseHtml(await fs.promises.readFile(filename, "utf8"), config, collectTo);
+    return parseHtml(await fs.promises.readFile(filename, "utf8"), config, classes);
   }
   const match = filename.match(/\.[cm]?([jt])s(x?)/);
   if (match) {
     const babelParserPlugins = [...(match[2] ? ["jsx" as const] : []), ...(match[1] === "t" ? ["typescript" as const] : [])];
-    const [, invalidClasses] = parseTaggedTemplates(await fs.promises.readFile(filename, "utf8"), config, babelParserPlugins, collectTo);
-    invalidClasses.forEach((nodes, className) => {
-      const start = nodes[0].loc?.start;
-      console.warn(`isaaccss: ${filename}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
-    });
+    const code = await fs.promises.readFile(filename, "utf8");
+    transformTaggedTemplates(code, filename, config, babelParserPlugins, classes);
   } else {
     console.warn(`ignore file: ${filename}`);
   }
-  return collectTo;
+  return classes;
 };
 
 const interact = async (config: ResolvedConfig) => {

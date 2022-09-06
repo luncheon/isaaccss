@@ -6,6 +6,7 @@ export interface IsaaccssRollupPluginOptions extends CssOptions {
     readonly include: FilterPattern;
     readonly exclude: FilterPattern;
     readonly output?: string;
+    readonly compress?: boolean;
     readonly replacements?: Replacements | readonly Replacements[];
     readonly postcss?: {
         readonly plugins?: AcceptedPlugin[];
@@ -13,7 +14,8 @@ export interface IsaaccssRollupPluginOptions extends CssOptions {
 }
 export declare const resolveIsaaccssRollupPluginOptions: (options?: IsaaccssRollupPluginOptions) => {
     filter: (id: unknown) => boolean;
-    parserOptions: {
+    transformOptions: {
+        compress: boolean | undefined;
         replacements: Replacements;
     };
     cssifyOptions: IsaaccssRollupPluginOptions | undefined;

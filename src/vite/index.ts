@@ -1,6 +1,6 @@
 import type { Plugin } from "vite";
 import { applyPostcss } from "../applyPostcss.js";
-import { cssify, parseTaggedTemplates } from "../index.node.js";
+import { cssify, transformTaggedTemplates } from "../index.node.js";
 import isaaccssRollupPlugin, { IsaaccssRollupPluginOptions, resolveIsaaccssRollupPluginOptions } from "../rollup/index.js";
 
 export interface IsaaccssVitePluginOptions extends IsaaccssRollupPluginOptions {}
@@ -17,7 +17,7 @@ const isaaccssVitePlugin = (options?: IsaaccssVitePluginOptions): Plugin[] => {
     });
   }
   {
-    const { filter, parserOptions, cssifyOptions } = resolveIsaaccssRollupPluginOptions(options);
+    const { filter, transformOptions, cssifyOptions } = resolveIsaaccssRollupPluginOptions(options);
     const cssMap = new Map<string, string>();
     const virtualCssPrefix = "virtual:isaaccss:";
     const virtualCssSuffix = ".css";
@@ -30,17 +30,13 @@ const isaaccssVitePlugin = (options?: IsaaccssVitePluginOptions): Plugin[] => {
         if (id.startsWith(virtualCssPrefix) || !filter(id)) {
           return;
         }
-        const [classes, invalidClasses] = parseTaggedTemplates(code, parserOptions);
-        const css = await applyPostcss(cssify(classes.values(), cssifyOptions), options?.postcss);
+        const result = transformTaggedTemplates(code, id, transformOptions);
+        const css = await applyPostcss(cssify(result.classes.values(), cssifyOptions), options?.postcss);
         if (css) {
           const virtualCss = virtualCssPrefix + id + virtualCssSuffix;
           cssMap.set(virtualCss, css);
-          return `import "${virtualCss}";${code}`;
+          return `import "${virtualCss}";${result.code}`;
         }
-        invalidClasses.forEach((nodes, className) => {
-          const start = nodes[0].loc?.start;
-          console.warn(`isaaccss: ${id}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
-        });
       },
     });
   }

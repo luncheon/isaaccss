@@ -1,5 +1,6 @@
 import esbuild from "esbuild";
 import babel from "esbuild-plugin-babel";
+import pipe from "esbuild-plugin-pipe";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "url";
@@ -8,6 +9,8 @@ import isaaccss from "../lib/esbuild/index.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = (...pathSegments) => path.resolve(__dirname, ...pathSegments);
 const resolveOutput = (...pathSegments) => resolve("assets", ...pathSegments);
+
+const isaaccssInstance = isaaccss.plugin();
 
 /** @type esbuild.BuildOptions */
 const buildOptions = {
@@ -20,14 +23,11 @@ const buildOptions = {
   inject: [isaaccss.inject],
   define: { "process.env.BABEL_TYPES_8_BREAKING": false, "process.platform": "''", "Buffer.isBuffer": "Function" },
   plugins: [
-    isaaccss.plugin({
+    pipe({
       filter: /\.tsx$/,
-      config: { pretty: true },
+      plugins: [isaaccssInstance, babel({ config: { presets: ["@babel/preset-typescript", "babel-preset-solid"] } })],
     }),
-    babel({
-      filter: /\.[cm]?([jt])s(x?)$/,
-      config: { presets: ["@babel/preset-typescript", "babel-preset-solid"] },
-    }),
+    isaaccssInstance,
   ],
 };
 

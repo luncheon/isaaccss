@@ -68,7 +68,7 @@ export const parseClass = (className: string, options?: ParserOptions) => {
   const replacements = options?.replacements;
   const match = className.match(
     // @media/                   selector/                property:value specificity
-    /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/
+    /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/,
   );
   const property = match && transformProperty(match[3], replacements?.property);
   return property
