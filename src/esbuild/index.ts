@@ -10,8 +10,8 @@ import {
   mergeReplacements,
   Replacements,
   Style,
+  transform,
   TransformOptions,
-  transformTaggedTemplates,
 } from "../index.node.js";
 
 const inject = createRequire(import.meta.url).resolve("./inject.js");
@@ -60,7 +60,7 @@ const plugin = (options?: IsaaccssEsbuildPluginOptions): EsbuildPipeablePlugin =
         const promises: Promise<unknown>[] = [];
         const load = async (path: string) => {
           const code = await fs.readFile(path, "utf8");
-          const transformed = transformTaggedTemplates(code, path, transformOptions, pathToBabelParserPlugin(path), classes);
+          const transformed = transform(code, path, transformOptions, pathToBabelParserPlugin(path), classes);
           transformedCodeMap.set(path, transformed.code);
         };
         const plugin: Plugin = {

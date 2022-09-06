@@ -24,7 +24,7 @@ const nthWordSequence = (chars: string) => (n: number) => {
 
 const compressClassName = nthWordSequence("abcdefghijklmnopqrstuvwxyz0123456789_");
 
-export const transformTaggedTemplates = (
+export const transform = (
   code: string,
   filename: string,
   options?: TransformOptions,

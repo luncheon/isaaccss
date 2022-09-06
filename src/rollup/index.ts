@@ -2,15 +2,7 @@ import { createFilter, FilterPattern } from "@rollup/pluginutils";
 import { AcceptedPlugin } from "postcss";
 import type { Plugin } from "rollup";
 import { applyPostcss } from "../applyPostcss.js";
-import {
-  cssify,
-  CssOptions,
-  defaultReplacements,
-  mergeReplacements,
-  Replacements,
-  Style,
-  transformTaggedTemplates,
-} from "../index.node.js";
+import { cssify, CssOptions, defaultReplacements, mergeReplacements, Replacements, Style, transform } from "../index.node.js";
 
 export interface IsaaccssRollupPluginOptions extends CssOptions {
   readonly include: FilterPattern;
@@ -42,7 +34,7 @@ const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => 
       order: "post",
       handler(code, id) {
         if (filter(id)) {
-          return transformTaggedTemplates(code, id, transformOptions, undefined, classes).code;
+          return transform(code, id, transformOptions, undefined, classes).code;
         }
       },
     },

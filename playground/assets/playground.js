@@ -49524,7 +49524,7 @@ ${rootStack}`;
     return collectTo;
   };
 
-  // ../src/core/transformTaggedTemplates.ts
+  // ../src/core/transform.ts
   init_inject();
   var import_generator = __toESM(require_lib4(), 1);
   var import_parser = __toESM(require_lib5(), 1);

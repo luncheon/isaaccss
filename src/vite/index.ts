@@ -1,6 +1,6 @@
 import type { Plugin } from "vite";
 import { applyPostcss } from "../applyPostcss.js";
-import { cssify, transformTaggedTemplates } from "../index.node.js";
+import { cssify, transform } from "../index.node.js";
 import isaaccssRollupPlugin, { IsaaccssRollupPluginOptions, resolveIsaaccssRollupPluginOptions } from "../rollup/index.js";
 
 export interface IsaaccssVitePluginOptions extends IsaaccssRollupPluginOptions {}
@@ -30,7 +30,7 @@ const isaaccssVitePlugin = (options?: IsaaccssVitePluginOptions): Plugin[] => {
         if (id.startsWith(virtualCssPrefix) || !filter(id)) {
           return;
         }
-        const result = transformTaggedTemplates(code, id, transformOptions);
+        const result = transform(code, id, transformOptions);
         const css = await applyPostcss(cssify(result.classes.values(), cssifyOptions), options?.postcss);
         if (css) {
           const virtualCss = virtualCssPrefix + id + virtualCssSuffix;
