@@ -1,6 +1,6 @@
 {
   "name": "isaaccss",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Inline-Style-as-a-Class CSS engine",
   "license": "WTFPL",
   "bin": "lib/cli.js",
