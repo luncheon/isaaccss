@@ -1,1 +1,1 @@
-@layer{.--a\:1\?{--a:1}.--b\:2\?{--b:2}}.--c\:3\*:not(#\ ):not(#\ ){--c:3}.d\:4\!:not(#\ ){d:4!important}
+@layer{.color\:\#0ff\?{color:#0ff}}.--a\:\$blue-1:not(#\ ){--a:var(--blue-1)}.d\:grid:not(#\ ){d:grid}.d\:none:not(#\ ){d:none}@media (w<100px){.\@w\<100px\/background\:hsl\(0\,100\%\,50\%\)\*:not(#\ ):not(#\ ){background:hsl(0,100%,50%)}}

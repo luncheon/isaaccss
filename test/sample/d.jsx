@@ -1,3 +1,6 @@
 import { is } from "isaaccss";
 
-export const d = () => <div className={is`d:4!`} />;
+// jsx syntax
+const D = () => <div />;
+
+export const d = show => is`${show ? "d:grid" : `d:none`}`

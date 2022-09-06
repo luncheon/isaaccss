@@ -16,7 +16,7 @@ import {
 
 const inject = createRequire(import.meta.url).resolve("./inject.js");
 
-interface IsaaccssEsbuildPluginOptions extends CssOptions {
+export interface IsaaccssEsbuildPluginOptions extends CssOptions {
   readonly filter?: RegExp;
   readonly compress?: boolean | { readonly prefix?: string };
   readonly replacements?: Replacements | readonly Replacements[];

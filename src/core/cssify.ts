@@ -14,7 +14,7 @@ const joinGroup = <T, K>(
   separator: string,
   array: readonly T[] | Iterable<T>,
   groupKeySelector: (element: T) => K,
-  joinedValueSelector: (key: K, elements: T[]) => string
+  joinedValueSelector: (key: K, elements: T[]) => string,
 ) => {
   const grouped = groupToMap(array, groupKeySelector);
   return [...grouped.keys()]
@@ -41,6 +41,6 @@ export const cssify = (classes: Iterable<Style>, options?: CssOptions): string =
       });
       return hasLayer ? `${indent1}@layer${layer ? " " : ""}${layer}{${newline}${content}${indent1}}${newline}` : content;
     });
-    return media ? `@media${media.startsWith("(") ? "" : " "}${media}{${newline}${content}}${newline}` : content;
+    return media ? `@media ${media}{${newline}${content}}${newline}` : content;
   });
 };

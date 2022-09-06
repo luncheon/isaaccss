@@ -1,68 +1,68 @@
 /* virtual:isaaccss:css:virtual:isaaccss.css */
-.align-items\:center:not(#\ ) {
+.\#f:not(#\ ) {
   align-items: center;
 }
-.b-c\:\#ccc:not(#\ ) {
+.\#r:not(#\ ) {
   border-color: #ccc;
 }
-.b-w\:1px:not(#\ ) {
+.\#q:not(#\ ) {
   border-width: 1px;
 }
-.box-shadow\:0_0_4px_\#bbb\,_0_2px_8px_\#bbb:not(#\ ) {
+.\#m:not(#\ ) {
   box-shadow: 0 0 4px #bbb, 0 2px 8px #bbb;
 }
-.c\:gray:not(#\ ) {
+.\#j:not(#\ ) {
   color: gray;
 }
-.cursor\:pointer:not(#\ ) {
+.\#n:not(#\ ) {
   cursor: pointer;
 }
-.d\:flex:not(#\ ) {
+.\#s:not(#\ ) {
   display: flex;
 }
-.d\:inline-flex:not(#\ ) {
+.\#d:not(#\ ) {
   display: inline-flex;
 }
-.flex-direction\:column:not(#\ ) {
+.\#e:not(#\ ) {
   flex-direction: column;
 }
-._textarea\/font-family\:\'Source_Code_Pro\'\,monospace:not(#\ ) textarea {
+.\#u:not(#\ ) textarea {
   font-family: "Source Code Pro", monospace;
 }
-.font-family\:logo:not(#\ ) {
+.\#c:not(#\ ) {
   font-family: logo;
 }
-._textarea\/font-size\:0\.9375rem:not(#\ ) textarea {
+.\#v:not(#\ ) textarea {
   font-size: 0.9375rem;
 }
-.font-size\:1rem:not(#\ ) {
+.\#i:not(#\ ) {
   font-size: 1rem;
 }
-.font-size\:2\.5rem:not(#\ ) {
+.\#g:not(#\ ) {
   font-size: 2.5rem;
 }
-.font-style\:oblique:not(#\ ) {
+.\#h:not(#\ ) {
   font-style: oblique;
 }
-.font-weight\:bold:not(#\ ) {
+.\#p:not(#\ ) {
   font-weight: bold;
 }
-.gap\:1rem:not(#\ ) {
+.\#t:not(#\ ) {
   gap: 1rem;
 }
-.letter-spacing\:0\.375em:not(#\ ) {
+.\#k:not(#\ ) {
   letter-spacing: 0.375em;
 }
-.p-b\:1em:not(#\ ) {
+.\#b:not(#\ ) {
   padding-bottom: 1em;
 }
-.p\:0\.5rem:not(#\ ) {
+.\#l:not(#\ ) {
   padding: 0.5rem;
 }
-.p\:1rem:not(#\ ) {
+.\#a:not(#\ ) {
   padding: 1rem;
 }
-.user-select\:none:not(#\ ) {
+.\#o:not(#\ ) {
   user-select: none;
 }
 

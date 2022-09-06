@@ -7020,12 +7020,12 @@
       Object.defineProperty(exports, "__esModule", {
         value: true
       });
-      exports.default = is2;
+      exports.default = is;
       var _shallowEqual = require_shallowEqual();
       var _isType = require_isType();
       var _isPlaceholderType = require_isPlaceholderType();
       var _definitions = require_definitions();
-      function is2(type, node, opts) {
+      function is(type, node, opts) {
         if (!node)
           return false;
         const matches = (0, _isType.default)(node.type, type);
@@ -44856,8 +44856,8 @@ ${rootStack}`;
       function isStatic() {
         return this.scope.isStatic(this.node);
       }
-      var is2 = has;
-      exports.is = is2;
+      var is = has;
+      exports.is = is;
       function isnt(key) {
         return !this.has(key);
       }
@@ -47701,12 +47701,6 @@ ${rootStack}`;
     else
       node.setAttribute(name, value);
   }
-  function className(node, value) {
-    if (value == null)
-      node.removeAttribute("class");
-    else
-      node.className = value;
-  }
   function insert(parent, accessor, marker, initial) {
     if (marker !== void 0 && !initial)
       initial = [];
@@ -47883,10 +47877,6 @@ ${rootStack}`;
     return [node];
   }
 
-  // ../index.js
-  init_inject();
-  var is = String.raw;
-
   // src/App.tsx
   init_inject();
 
@@ -47928,7 +47918,7 @@ ${rootStack}`;
         });
         return hasLayer ? `${indent1}@layer${layer ? " " : ""}${layer}{${newline}${content2}${indent1}}${newline}` : content2;
       });
-      return media ? `@media${media.startsWith("(") ? "" : " "}${media}{${newline}${content}}${newline}` : content;
+      return media ? `@media ${media}{${newline}${content}}${newline}` : content;
     });
   };
 
@@ -47990,14 +47980,14 @@ ${rootStack}`;
       return property;
     }
   };
-  var parseClass = (className2, options) => {
+  var parseClass = (className, options) => {
     const replacements = options?.replacements;
-    const match = className2.match(
+    const match = className.match(
       /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/
     );
     const property = match && transformProperty(match[3], replacements?.property);
     return property ? {
-      className: className2,
+      className,
       media: match[1] ? transformMedia(match[1], replacements?.media) : void 0,
       layer: match[7] === "?" ? "" : void 0,
       selector: match[2] ? transformSelector(match[2], replacements?.selector) : void 0,
@@ -49524,9 +49514,9 @@ ${rootStack}`;
     new Parser({
       onattribute(name, value) {
         if (name === "class") {
-          value.split(" ").forEach((className2) => {
-            const parsed = !collectTo.has(className2) && parseClass(className2, options);
-            parsed && collectTo.set(className2, parsed);
+          value.split(" ").forEach((className) => {
+            const parsed = !collectTo.has(className) && parseClass(className, options);
+            parsed && collectTo.set(className, parsed);
           });
         }
       }
@@ -49627,17 +49617,14 @@ ${rootStack}`;
   var sample_default = '<form onsubmit="arguments[0].preventDefault()">\n  <label class="cursor:pointer user-select:none d:inline-flex align-items:center gap:4px :has(>:checked)/c:rebeccapurple :has(>:checked)/accent-c:rebeccapurple">\n    <input type="checkbox" class="cursor:inherit" />\n    Checkbox\n  </label>\n\n  <button class="--H:210 --S:100% --L:50% p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($H,$S,80%) bg:hsl($H,$S,$L) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1">\n    Submit\n  </button>\n</form>\n';
 
   // src/App.tsx
-  var _tmpl$ = /* @__PURE__ */ template(`<header><h1>isaaccss</h1><h2>playground</h2></header>`, 6);
-  var _tmpl$2 = /* @__PURE__ */ template(`<details><summary></summary><div></div></details>`, 6);
+  var _tmpl$ = /* @__PURE__ */ template(`<header class="#b #c #d #e #f"><h1 class="#g #h">isaaccss</h1><h2 class="#i #j #k">playground</h2></header>`, 6);
+  var _tmpl$2 = /* @__PURE__ */ template(`<details class="#l #m"><summary class="#n #o #p"></summary><div class="#q #r"></div></details>`, 6);
   var _tmpl$3 = /* @__PURE__ */ template(`<textarea rows="10"></textarea>`, 2);
   var _tmpl$4 = /* @__PURE__ */ template(`<textarea rows="10" readonly></textarea>`, 2);
   var _tmpl$5 = /* @__PURE__ */ template(`<iframe></iframe>`, 2);
-  var _tmpl$6 = /* @__PURE__ */ template(`<main></main>`, 2);
+  var _tmpl$6 = /* @__PURE__ */ template(`<main class="#s #e #t #u #v"></main>`, 2);
   var Header = () => (() => {
     const _el$ = _tmpl$.cloneNode(true), _el$2 = _el$.firstChild, _el$3 = _el$2.nextSibling;
-    className(_el$, is`p-b:1em font-family:logo d:inline-flex flex-direction:column align-items:center`);
-    className(_el$2, is`font-size:2.5rem font-style:oblique`);
-    className(_el$3, is`font-size:1rem c:gray letter-spacing:0.375em`);
     return _el$;
   })();
   var Details = ({
@@ -49646,17 +49633,13 @@ ${rootStack}`;
     children: children2
   }) => (() => {
     const _el$4 = _tmpl$2.cloneNode(true), _el$5 = _el$4.firstChild, _el$6 = _el$5.nextSibling;
-    className(_el$4, is`p:0.5rem box-shadow:0_0_4px_#bbb,_0_2px_8px_#bbb`);
     _el$4.open = open;
-    className(_el$5, is`cursor:pointer user-select:none font-weight:bold`);
     insert(_el$5, summary);
-    className(_el$6, is`b-w:1px b-c:#ccc`);
     insert(_el$6, children2);
     return _el$4;
   })();
   var Main = () => (() => {
     const _el$7 = _tmpl$6.cloneNode(true);
-    className(_el$7, is`d:flex flex-direction:column gap:1rem _textarea/font-family:'Source_Code_Pro',monospace _textarea/font-size:0.9375rem`);
     insert(_el$7, createComponent(Details, {
       summary: "HTML",
       open: true,
@@ -49716,6 +49699,6 @@ ${rootStack}`;
   delegateEvents(["input"]);
 
   // src/playground.tsx
-  document.body.className = is`p:1rem`;
+  document.body.className = `#a`;
   render(() => createComponent(App, {}), document.body);
 })();

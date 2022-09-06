@@ -25,8 +25,8 @@ const build = options =>
     .then(result => result.outputFiles[1].text.trimEnd());
 
 it("esbuild", async () => {
-  assert.equal(await build(), expected.default + expected.reset);
-  assert.equal(await build({ replacements: [] }), expected.noReplacements + expected.reset);
-  assert.equal(await build({ postcss: { plugins: [postcssJitProps(OpenProps)] } }), expected.openProps + expected.reset);
-  assert.equal(await build({ filter: /\.(js|tsx?)$/ }), expected.abc + expected.reset);
+  assert.equal(await build({ compress: false }), expected.default + expected.reset);
+  assert.equal(await build({ compress: false, replacements: [] }), expected.noReplacements + expected.reset);
+  assert.equal(await build({ compress: false, postcss: { plugins: [postcssJitProps(OpenProps)] } }), expected.openProps + expected.reset);
+  assert.equal(await build({ compress: false, filter: /\.(js|tsx?)$/ }), expected.abc + expected.reset);
 });

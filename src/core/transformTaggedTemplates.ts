@@ -31,7 +31,7 @@ export const transformTaggedTemplates = (
   babelParserPlugins?: BabelParserOptions["plugins"],
   classes = new Map<string, Style>(),
 ): { code: string; classes: Map<string, Style> } => {
-  const compress = options?.compress;
+  const compress = options?.compress ?? true;
   const compressPrefix = (typeof compress === "object" && compress?.prefix) || "#";
 
   const transformClassName = (className: string, node: t.StringLiteral | t.TemplateElement) =>

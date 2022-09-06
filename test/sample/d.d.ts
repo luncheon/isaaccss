@@ -1,1 +1,1 @@
-export const d: () => any;
+export const d: (show: boolean) => string;

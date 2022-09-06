@@ -23,7 +23,7 @@ const plugins = [resolve({ extensions: [".js", ".jsx", ".ts", ".tsx"] }), sucras
 describe("rollup", () => {
   it("default config", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin(), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false }), ...plugins] })
         .then(result => result.generate({ file: "a.js" }))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.default],
@@ -32,7 +32,7 @@ describe("rollup", () => {
 
   it("default output filename is based on bundle filename", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin(), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false }), ...plugins] })
         .then(result => result.generate({ file: "b.js" }))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "b.css", expected.default],
@@ -41,7 +41,7 @@ describe("rollup", () => {
 
   it("output filename can be specified", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin({ output: "c.css" }), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false, output: "c.css" }), ...plugins] })
         .then(result => result.generate({ file: "a.js" }))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "c.css", expected.default],
@@ -50,7 +50,7 @@ describe("rollup", () => {
 
   it("bundle with other css", async () => {
     assert.deepEqual(
-      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin(), ...plugins] })
+      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin({ compress: false }), ...plugins] })
         .then(result => result.generate({ file: "a.js" }))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.reset + expected.default],
@@ -59,7 +59,7 @@ describe("rollup", () => {
 
   it("bundle with other css, another output filename", async () => {
     assert.deepEqual(
-      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin({ output: "b.css" }), ...plugins] })
+      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin({ compress: false, output: "b.css" }), ...plugins] })
         .then(result => result.generate({ file: "a.js" }))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source, output[2].fileName, output[2].source]),
       [3, "a.css", expected.reset, "b.css", expected.default],
@@ -68,7 +68,7 @@ describe("rollup", () => {
 
   it("no replacements", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin({ replacements: [] }), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false, replacements: [] }), ...plugins] })
         .then(result => result.generate({}))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.noReplacements],
@@ -77,7 +77,7 @@ describe("rollup", () => {
 
   it("open props", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin({ postcss: { plugins: [postcssJitProps(OpenProps)] } }), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false, postcss: { plugins: [postcssJitProps(OpenProps)] } }), ...plugins] })
         .then(result => result.generate({}))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.openProps],
@@ -86,7 +86,7 @@ describe("rollup", () => {
 
   it("include: a,b,c", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin({ include: ["**/*.{js,ts,tsx}"] }), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false, include: ["**/*.{js,ts,tsx}"] }), ...plugins] })
         .then(result => result.generate({}))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.abc],
@@ -95,7 +95,7 @@ describe("rollup", () => {
 
   it("exclude: d", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin({ exclude: ["**/*.jsx"] }), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false, exclude: ["**/*.jsx"] }), ...plugins] })
         .then(result => result.generate({}))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.abc],

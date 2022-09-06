@@ -1,7 +1,7 @@
 {
   "name": "isaaccss",
   "version": "0.8.0",
-  "description": "Inline-Style-as-a-Class CSS utility",
+  "description": "Inline-Style-as-a-Class CSS engine",
   "license": "WTFPL",
   "bin": "lib/cli.js",
   "type": "module",

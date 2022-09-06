@@ -17,33 +17,33 @@ const resolvePath = (...segments) => path.resolve(__dirname, ...segments);
 
 describe("vite", () => {
   it("default config", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin()] });
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false })] });
     assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.default);
   });
 
   it("bundle with other css, another output filename", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ output: "a.css" })] });
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false, output: "a.css" })] });
     assert.equal(built.output.find(o => o.fileName === "index.css")?.source.trim(), expected.reset);
     assert.equal(built.output.find(o => o.fileName === "a.css")?.source.trim(), expected.default);
   });
 
   it("no replacements", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ replacements: [] })] });
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false, replacements: [] })] });
     assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.noReplacements);
   });
 
   it("open props", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ postcss: { plugins: [postcssJitProps(OpenProps)] } })] });
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false, postcss: { plugins: [postcssJitProps(OpenProps)] } })] });
     assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.openProps);
   });
 
   it("a,b,c", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ include: ["**/*.{js,ts,tsx}"] })] });
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false, include: ["**/*.{js,ts,tsx}"] })] });
     assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.abc);
   });
 
   it("exclude: d", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ exclude: ["**/*.jsx"] })] });
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false, exclude: ["**/*.jsx"] })] });
     assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.abc);
   });
 

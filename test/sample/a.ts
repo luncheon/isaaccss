@@ -1,5 +1,7 @@
 import { is } from "isaaccss";
-export * from "./b";
+import "./b";
 export * from "./c";
 
-export const a: string = is`@a/:b/c:$blue-1**!? --a:1?`;
+export const a: string = "a";
+
+document.body.innerHTML += `<input data-testid="a" class="${is`--a:$blue-1 c:$a bg:aliceblue @w<100px/background:hsl(0,100%,50%)* :focus/bg:#ffff00`}">`;

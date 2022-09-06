@@ -10,9 +10,10 @@
     "trailingComma": "all"
   },
   "scripts": {
-    "test": "node index.js"
+    "test": "node node.all.js && playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.25.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-sucrase": "^4.0.4",
     "open-props": "^1.4.14",

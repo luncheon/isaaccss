@@ -1,1 +1,1 @@
-@layer{.--a\:1\?{--a:1}.--b\:2\?{--b:2}}.--c\:3\*:not(#\ ):not(#\ ){--c:3}@media a{@layer{.\@a\/\:b\/c\:\$blue-1\*\*\!\?:not(#\ ):not(#\ ):b{color:var(--blue-1)!important}}}
+@layer{.color\:\#0ff\?{color:#0ff}}.--a\:\$blue-1:not(#\ ){--a:var(--blue-1)}.\:focus\/bg\:\#ffff00:not(#\ ):focus{background:#ffff00}.bg\:aliceblue:not(#\ ){background:aliceblue}.bg\:blue\!:not(#\ ){background:blue!important}.c\:\$a:not(#\ ){color:var(--a)}@media (width<100px){.\@w\<100px\/background\:hsl\(0\,100\%\,50\%\)\*:not(#\ ):not(#\ ){background:hsl(0,100%,50%)}}

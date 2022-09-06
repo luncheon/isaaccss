@@ -1,4 +1,4 @@
-# isaaccss: Inline-Style-as-a-Class CSS utility
+# isaaccss: Inline-Style-as-a-Class CSS engine
 
 A CSS class DSL like inline styles.
 
@@ -13,7 +13,7 @@ const Button = () => (
 );
 ```
 
-Or using some replacements:
+Or using some short aliases:
 
 <!-- prettier-ignore -->
 ```jsx
@@ -37,6 +37,7 @@ const Button = () => (
     - Simple and flexible: any media, any selector, any property and any value can be described as is
   - High specificity (ID-specificity = 1) by default to override styles from other CSS libraries
   - Specificity can be adjusted
+  - Class names can be compressed
   - Invalid class names can be detected
 - Unlike [Linaria](https://linaria.dev/):
   - Short aliases can be used
@@ -94,8 +95,12 @@ export default {
   // Whether to pretty-print. Default is `false`.
   pretty: true,
 
-  // Replacements. Default is `defaultReplacements`.
-  // But if specified, it will be overwritten.
+  // Class name compression setting in boolean or `{ prefix: string }`. Pass `false` to turn off.
+  // Default is `{ prefix: "#" }`; class names are "#a", "#b", ..., "#aa", "#ab", ...
+  compress: { prefix: "~" },
+
+  // Replacements (aliases).
+  // Default is `defaultReplacements`. But if specified, it will be overwritten.
   replacements: [
     // If you want to extend the default, pass `defaultReplacements`.
     defaultReplacements,
@@ -126,7 +131,7 @@ export default {
   ],
 
   // Optional PostCSS config. The only field is `plugins`.
-  // For example, to use Open Props such as `color:$blue-1`:
+  // Following configuration is an example of using Open Props (e.g. `color:$blue-1`):
   postcss: {
     plugins: [postcssJitProps(OpenProps)],
   },
@@ -154,6 +159,7 @@ esbuild.build({
 
       // Optional isaaccss config. See `Configuration Example` section above.
       pretty: true,
+      compress: { prefix: "~" },
       replacements: [],
       postcss: { plugins: [] },
     }),
@@ -185,6 +191,7 @@ export default {
 
       // Optional isaaccss config. See `Configuration Example` section above.
       pretty: true,
+      compress: { prefix: "~" },
       replacements: [],
       postcss: { plugins: [] },
     }),
