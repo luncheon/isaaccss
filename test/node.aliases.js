@@ -1,11 +1,10 @@
+import { defaultAliases } from "isaaccss/lib/aliases/default.js";
 import { parseClass } from "isaaccss/lib/core/parseClass.js";
-import { defaultReplacements } from "isaaccss/lib/replacements/default.js";
-import { mergeReplacements } from "isaaccss/lib/replacements/merge.js";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-const readmeReplacements = mergeReplacements([
-  defaultReplacements,
+const readmeAliases = [
+  defaultAliases,
   {
     media: {
       dark: "prefers-color-scheme:dark",
@@ -28,7 +27,7 @@ const readmeReplacements = mergeReplacements([
       rel: "relative",
     },
   },
-]);
+];
 
 const parser =
   parserOptions =>
@@ -44,12 +43,12 @@ const parser =
     return parsed;
   };
 
-describe("replacements", () => {
+describe("aliases", () => {
   describe("default", () => {
-    const replacements = defaultReplacements;
+    const aliases = defaultAliases;
 
     it("@media &, |, !", () => {
-      const parse = parser({ replacements });
+      const parse = parser({ aliases });
       const properties = [{ name: "display", value: "none" }];
       assert.deepEqual(parse`@print&hover:hover/d:none`, { media: "print and (hover:hover)", specificity: 1, properties });
       assert.deepEqual(parse`@print|hover:hover/d:none`, { media: "print or (hover:hover)", specificity: 1, properties });
@@ -60,7 +59,7 @@ describe("replacements", () => {
     });
 
     it("@media h, w", () => {
-      const parse = parser({ replacements });
+      const parse = parser({ aliases });
       const properties = [{ name: "display", value: "none" }];
       assert.deepEqual(parse`@h>0/d:none`, { media: "(height>0)", specificity: 1, properties });
       assert.deepEqual(parse`@min-h:1px/d:none`, { media: "(min-height:1px)", specificity: 1, properties });
@@ -74,7 +73,7 @@ describe("replacements", () => {
     });
 
     it("property", () => {
-      const parse = parser({ replacements });
+      const parse = parser({ aliases });
       assert.deepEqual(parse`b:0`, { specificity: 1, properties: [{ name: "border", value: "0" }] });
       assert.deepEqual(parse`b-b:0`, { specificity: 1, properties: [{ name: "border-bottom", value: "0" }] });
       assert.deepEqual(parse`b-b-c:0`, { specificity: 1, properties: [{ name: "border-bottom-color", value: "0" }] });
@@ -82,10 +81,10 @@ describe("replacements", () => {
   });
 
   describe("readme", () => {
-    const replacements = readmeReplacements;
+    const aliases = readmeAliases;
 
     it("@media", () => {
-      const parse = parser({ replacements });
+      const parse = parser({ aliases });
       const properties = [{ name: "display", value: "none" }];
       assert.deepEqual(parse`@print&hover:hover/d:none`, { media: "print and (hover:hover)", specificity: 1, properties });
       assert.deepEqual(parse`@print|hover:hover/d:none`, { media: "print or (hover:hover)", specificity: 1, properties });
@@ -100,7 +99,7 @@ describe("replacements", () => {
     });
 
     it("selector", () => {
-      const parse = parser({ replacements });
+      const parse = parser({ aliases });
       const properties = [{ name: "display", value: "none" }];
       assert.deepEqual(parse`::a/d:none`, { selector: "::after", specificity: 1, properties });
       assert.deepEqual(parse`@dark/::b/d:none`, { media: "(prefers-color-scheme:dark)", selector: "::before", specificity: 1, properties });
@@ -112,7 +111,7 @@ describe("replacements", () => {
     });
 
     it("property", () => {
-      const parse = parser({ replacements });
+      const parse = parser({ aliases });
       assert.deepEqual(parse`b:0`, { specificity: 1, properties: [{ name: "border", value: "0" }] });
       assert.deepEqual(parse`b-b:0`, { specificity: 1, properties: [{ name: "border-bottom", value: "0" }] });
       assert.deepEqual(parse`b-b-c:0`, { specificity: 1, properties: [{ name: "border-bottom-color", value: "0" }] });
@@ -122,7 +121,7 @@ describe("replacements", () => {
     });
 
     it("value", () => {
-      const parse = parser({ replacements });
+      const parse = parser({ aliases });
       assert.deepEqual(parse`pos:abs`, { specificity: 1, properties: [{ name: "position", value: "absolute" }] });
       assert.deepEqual(parse`pos:rel`, { specificity: 1, properties: [{ name: "position", value: "relative" }] });
     });

@@ -26,7 +26,7 @@ const build = options =>
 
 it("esbuild", async () => {
   assert.equal(await build({ compress: false }), expected.default + expected.reset);
-  assert.equal(await build({ compress: false, replacements: [] }), expected.noReplacements + expected.reset);
+  assert.equal(await build({ compress: false, aliases: [] }), expected.noAliases + expected.reset);
   assert.equal(await build({ compress: false, postcss: { plugins: [postcssJitProps(OpenProps)] } }), expected.openProps + expected.reset);
   assert.equal(await build({ compress: false, filter: /\.(js|tsx?)$/ }), expected.abc + expected.reset);
 });

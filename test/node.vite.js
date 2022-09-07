@@ -27,9 +27,9 @@ describe("vite", () => {
     assert.equal(built.output.find(o => o.fileName === "a.css")?.source.trim(), expected.default);
   });
 
-  it("no replacements", async () => {
-    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false, replacements: [] })] });
-    assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.noReplacements);
+  it("no aliases", async () => {
+    const built = await build({ ...viteConfig, plugins: [isaaccssPlugin({ compress: false, aliases: [] })] });
+    assert.equal(built.output.find(o => o.fileName === "index.css")?.source, expected.reset + "\n" + expected.noAliases);
   });
 
   it("open props", async () => {

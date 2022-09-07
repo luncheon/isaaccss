@@ -2,14 +2,14 @@ import { createFilter, FilterPattern } from "@rollup/pluginutils";
 import { AcceptedPlugin } from "postcss";
 import type { Plugin } from "rollup";
 import { applyPostcss } from "../applyPostcss.js";
-import { cssify, CssOptions, defaultReplacements, mergeReplacements, Replacements, Style, transform } from "../index.node.js";
+import { Aliases, cssify, CssifyOptions, defaultAliases, Style, transform } from "../index.node.js";
 
-export interface IsaaccssRollupPluginOptions extends CssOptions {
+export interface IsaaccssRollupPluginOptions extends CssifyOptions {
   readonly include: FilterPattern;
   readonly exclude: FilterPattern;
   readonly output?: string;
   readonly compress?: boolean;
-  readonly replacements?: Replacements | readonly Replacements[];
+  readonly aliases?: Aliases | readonly Aliases[];
   readonly postcss?: { readonly plugins?: AcceptedPlugin[] };
 }
 
@@ -20,7 +20,7 @@ export const resolveIsaaccssRollupPluginOptions = (options?: IsaaccssRollupPlugi
   ),
   transformOptions: {
     compress: options?.compress,
-    replacements: options?.replacements ? mergeReplacements(options?.replacements) : defaultReplacements,
+    aliases: options?.aliases ?? defaultAliases,
   },
   cssifyOptions: options,
 });

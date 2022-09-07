@@ -43992,20 +43992,20 @@ ${str}
           names
         } = buildLiteralData(formatter, tpl, opts);
         return (arg) => {
-          const defaultReplacements2 = {};
+          const defaultReplacements = {};
           arg.forEach((replacement, i) => {
-            defaultReplacements2[names[i]] = replacement;
+            defaultReplacements[names[i]] = replacement;
           });
           return (arg2) => {
             const replacements = (0, _options.normalizeReplacements)(arg2);
             if (replacements) {
               Object.keys(replacements).forEach((key) => {
-                if (Object.prototype.hasOwnProperty.call(defaultReplacements2, key)) {
+                if (Object.prototype.hasOwnProperty.call(defaultReplacements, key)) {
                   throw new Error("Unexpected replacement overlap.");
                 }
               });
             }
-            return formatter.unwrap((0, _populate.default)(metadata, replacements ? Object.assign(replacements, defaultReplacements2) : defaultReplacements2));
+            return formatter.unwrap((0, _populate.default)(metadata, replacements ? Object.assign(replacements, defaultReplacements) : defaultReplacements));
           };
         };
       }
@@ -47892,6 +47892,60 @@ ${rootStack}`;
   // ../src/index.browser.ts
   init_inject();
 
+  // ../src/aliases/index.ts
+  init_inject();
+
+  // ../src/aliases/default.ts
+  init_inject();
+  var mediaOperatorAliases = {
+    media: [
+      [/!/g, "not "],
+      [/&/g, " and "],
+      [/\|/g, " or "]
+    ]
+  };
+  var abbreviationAliases = {
+    media: {
+      h: "height",
+      "min-h": "min-height",
+      "max-h": "max-height",
+      w: "width",
+      "min-w": "min-width",
+      "max-w": "max-width"
+    },
+    property: [
+      {
+        b: "border",
+        bg: "background",
+        c: "color",
+        d: "display",
+        h: "height",
+        m: "margin",
+        p: "padding",
+        pos: "position",
+        w: "width",
+        z: "z-index"
+      },
+      [/^b-/, "border-"],
+      [/^bg-/, "background-"],
+      [/^m-/, "margin-"],
+      [/^p-/, "padding-"],
+      [/-b$/, "-bottom"],
+      [/-c$/, "-color"],
+      [/-h$/, "-height"],
+      [/-l$/, "-left"],
+      [/-r$/, "-right"],
+      [/-t$/, "-top"],
+      [/-pos$/, "-position"],
+      [/-w$/, "-width"],
+      [/-b-/, "-bottom-"],
+      [/-l-/, "-left-"],
+      [/-r-/, "-right-"],
+      [/-t-/, "-top-"]
+    ]
+  };
+  var defaultAliases = [mediaOperatorAliases, abbreviationAliases];
+
   // ../src/core/index.ts
   init_inject();
 
@@ -47936,76 +47990,94 @@ ${rootStack}`;
   init_inject();
   var import_known_css_properties = __toESM(require_known_css_properties(), 1);
   var knownCssPropertySet = new Set(import_known_css_properties.all);
+  function* flattenAliases(aliases, key) {
+    if (!aliases) {
+      return;
+    }
+    if (Array.isArray(aliases)) {
+      for (const alias2 of aliases) {
+        yield* flattenAliases(alias2, key);
+      }
+      return;
+    }
+    const alias = aliases[key];
+    if (!alias) {
+      return;
+    }
+    if (!Array.isArray(alias) || alias[0] instanceof RegExp) {
+      yield alias;
+    } else {
+      for (const a of alias) {
+        if (a) {
+          yield a;
+        }
+      }
+    }
+  }
   var unescapeBackslash = (s) => s.replace(/\\(.)/g, "$1");
   var unescapeWhitespace = (s) => s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
-  var replaceTokens = (source, replacement, tokenPattern) => {
-    if (!replacement) {
-      return source;
-    }
-    if (Array.isArray(replacement)) {
-      if (replacement[0] instanceof RegExp) {
-        return source.replace(replacement[0], replacement[1]);
+  var replaceTokens = (source, aliases, tokenPattern) => {
+    for (const alias of aliases) {
+      if (Array.isArray(alias)) {
+        source = source.replace(alias[0], alias[1]);
       } else {
-        return replacement.reduce((s, r) => replaceTokens(s, r, tokenPattern), source);
+        source = source.replaceAll(tokenPattern, (token) => alias[token] ?? token);
       }
     }
-    return source.replaceAll(tokenPattern, (token) => replacement[token] ?? token);
+    return source;
   };
-  var replaceProperty = (property, replacement) => {
-    if (!replacement) {
-      return property;
-    }
-    if (Array.isArray(replacement)) {
-      if (replacement[0] instanceof RegExp) {
-        return property.replace(replacement[0], replacement[1]);
+  var replaceProperty = (property, aliases) => {
+    for (const alias of aliases) {
+      if (Array.isArray(alias)) {
+        property = property.replace(alias[0], alias[1]);
       } else {
-        return replacement.reduce(replaceProperty, property);
+        property = alias[property] || property;
       }
     }
-    return replacement[property] || property;
+    return property;
   };
-  var transformMedia = (media, replacements) => {
-    media = replaceTokens(media, replacements, /[\w$#-]+/g);
+  var transformMedia = (media, aliases) => {
+    media = replaceTokens(media, flattenAliases(aliases, "media"), /[\w$#-]+/g);
     media = unescapeWhitespace(media);
     media = media.replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3");
     return unescapeBackslash(media);
   };
-  var transformSelector = (selector, replacements) => {
-    selector = replaceTokens(selector, replacements, /([:>+~_]|::)[\w$#-]+/g);
+  var transformSelector = (selector, aliases) => {
+    selector = replaceTokens(selector, flattenAliases(aliases, "selector"), /([:>+~_]|::)[\w$#-]+/g);
     selector = unescapeWhitespace(selector);
     return unescapeBackslash(selector);
   };
-  var transformValue = (value, replacements) => {
-    value = replaceTokens(value, replacements, /[\w$#-]+/g);
+  var transformValue = (value, aliases) => {
+    value = replaceTokens(value, flattenAliases(aliases, "value"), /[\w$#-]+/g);
     value = unescapeWhitespace(value);
     value = value.replace(/\$([_a-zA-Z0-9-]*[a-zA-Z0-9])/g, "var(--$1)");
     return unescapeBackslash(value);
   };
-  var transformProperty = (property, replacements) => {
+  var transformProperty = (property, aliases) => {
     if (property.startsWith("--")) {
       return property;
     }
-    property = replaceProperty(property, replacements);
+    property = replaceProperty(property, flattenAliases(aliases, "property"));
     if (knownCssPropertySet.has(property)) {
       return property;
     }
   };
   var parseClass = (className, options) => {
-    const replacements = options?.replacements;
+    const aliases = options?.aliases;
     const match = className.match(
       /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/
     );
-    const property = match && transformProperty(match[3], replacements?.property);
+    const property = match && transformProperty(match[3], aliases);
     return property ? {
       className,
-      media: match[1] ? transformMedia(match[1], replacements?.media) : void 0,
+      media: match[1] ? transformMedia(match[1], aliases) : void 0,
       layer: match[7] === "?" ? "" : void 0,
-      selector: match[2] ? transformSelector(match[2], replacements?.selector) : void 0,
+      selector: match[2] ? transformSelector(match[2], aliases) : void 0,
       specificity: (match[7] === "?" ? 0 : 1) + match[5].length,
       properties: [
         {
           name: property,
-          value: transformValue(match[4], replacements?.value),
+          value: transformValue(match[4], aliases),
           important: match[6] === "!"
         }
       ]
@@ -49559,74 +49631,6 @@ ${rootStack}`;
   // ../src/core/types.ts
   init_inject();
 
-  // ../src/replacements/index.ts
-  init_inject();
-
-  // ../src/replacements/default.ts
-  init_inject();
-
-  // ../src/replacements/merge.ts
-  init_inject();
-  var mergeReplacements = (...replacements) => {
-    const rs = [].concat(...replacements);
-    return {
-      media: rs.map((r) => r.media),
-      selector: rs.map((r) => r.selector),
-      property: rs.map((r) => r.property),
-      value: rs.map((r) => r.value)
-    };
-  };
-
-  // ../src/replacements/default.ts
-  var mediaOperatorReplacements = {
-    media: [
-      [/!/g, "not "],
-      [/&/g, " and "],
-      [/\|/g, " or "]
-    ]
-  };
-  var abbreviationReplacements = {
-    media: {
-      h: "height",
-      "min-h": "min-height",
-      "max-h": "max-height",
-      w: "width",
-      "min-w": "min-width",
-      "max-w": "max-width"
-    },
-    property: [
-      {
-        b: "border",
-        bg: "background",
-        c: "color",
-        d: "display",
-        h: "height",
-        m: "margin",
-        p: "padding",
-        pos: "position",
-        w: "width",
-        z: "z-index"
-      },
-      [/^b-/, "border-"],
-      [/^bg-/, "background-"],
-      [/^m-/, "margin-"],
-      [/^p-/, "padding-"],
-      [/-b$/, "-bottom"],
-      [/-c$/, "-color"],
-      [/-h$/, "-height"],
-      [/-l$/, "-left"],
-      [/-r$/, "-right"],
-      [/-t$/, "-top"],
-      [/-pos$/, "-position"],
-      [/-w$/, "-width"],
-      [/-b-/, "-bottom-"],
-      [/-l-/, "-left-"],
-      [/-r-/, "-right-"],
-      [/-t-/, "-top-"]
-    ]
-  };
-  var defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements);
-
   // src/sample.html
   var sample_default = '<form onsubmit="arguments[0].preventDefault()">\n  <label class="cursor:pointer user-select:none d:inline-flex align-items:center gap:4px :has(>:checked)/c:rebeccapurple :has(>:checked)/accent-c:rebeccapurple">\n    <input type="checkbox" class="cursor:inherit" />\n    Checkbox\n  </label>\n\n  <button class="--H:210 --S:100% --L:50% p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($H,$S,80%) bg:hsl($H,$S,$L) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1">\n    Submit\n  </button>\n</form>\n';
 
@@ -49702,7 +49706,7 @@ ${rootStack}`;
   })();
   var [htmlContent, setHtmlContent] = createSignal(sample_default);
   var classes = createMemo(() => parseHtml(htmlContent(), {
-    replacements: defaultReplacements
+    aliases: defaultAliases
   }));
   var classesJson = createMemo(() => JSON.stringify([...classes().values()], void 0, 2));
   var css = createMemo(() => cssify(classes().values()));

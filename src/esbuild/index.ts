@@ -3,23 +3,14 @@ import fs from "node:fs/promises";
 import { createRequire } from "node:module";
 import { AcceptedPlugin } from "postcss";
 import { applyPostcss } from "../applyPostcss.js";
-import {
-  cssify,
-  CssOptions,
-  defaultReplacements,
-  mergeReplacements,
-  Replacements,
-  Style,
-  transform,
-  TransformOptions,
-} from "../index.node.js";
+import { Aliases, cssify, CssifyOptions, defaultAliases, Style, transform, TransformOptions } from "../index.node.js";
 
 const inject = createRequire(import.meta.url).resolve("./inject.js");
 
-export interface IsaaccssEsbuildPluginOptions extends CssOptions {
+export interface IsaaccssEsbuildPluginOptions extends CssifyOptions {
   readonly filter?: RegExp;
   readonly compress?: boolean | { readonly prefix?: string };
-  readonly replacements?: Replacements | readonly Replacements[];
+  readonly aliases?: Aliases | readonly Aliases[];
   readonly postcss?: { readonly plugins?: AcceptedPlugin[] };
 }
 
@@ -39,7 +30,7 @@ const plugin = (options?: IsaaccssEsbuildPluginOptions): EsbuildPipeablePlugin =
   const filter = options?.filter ?? /\.[cm]?[jt]sx?$/;
   const transformOptions: TransformOptions = {
     compress: options?.compress,
-    replacements: options?.replacements ? mergeReplacements(options?.replacements) : defaultReplacements,
+    aliases: options?.aliases ?? defaultAliases,
   };
   const transformedCodeMap = new Map<string, string>();
   return {

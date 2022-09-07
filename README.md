@@ -87,7 +87,7 @@ npm i -D isaaccss
 ### Configuration Example
 
 ```js
-import { defaultReplacements } from "isaaccss";
+import { defaultAliases } from "isaaccss";
 import OpenProps from "open-props";
 import postcssJitProps from "postcss-jit-props";
 
@@ -99,13 +99,12 @@ export default {
   // Default is `{ prefix: "#" }`; class names are "#a", "#b", ..., "#aa", "#ab", ...
   compress: { prefix: "~" },
 
-  // Replacements (aliases).
-  // Default is `defaultReplacements`. But if specified, it will be overwritten.
-  replacements: [
-    // If you want to extend the default, pass `defaultReplacements`.
-    defaultReplacements,
+  // Aliases. If specified, the default aliases are removed.
+  aliases: [
+    // If you want to extend the default, pass the `defaultAliases` imported from "isaaccss".
+    defaultAliases,
 
-    // Custom replacements. For example:
+    // Custom aliases. For example:
     {
       media: {
         dark: "prefers-color-scheme:dark",
@@ -138,7 +137,7 @@ export default {
 };
 ```
 
-See [src/replacements/default.ts](https://github.com/luncheon/isaaccss/blob/main/src/replacements/default.ts) for `defaultReplacements`.
+See [src/aliases/default.ts](https://github.com/luncheon/isaaccss/blob/main/src/aliases/default.ts) for the default aliases.
 
 ### [esbuild](https://esbuild.github.io/)
 
@@ -160,7 +159,7 @@ esbuild.build({
       // Optional isaaccss config. See `Configuration Example` section above.
       pretty: true,
       compress: { prefix: "~" },
-      replacements: [],
+      aliases: [],
       postcss: { plugins: [] },
     }),
   ],
@@ -192,7 +191,7 @@ export default {
       // Optional isaaccss config. See `Configuration Example` section above.
       pretty: true,
       compress: { prefix: "~" },
-      replacements: [],
+      aliases: [],
       postcss: { plugins: [] },
     }),
   ],
@@ -215,6 +214,8 @@ export default {
 ```
 
 ### [Vite](https://vitejs.dev/)
+
+- Class name compression is not supported in Vite dev server.
 
 ```js
 // vite.config.js

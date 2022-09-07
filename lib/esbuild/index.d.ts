@@ -1,12 +1,12 @@
 import type { OnLoadArgs, OnLoadResult, Plugin, PluginBuild } from "esbuild";
 import { AcceptedPlugin } from "postcss";
-import { CssOptions, Replacements } from "../index.node.js";
-export interface IsaaccssEsbuildPluginOptions extends CssOptions {
+import { Aliases, CssifyOptions } from "../index.node.js";
+export interface IsaaccssEsbuildPluginOptions extends CssifyOptions {
     readonly filter?: RegExp;
     readonly compress?: boolean | {
         readonly prefix?: string;
     };
-    readonly replacements?: Replacements | readonly Replacements[];
+    readonly aliases?: Aliases | readonly Aliases[];
     readonly postcss?: {
         readonly plugins?: AcceptedPlugin[];
     };

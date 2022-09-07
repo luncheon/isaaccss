@@ -1,7 +1,7 @@
 import { is } from "isaaccss";
 import { createMemo, createSignal } from "solid-js";
 import type { JSX } from "solid-js/types/jsx";
-import { cssify, defaultReplacements, parseHtml } from "../../src/index.browser.js";
+import { cssify, defaultAliases, parseHtml } from "../../src/index.browser.js";
 import sampleHtml from "./sample.html";
 
 const Header = () => (
@@ -43,7 +43,7 @@ const Main = () => (
 );
 
 const [htmlContent, setHtmlContent] = createSignal(sampleHtml);
-const classes = createMemo(() => parseHtml(htmlContent(), { replacements: defaultReplacements }));
+const classes = createMemo(() => parseHtml(htmlContent(), { aliases: defaultAliases }));
 const classesJson = createMemo(() => JSON.stringify([...classes().values()], undefined, 2));
 const css = createMemo(() => cssify(classes().values()));
 const beautifiedCss = createMemo(() => cssify(classes().values(), { pretty: true }));

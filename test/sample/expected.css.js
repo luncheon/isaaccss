@@ -14,8 +14,8 @@ export default {
   get default() {
     return fs.readFileSync(require.resolve("./expected-default.css"), "utf8");
   },
-  get noReplacements() {
-    return fs.readFileSync(require.resolve("./expected-no-replacements.css"), "utf8");
+  get noAliases() {
+    return fs.readFileSync(require.resolve("./expected-no-aliases.css"), "utf8");
   },
   get openProps() {
     return fs.readFileSync(require.resolve("./expected-open-props.css"), "utf8");

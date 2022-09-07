@@ -1,23 +1,24 @@
-export type Replacer = string | Parameters<string["replace"]>[1];
-export type ReplacementElement = { readonly [token in string]: string } | readonly [RegExp, Replacer];
-export type Replacement = ReplacementElement | Replacement[] | undefined | null | false;
+export type AliasElement = { readonly [token in string]: string } | readonly [RegExp, string | Parameters<string["replace"]>[1]];
+export type Alias = AliasElement | undefined | null | false;
 
-export interface Replacements {
-  readonly media?: Replacement;
-  readonly selector?: Replacement;
-  readonly property?: Replacement;
-  readonly value?: Replacement;
+export interface Aliases {
+  readonly media?: Alias | readonly Alias[];
+  readonly selector?: Alias | readonly Alias[];
+  readonly property?: Alias | readonly Alias[];
+  readonly value?: Alias | readonly Alias[];
 }
 
+export type DeepArray<T> = readonly (T | DeepArray<T>)[];
+
 export interface ParserOptions {
-  readonly replacements?: Replacements;
+  readonly aliases?: Aliases | DeepArray<Aliases>;
 }
 
 export interface TransformOptions extends ParserOptions {
   readonly compress?: boolean | { readonly prefix?: string };
 }
 
-export interface CssOptions {
+export interface CssifyOptions {
   readonly pretty?: boolean;
 }
 

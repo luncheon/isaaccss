@@ -66,12 +66,12 @@ describe("rollup", () => {
     );
   });
 
-  it("no replacements", async () => {
+  it("no aliases", async () => {
     assert.deepEqual(
-      await rollup({ input, plugins: [isaaccssPlugin({ compress: false, replacements: [] }), ...plugins] })
+      await rollup({ input, plugins: [isaaccssPlugin({ compress: false, aliases: [] }), ...plugins] })
         .then(result => result.generate({}))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
-      [2, "a.css", expected.noReplacements],
+      [2, "a.css", expected.noAliases],
     );
   });
 

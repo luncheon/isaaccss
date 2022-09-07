@@ -1,7 +1,6 @@
-import type { Replacements } from "../core/types.js";
-import { mergeReplacements } from "./merge.js";
+import type { Aliases } from "../core/types.js";
 
-export const mediaOperatorReplacements: Replacements = {
+export const mediaOperatorAliases: Aliases = {
   media: [
     [/!/g, "not "],
     [/&/g, " and "],
@@ -9,7 +8,7 @@ export const mediaOperatorReplacements: Replacements = {
   ],
 };
 
-export const abbreviationReplacements: Replacements = {
+export const abbreviationAliases: Aliases = {
   media: {
     h: "height",
     "min-h": "min-height",
@@ -53,4 +52,4 @@ export const abbreviationReplacements: Replacements = {
   ],
 };
 
-export const defaultReplacements = mergeReplacements(mediaOperatorReplacements, abbreviationReplacements);
+export const defaultAliases = [mediaOperatorAliases, abbreviationAliases];

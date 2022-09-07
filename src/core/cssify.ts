@@ -1,4 +1,4 @@
-import type { CssOptions, Style } from "./types.js";
+import type { CssifyOptions, Style } from "./types.js";
 
 const groupToMap = <T, K>(array: readonly T[] | Iterable<T>, keySelector: (element: T) => K): Map<K, T[]> => {
   const map = new Map<K, T[]>();
@@ -29,7 +29,7 @@ const selectorSelector = (c: Style) => `.${CSS.escape(c.className)}${":not(#\\ )
 const propertiesSelector = (indent: string, newline: string) => (c: Style) =>
   c.properties.map(p => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(newline);
 
-export const cssify = (classes: Iterable<Style>, options?: CssOptions): string => {
+export const cssify = (classes: Iterable<Style>, options?: CssifyOptions): string => {
   const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
   return joinGroup(newline, classes, mediaSelector, (media, mediaRecords) => {
     const indent1 = media ? singleIndent : "";
