@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import esbuild from "esbuild";
-import isaaccss from "isaaccss/lib/esbuild/index.js";
+import isaaccss from "isaaccss/esbuild";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import OpenProps from "open-props";

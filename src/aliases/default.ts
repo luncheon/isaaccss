@@ -1,4 +1,4 @@
-import type { Aliases } from "../core/types.js";
+import type { Aliases } from "../api/types.js";
 
 export const mediaOperatorAliases: Aliases = {
   media: [

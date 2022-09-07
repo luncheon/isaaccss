@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
+    "outDir": "pkg",
     "declaration": true,
     "target": "esnext",
     "module": "esnext",
@@ -13,6 +13,7 @@
     "noUnusedParameters": true,
     "noImplicitOverride": true,
     "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "newLine": "LF"
   },
   "include": ["src/**/*.ts"],

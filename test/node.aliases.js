@@ -1,5 +1,5 @@
-import { defaultAliases } from "isaaccss/lib/aliases/default.js";
-import { parseClass } from "isaaccss/lib/core/parseClass.js";
+import { defaultAliases } from "isaaccss/aliases/default.js";
+import { parseClass } from "isaaccss/api/parseClass.js";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 

@@ -5,6 +5,7 @@
   "license": "WTFPL",
   "type": "module",
   "scripts": {
+    "postinstall": "npm link ../pkg",
     "build": "node build.js",
     "start": "node build.js --serve"
   },

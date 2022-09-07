@@ -2,7 +2,6 @@
   "name": "isaaccss",
   "version": "0.10.0",
   "description": "Inline-Style-as-a-Class CSS engine",
-  "private": true,
   "license": "WTFPL",
   "type": "module",
   "exports": {
@@ -31,18 +30,6 @@
     "tailwindcss",
     "windicss"
   ],
-  "prettier": {
-    "arrowParens": "avoid",
-    "printWidth": 140,
-    "trailingComma": "all"
-  },
-  "scripts": {
-    "clean": "node -e \"require('node:fs').rmSync('pkg',{recursive:true,force:true})\"",
-    "build": "node build.js && npm run build:playground",
-    "build:playground": "cd playground && npm run build",
-    "start": "cd playground && npm start",
-    "test": "cd test/ && npm t"
-  },
   "devDependencies": {
     "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.18.1",

@@ -1,7 +1,9 @@
 import { is } from "isaaccss";
+import { defaultAliases } from "isaaccss/aliases/default.js";
+import { cssify } from "isaaccss/api/cssify.js";
+import { parseHtml } from "isaaccss/api/parseHtml.js";
 import { createMemo, createSignal } from "solid-js";
 import type { JSX } from "solid-js/types/jsx";
-import { cssify, defaultAliases, parseHtml } from "../../src/index.browser.js";
 import sampleHtml from "./sample.html";
 
 const Header = () => (
