@@ -48065,20 +48065,20 @@ ${rootStack}`;
   var parseClass = (className, options) => {
     const aliases = options?.aliases;
     const match = className.match(
-      /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(\**)(!?)(\??)$/
+      /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(!?)(\??)(\**)$/
     );
     const property = match && transformProperty(match[3], aliases);
     return property ? {
       className,
       media: match[1] ? transformMedia(match[1], aliases) : void 0,
-      layer: match[7] === "?" ? "" : void 0,
+      layer: match[6] === "?" ? "" : void 0,
       selector: match[2] ? transformSelector(match[2], aliases) : void 0,
-      specificity: (match[7] === "?" ? 0 : 1) + match[5].length,
+      specificity: (match[6] === "?" ? 0 : 1) + match[7].length,
       properties: [
         {
           name: property,
           value: transformValue(match[4], aliases),
-          important: match[6] === "!"
+          important: match[5] === "!"
         }
       ]
     } : void 0;

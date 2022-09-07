@@ -61,9 +61,10 @@ describe("parseClass", () => {
     assert.deepEqual(parse`x:0*`, { specificity: 2, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`x:0**`, { specificity: 3, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`x:0?`, { layer: "", specificity: 0, properties: [{ name: "x", value: "0" }] });
-    assert.deepEqual(parse`x:0*?`, { layer: "", specificity: 1, properties: [{ name: "x", value: "0" }] });
+    assert.deepEqual(parse`x:0?*`, { layer: "", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`x:0!`, { specificity: 1, properties: [{ name: "x", value: "0", important: true }] });
+    assert.deepEqual(parse`x:0!*`, { specificity: 2, properties: [{ name: "x", value: "0", important: true }] });
     assert.deepEqual(parse`x:0!?`, { layer: "", specificity: 0, properties: [{ name: "x", value: "0", important: true }] });
-    assert.deepEqual(parse`x:0*!?`, { layer: "", specificity: 1, properties: [{ name: "x", value: "0", important: true }] });
+    assert.deepEqual(parse`x:0!?*`, { layer: "", specificity: 1, properties: [{ name: "x", value: "0", important: true }] });
   });
 });

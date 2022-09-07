@@ -45,7 +45,7 @@ const Button = () => (
 ## Class Format
 
 ```
-[@media/][selectors/]property:value[*][!][?]
+[@media/][selectors/]property:value[!][?][*]
 ```
 
 - Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
@@ -69,11 +69,11 @@ const Button = () => (
 - Required `value` indicates the property value
   - `$bar` will be replaced with `var(--bar)`
     - Custom property set libraries, such as [Open Props](https://open-props.style/), can help with design themes
-- Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
-  - For example, add `*` to the preferred style between `:hover` and `:active`
 - Optional trailing `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
   - For example, add `?` to the components in a component library, so that applications using it can override the properties
 - Optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
+- Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
+  - For example, add `*` to the preferred style between `:hover` and `:active`
 - An underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
 
 ## Installation
