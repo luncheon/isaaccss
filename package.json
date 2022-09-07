@@ -3,7 +3,6 @@
   "version": "0.10.0",
   "description": "Inline-Style-as-a-Class CSS engine",
   "license": "WTFPL",
-  "bin": "lib/cli.js",
   "type": "module",
   "exports": {
     ".": "./index.js",
