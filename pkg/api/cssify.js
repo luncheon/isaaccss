@@ -18,7 +18,7 @@ const joinGroup = (separator, array, groupKeySelector, joinedValueSelector) => {
 const mediaSelector = (c) => c.media ?? "";
 const layerSelector = (c) => c.layer;
 const selectorSelector = (c) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
-const propertiesSelector = (indent, newline) => (c) => c.properties.map(p => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(newline);
+const propertiesSelector = (indent, newline) => (c) => c.properties.map(p => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(";" + newline);
 export const cssify = (classes, options) => {
     const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
     return joinGroup(newline, classes, mediaSelector, (media, mediaRecords) => {

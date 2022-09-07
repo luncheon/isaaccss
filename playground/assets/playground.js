@@ -2241,7 +2241,7 @@
   var mediaSelector = (c) => c.media ?? "";
   var layerSelector = (c) => c.layer;
   var selectorSelector = (c) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
-  var propertiesSelector = (indent, newline) => (c) => c.properties.map((p) => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(newline);
+  var propertiesSelector = (indent, newline) => (c) => c.properties.map((p) => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(";" + newline);
   var cssify = (classes2, options) => {
     const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
     return joinGroup(newline, classes2, mediaSelector, (media, mediaRecords) => {

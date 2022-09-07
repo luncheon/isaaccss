@@ -28,7 +28,7 @@ const mediaSelector = (c: Style) => c.media ?? "";
 const layerSelector = (c: Style) => c.layer;
 const selectorSelector = (c: Style) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
 const propertiesSelector = (indent: string, newline: string) => (c: Style) =>
-  c.properties.map(p => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(newline);
+  c.properties.map(p => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(";" + newline);
 
 export const cssify = (classes: Iterable<Style>, options?: CssifyOptions): string => {
   const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
