@@ -37,8 +37,8 @@ const parser =
     if (parsed) {
       assert.equal(parsed.className, className);
       delete parsed.className;
-      Object.entries(parsed).forEach(([key, value]) => value === undefined && delete parsed[key]);
       parsed.properties.forEach(p => p.important || delete p.important);
+      parsed.unknownProperties.length === 0 && delete parsed.unknownProperties;
     }
     return parsed;
   };

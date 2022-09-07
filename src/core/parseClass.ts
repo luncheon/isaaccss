@@ -1,5 +1,9 @@
 import { all as __knownCssProperties } from "known-css-properties";
-import type { AliasElement, Aliases, ParserOptions } from "./types.js";
+import type { AliasElement, Aliases, ParserOptions, Style, StyleProperty } from "./types.js";
+
+type Writable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
 
 const knownCssPropertySet = new Set(__knownCssProperties);
 
@@ -83,27 +87,29 @@ const transformProperty = (property: string, aliases?: ParserOptions["aliases"])
   }
 };
 
-export const parseClass = (className: string, options?: ParserOptions) => {
+export const parseClass = (className: string, options?: ParserOptions): Writable<Style> => {
   const aliases = options?.aliases;
   const match = className.match(
-    // @media/                   selector/                property:value specificity
-    /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(!?)(\??)(\**)$/,
+    // @media/                   selector/                properties                    ?    *
+    /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+:.+?!?(?:;[^:]+:.+?!?)*)(\??)(\**)$/,
   );
-  const property = match && transformProperty(match[3], aliases);
-  return property
-    ? {
-        className,
-        media: match[1] ? transformMedia(match[1], aliases) : undefined,
-        layer: match[6] === "?" ? "" : undefined,
-        selector: match[2] ? transformSelector(match[2], aliases) : undefined,
-        specificity: (match[6] === "?" ? 0 : 1) + match[7].length,
-        properties: [
-          {
-            name: property,
-            value: transformValue(match[4], aliases),
-            important: match[5] === "!",
-          },
-        ],
-      }
-    : undefined;
+  if (!match) {
+    return { className, properties: [], unknownProperties: [className], specificity: 1 };
+  }
+  const properties: StyleProperty[] = [];
+  const unknownProperties: string[] = [];
+  for (const s of match[3].split(";")) {
+    const match = s.match(/^([^:]+):(.+?)(!?)$/);
+    const name = match && transformProperty(match[1], aliases);
+    if (name) {
+      properties.push({ name, value: transformValue(match[2], aliases), important: !!match[3] });
+    } else {
+      unknownProperties.push(s);
+    }
+  }
+  const style: Writable<Style> = { className, properties, unknownProperties, specificity: (match[4] === "?" ? 0 : 1) + match[5].length };
+  match[1] && (style.media = transformMedia(match[1], aliases));
+  match[4] === "?" && (style.layer = "");
+  match[2] && (style.selector = transformSelector(match[2], aliases));
+  return style;
 };

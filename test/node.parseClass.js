@@ -8,8 +8,8 @@ const parse = (strings, ...args) => {
   if (parsed) {
     assert.equal(parsed.className, className);
     delete parsed.className;
-    Object.entries(parsed).forEach(([key, value]) => value === undefined && delete parsed[key]);
     parsed.properties.forEach(p => p.important || delete p.important);
+    parsed.unknownProperties.length === 0 && delete parsed.unknownProperties;
   }
   return parsed;
 };
@@ -17,8 +17,8 @@ const parse = (strings, ...args) => {
 describe("parseClass", () => {
   it("property", () => {
     assert.deepEqual(parse`x:0`, { specificity: 1, properties: [{ name: "x", value: "0" }] });
-    assert.equal(parse`xx:0`, undefined);
-    assert.equal(parse`-x:0`, undefined);
+    assert.deepEqual(parse`xx:0`, { specificity: 1, properties: [], unknownProperties: ["xx:0"] });
+    assert.deepEqual(parse`-x:0`, { specificity: 1, properties: [], unknownProperties: ["-x:0"] });
     assert.deepEqual(parse`--x:0`, { specificity: 1, properties: [{ name: "--x", value: "0" }] });
     assert.deepEqual(parse`--x-y:0`, { specificity: 1, properties: [{ name: "--x-y", value: "0" }] });
     assert.deepEqual(parse`--x--y:0`, { specificity: 1, properties: [{ name: "--x--y", value: "0" }] });
@@ -40,10 +40,10 @@ describe("parseClass", () => {
   });
 
   it("media", () => {
-    assert.equal(parse`@print`, undefined);
-    assert.equal(parse`@print/`, undefined);
-    assert.equal(parse`@print/x`, undefined);
-    assert.equal(parse`@print/x:`, undefined);
+    assert.deepEqual(parse`@print`, { specificity: 1, properties: [], unknownProperties: ["@print"] });
+    assert.deepEqual(parse`@print/`, { specificity: 1, properties: [], unknownProperties: ["@print/"] });
+    assert.deepEqual(parse`@print/x`, { specificity: 1, properties: [], unknownProperties: ["@print/x"] });
+    assert.deepEqual(parse`@print/x:`, { specificity: 1, properties: [], unknownProperties: ["@print/x:"] });
     assert.deepEqual(parse`@print/x:0`, { media: "print", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`@print/x:0`, { media: "print", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`@hover:hover/x:0`, { media: "(hover:hover)", specificity: 1, properties: [{ name: "x", value: "0" }] });
@@ -66,5 +66,52 @@ describe("parseClass", () => {
     assert.deepEqual(parse`x:0!*`, { specificity: 2, properties: [{ name: "x", value: "0", important: true }] });
     assert.deepEqual(parse`x:0!?`, { layer: "", specificity: 0, properties: [{ name: "x", value: "0", important: true }] });
     assert.deepEqual(parse`x:0!?*`, { layer: "", specificity: 1, properties: [{ name: "x", value: "0", important: true }] });
+  });
+
+  it("multiple properties", () => {
+    assert.deepEqual(parse`x:0;y:1`, {
+      specificity: 1,
+      properties: [
+        { name: "x", value: "0" },
+        { name: "y", value: "1" },
+      ],
+    });
+    assert.deepEqual(parse`:hover/x:0!;y:1`, {
+      specificity: 1,
+      selector: ":hover",
+      properties: [
+        { name: "x", value: "0", important: true },
+        { name: "y", value: "1" },
+      ],
+    });
+    assert.deepEqual(parse`@w<sm/x:0;y:1!`, {
+      specificity: 1,
+      media: "(w<sm)",
+      properties: [
+        { name: "x", value: "0" },
+        { name: "y", value: "1", important: true },
+      ],
+    });
+    assert.deepEqual(parse`@print/::before/xx:0;y:1`, {
+      specificity: 1,
+      media: "print",
+      selector: "::before",
+      properties: [{ name: "y", value: "1" }],
+      unknownProperties: ["xx:0"],
+    });
+    assert.deepEqual(parse`x:0;yy:1?`, {
+      specificity: 0,
+      layer: "",
+      properties: [{ name: "x", value: "0" }],
+      unknownProperties: ["yy:1"],
+    });
+    assert.deepEqual(parse`x:0;y:1;d:2**`, {
+      specificity: 3,
+      properties: [
+        { name: "x", value: "0" },
+        { name: "y", value: "1" },
+        { name: "d", value: "2" },
+      ],
+    });
   });
 });

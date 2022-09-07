@@ -1,13 +1,6 @@
-import type { ParserOptions } from "./types.js";
-export declare const parseClass: (className: string, options?: ParserOptions) => {
-    className: string;
-    media: string | undefined;
-    layer: string | undefined;
-    selector: string | undefined;
-    specificity: number;
-    properties: {
-        name: string;
-        value: string;
-        important: boolean;
-    }[];
-} | undefined;
+import type { ParserOptions, Style } from "./types.js";
+declare type Writable<T> = {
+    -readonly [P in keyof T]: T[P];
+};
+export declare const parseClass: (className: string, options?: ParserOptions) => Writable<Style>;
+export {};

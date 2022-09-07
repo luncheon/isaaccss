@@ -45,35 +45,39 @@ const Button = () => (
 ## Class Format
 
 ```
-[@media/][selectors/]property:value[!][?][*]
+[@media/][selectors/]property:value[!][;property:value[!]...][?][*[*...]]
+ ~~~~~~~  ~~~~~~~~~~ ~~~~~~~~ ~~~~~ ~  ~~~~~~~~~~~~~~~~~~~~~  ~  ~~~~~~~
+   (1)       (2)       (3)     (4) (5)          (6)          (7)   (8)
 ```
 
-- Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
-  - `@foo/...` generates `@media foo {...}`
-  - Tokens are parenthesized where necessary
-- Optional `selectors/` indicates additional selectors
-  - [Pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
-    e.g. `:hover/`, `:has(>:checked)/`
-  - [Pseudo-elements](https://developer.mozilla.org/docs/Web/CSS/Pseudo-elements)  
-    e.g. `::before/`, `::part(foo)/`
-  - [Child combinator](https://developer.mozilla.org/docs/Web/CSS/Child_combinator)  
-    e.g. `>div/`
-  - [Adjacent sibling combinator](https://developer.mozilla.org/docs/Web/CSS/Adjacent_sibling_combinator)  
-    e.g. `+div/`
-  - [General sibling combinator](https://developer.mozilla.org/docs/Web/CSS/General_sibling_combinator)  
-    e.g. `~div/`
-  - Combination of the above  
-    e.g. `:hover>input+label::before/`
-- Required `property` indicates the property name
-  - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
-- Required `value` indicates the property value
-  - `$bar` will be replaced with `var(--bar)`
-    - Custom property set libraries, such as [Open Props](https://open-props.style/), can help with design themes
-- Optional trailing `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
-  - For example, add `?` to the components in a component library, so that applications using it can override the properties
-- Optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
-- Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
-  - For example, add `*` to the preferred style between `:hover` and `:active`
+1. Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
+   - `@foo/...` generates `@media foo {...}`
+   - Tokens are parenthesized where necessary
+2. Optional `selectors/` indicates additional selectors
+   - [Pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
+     e.g. `:hover/`, `:has(>:checked)/`
+   - [Pseudo-elements](https://developer.mozilla.org/docs/Web/CSS/Pseudo-elements)  
+     e.g. `::before/`, `::part(foo)/`
+   - [Child combinator](https://developer.mozilla.org/docs/Web/CSS/Child_combinator)  
+     e.g. `>div/`
+   - [Adjacent sibling combinator](https://developer.mozilla.org/docs/Web/CSS/Adjacent_sibling_combinator)  
+     e.g. `+div/`
+   - [General sibling combinator](https://developer.mozilla.org/docs/Web/CSS/General_sibling_combinator)  
+     e.g. `~div/`
+   - Combination of the above  
+     e.g. `:hover>input+label::before/`
+3. Required `property` indicates the property name
+   - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
+4. Required `value` indicates the property value
+   - `$bar` will be replaced with `var(--bar)`
+     - Custom property set libraries, such as [Open Props](https://open-props.style/), can help with design themes
+5. Optional `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
+6. Multiple `property:value[!]` can be specified, delimited by semicolons `;`
+7. Optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
+   - For example, add `?` to the components in a component library, so that applications using it can override the properties
+8. Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
+   - For example, add `*` to the preferred style between `:hover` and `:active`
+
 - An underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
 
 ## Installation

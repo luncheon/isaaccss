@@ -46,15 +46,18 @@ export const transform = (
           return existing.className;
         }
         const parsed = parseClass(className, options);
-        if (parsed) {
-          compress && (parsed.className = compressPrefix + compressClassName(classes.size));
-          classes.set(className, parsed);
-          return parsed.className;
-        } else {
+        if (parsed.unknownProperties?.length) {
           const start = node.loc?.start;
-          console.warn(`isaaccss: ${filename}${start ? `:${start.line}` : ""} - Couldn't parse class "${className}".`);
+          console.warn(
+            `isaaccss: ${filename}${start ? `:${start.line}` : ""} - Unknown property: "${parsed.unknownProperties.join('", "')}".`,
+          );
+        }
+        if (parsed.properties.length === 0) {
           return className;
         }
+        compress && (parsed.className = compressPrefix + compressClassName(classes.size));
+        classes.set(className, parsed);
+        return parsed.className;
       })
       .join(" ");
 

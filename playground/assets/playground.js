@@ -48065,23 +48065,27 @@ ${rootStack}`;
   var parseClass = (className, options) => {
     const aliases = options?.aliases;
     const match = className.match(
-      /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+?):(.+?)(!?)(\??)(\**)$/
+      /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+:.+?!?(?:;[^:]+:.+?!?)*)(\??)(\**)$/
     );
-    const property = match && transformProperty(match[3], aliases);
-    return property ? {
-      className,
-      media: match[1] ? transformMedia(match[1], aliases) : void 0,
-      layer: match[6] === "?" ? "" : void 0,
-      selector: match[2] ? transformSelector(match[2], aliases) : void 0,
-      specificity: (match[6] === "?" ? 0 : 1) + match[7].length,
-      properties: [
-        {
-          name: property,
-          value: transformValue(match[4], aliases),
-          important: match[5] === "!"
-        }
-      ]
-    } : void 0;
+    if (!match) {
+      return { className, properties: [], unknownProperties: [className], specificity: 1 };
+    }
+    const properties = [];
+    const unknownProperties = [];
+    for (const s of match[3].split(";")) {
+      const match2 = s.match(/^([^:]+):(.+?)(!?)$/);
+      const name = match2 && transformProperty(match2[1], aliases);
+      if (name) {
+        properties.push({ name, value: transformValue(match2[2], aliases), important: !!match2[3] });
+      } else {
+        unknownProperties.push(s);
+      }
+    }
+    const style = { className, properties, unknownProperties, specificity: (match[4] === "?" ? 0 : 1) + match[5].length };
+    match[1] && (style.media = transformMedia(match[1], aliases));
+    match[4] === "?" && (style.layer = "");
+    match[2] && (style.selector = transformSelector(match[2], aliases));
+    return style;
   };
 
   // ../src/core/parseHtml.ts
