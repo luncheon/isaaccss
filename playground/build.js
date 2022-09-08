@@ -14,11 +14,11 @@ const isaaccssInstance = isaaccss.plugin();
 
 /** @type esbuild.BuildOptions */
 const buildOptions = {
-  entryPoints: [resolve("src/playground.tsx")],
+  entryPoints: [resolve("src/index.tsx")],
   outfile: resolveOutput("playground.js"),
   bundle: true,
-  minify: false,
-  loader: { ".html": "text", ".otf": "copy" },
+  minify: true,
+  loader: { ".otf": "copy" },
   assetNames: "[name]",
   inject: [isaaccss.inject],
   define: { "process.env.BABEL_TYPES_8_BREAKING": false, "process.platform": "''", "Buffer.isBuffer": "Function" },

@@ -1,10 +1,20 @@
 import { is } from "isaaccss";
-import { defaultAliases } from "isaaccss/aliases/default.js";
-import { cssify } from "isaaccss/api/cssify.js";
-import { parseHtml } from "isaaccss/api/parseHtml.js";
 import { createMemo, createSignal } from "solid-js";
 import type { JSX } from "solid-js/types/jsx";
-import sampleHtml from "./sample.html";
+import sampleTsx from "./sample.txt";
+import { transform } from "./transform";
+
+const [sourceCode, setSourceCode] = createSignal(sampleTsx);
+const transformed = createMemo(() => transform(sourceCode()));
+
+const previewHtmlContent = (js: string, css: string) => `<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/open-props/open-props.min.css">
+    <style>${css}</style>
+    <script type="module">${js}</script>
+  </head>
+  <body></body>
+</html>`;
 
 const Header = () => (
   <header class={is`p-b:1em font-family:logo d:inline-flex flex-direction:column align-items:center`}>
@@ -21,34 +31,24 @@ const Details = ({ open, summary, children }: { open?: boolean; summary: string;
 );
 
 const Main = () => (
-  <main class={is`d:flex flex-direction:column gap:1rem _textarea/font-family:'Source_Code_Pro',monospace _textarea/font-size:0.9375rem`}>
-    <Details summary="HTML" open>
-      <textarea rows="10" value={htmlContent()} onInput={e => setHtmlContent(e.currentTarget.value)} />
+  <main class={is`d:flex flex-direction:column gap:1rem _textarea/font-family:'Source_Code_Pro',monospace _textarea/font-size:0.875rem`}>
+    <Details summary="index.tsx" open>
+      <textarea rows="30" value={sourceCode()} onChange={e => setSourceCode(e.currentTarget.value)} />
     </Details>
 
-    <Details summary="Parsed Classes">
-      <textarea rows="10" readonly value={classesJson()} />
+    <Details summary="index.js">
+      <textarea rows="10" readonly value={transformed().error ?? transformed().code} />
     </Details>
 
-    <Details summary="CSS">
-      <textarea rows="10" readonly value={css()} />
-    </Details>
-
-    <Details summary="Pretty CSS" open>
-      <textarea rows="10" readonly value={beautifiedCss()} />
+    <Details summary="index.css">
+      <textarea rows="10" readonly value={transformed().css ?? ""} />
     </Details>
 
     <Details summary="Preview" open>
-      <iframe srcdoc={`<html><head><style>${css()}</style></head><body>${htmlContent()}</body></html>`}></iframe>
+      <iframe srcdoc={previewHtmlContent(transformed().code ?? "", transformed().css ?? "")}></iframe>
     </Details>
   </main>
 );
-
-const [htmlContent, setHtmlContent] = createSignal(sampleHtml);
-const classes = createMemo(() => parseHtml(htmlContent(), { aliases: defaultAliases }));
-const classesJson = createMemo(() => JSON.stringify([...classes().values()], undefined, 2));
-const css = createMemo(() => cssify(classes().values()));
-const beautifiedCss = createMemo(() => cssify(classes().values(), { pretty: true }));
 
 export const App = () => (
   <>
