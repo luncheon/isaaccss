@@ -34,7 +34,7 @@
     "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.18.1",
     "@types/glob": "^8.0.0",
-    "@types/node": "^18.7.15",
+    "@types/node": "^18.7.16",
     "esbuild": "^0.15.7",
     "rollup": "^2.79.0",
     "typescript": "^4.8.2",
@@ -47,7 +47,6 @@
     "@babel/types": "^7.19.0",
     "@rollup/pluginutils": "^4.2.1",
     "css.escape": "^1.5.1",
-    "htmlparser2": "^8.0.1",
     "known-css-properties": "^0.25.0",
     "postcss": "^8.4.16"
   }
