@@ -1,5 +1,6 @@
-import "./aliases.node.js";
-import "./esbuild.node.js";
-import "./parseClass.node.js";
-import "./rollup.node.js";
-import "./vite.node.js";
+import "./aliases.spec.js";
+import "./cssify.spec.js";
+import "./esbuild.spec.js";
+import "./parseClass.spec.js";
+import "./rollup.spec.js";
+import "./vite.spec.js";

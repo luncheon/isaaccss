@@ -66,6 +66,8 @@ const Button = () => (
      e.g. `~div/`
    - Combination of the above  
      e.g. `:hover>input+label::before/`
+   - If there are ampersands `&`, they becomes that class  
+     e.g. `&+&/m-l:1em` -> `.\&\+\& + .\&\+\& { margin-left: 1rem }`
 3. Required `property` indicates the property name
    - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
 4. Required `value` indicates the property value

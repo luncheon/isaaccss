@@ -26,7 +26,11 @@ const joinGroup = <T, K>(
 
 const mediaSelector = (c: Style) => c.media ?? "";
 const layerSelector = (c: Style) => c.layer;
-const selectorSelector = (c: Style) => `.${CSS.escape(c.className)}${":not(#\\ )".repeat(c.specificity ?? 0)}${c.selector ?? ""}`;
+const selectorSelector = (c: Style) => {
+  const selector = c.selector ?? "";
+  const selfSelector = "." + CSS.escape(c.className) + ":not(#\\ )".repeat(c.specificity ?? 0);
+  return selector.includes("&") ? selector.replaceAll("&", selfSelector) : selfSelector + selector;
+};
 const propertiesSelector = (indent: string, newline: string) => (c: Style) =>
   c.properties.map(p => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(";" + newline);
 
