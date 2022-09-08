@@ -11,7 +11,9 @@
   },
   "scripts": {
     "postinstall": "npm link ../pkg",
-    "test": "node node.all.js && playwright test"
+    "test": "npm run test:node && npm run test:e2e",
+    "test:node": "node node/index.js",
+    "test:e2e": "playwright test --config=e2e"
   },
   "devDependencies": {
     "@playwright/test": "^1.25.1",

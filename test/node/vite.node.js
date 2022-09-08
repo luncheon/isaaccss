@@ -9,8 +9,8 @@ import isaaccssPlugin from "isaaccss/vite";
 import OpenProps from "open-props";
 import postcssJitProps from "postcss-jit-props";
 import { build } from "vite";
-import expected from "./sample/expected.css.js";
-import viteConfig from "./vite.config.js";
+import expected from "../sample/expected.css.js";
+import viteConfig from "../vite.config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolvePath = (...segments) => path.resolve(__dirname, ...segments);
@@ -48,7 +48,8 @@ describe("vite", () => {
   });
 
   it("vite cli", async () => {
-    execFileSync("npx", ["vite", "build"], { cwd: __dirname });
-    assert.equal(fs.readFileSync(resolvePath(".dist/vite/index.css"), "utf8"), expected.reset + "\n" + expected.default);
+    fs.rmSync(resolvePath("../.dist/vite/"), { force: true, recursive: true });
+    execFileSync("npx", ["vite", "build"], { cwd: resolvePath("..") });
+    assert.equal(fs.readFileSync(resolvePath("../.dist/vite/index.css"), "utf8"), expected.reset + "\n" + expected.default);
   });
 });

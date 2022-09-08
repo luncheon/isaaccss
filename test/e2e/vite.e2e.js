@@ -3,7 +3,7 @@ import isaaccssPlugin from "isaaccss/vite";
 import OpenProps from "open-props";
 import postcssJitProps from "postcss-jit-props";
 import { build } from "vite";
-import viteConfig from "./vite.config.js";
+import viteConfig from "../vite.config.js";
 
 const html = (js, css) => `
 <html>

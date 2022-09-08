@@ -11,7 +11,7 @@ import { rollup } from "rollup";
 import css from "rollup-plugin-import-css";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const resolvePath = (...segments) => path.resolve(__dirname, ...segments);
+const resolvePath = (...segments) => path.resolve(__dirname, "..", ...segments);
 
 const input = resolvePath("sample/a.ts");
 const plugins = [resolve({ extensions: [".js", ".jsx", ".ts", ".tsx"] }), sucrase({ production: true, transforms: ["jsx", "typescript"] })];

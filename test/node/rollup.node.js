@@ -12,12 +12,12 @@ import OpenProps from "open-props";
 import postcssJitProps from "postcss-jit-props";
 import { rollup } from "rollup";
 import css from "rollup-plugin-import-css";
-import expected from "./sample/expected.css.js";
+import expected from "../sample/expected.css.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolvePath = (...segments) => path.resolve(__dirname, ...segments);
 
-const input = resolvePath("sample/a.ts");
+const input = resolvePath("../sample/a.ts");
 const plugins = [resolve({ extensions: [".js", ".jsx", ".ts", ".tsx"] }), sucrase({ production: true, transforms: ["jsx", "typescript"] })];
 
 describe("rollup", () => {
@@ -50,7 +50,7 @@ describe("rollup", () => {
 
   it("bundle with other css", async () => {
     assert.deepEqual(
-      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin({ compress: false }), ...plugins] })
+      await rollup({ input: resolvePath("../sample/index.js"), plugins: [css(), isaaccssPlugin({ compress: false }), ...plugins] })
         .then(result => result.generate({ file: "a.js" }))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source]),
       [2, "a.css", expected.reset + expected.default],
@@ -59,7 +59,7 @@ describe("rollup", () => {
 
   it("bundle with other css, another output filename", async () => {
     assert.deepEqual(
-      await rollup({ input: resolvePath("sample/index.js"), plugins: [css(), isaaccssPlugin({ compress: false, output: "b.css" }), ...plugins] })
+      await rollup({ input: resolvePath("../sample/index.js"), plugins: [css(), isaaccssPlugin({ compress: false, output: "b.css" }), ...plugins] })
         .then(result => result.generate({ file: "a.js" }))
         .then(({ output }) => [output.length, output[1].fileName, output[1].source, output[2].fileName, output[2].source]),
       [3, "a.css", expected.reset, "b.css", expected.default],
@@ -103,8 +103,8 @@ describe("rollup", () => {
   });
 
   it("rollup cli", async () => {
-    fs.rmSync(resolvePath(".dist/rollup/"), { force: true, recursive: true });
-    execFileSync("npx", ["rollup", "-c"], { cwd: __dirname });
-    assert.equal(fs.readFileSync(resolvePath(".dist/rollup/bundle.css"), "utf8"), expected.reset + expected.default);
+    fs.rmSync(resolvePath("../.dist/rollup/"), { force: true, recursive: true });
+    execFileSync("npx", ["rollup", "-c"], { cwd: resolvePath("..") });
+    assert.equal(fs.readFileSync(resolvePath("../.dist/rollup/bundle.css"), "utf8"), expected.reset + expected.default);
   });
 });
