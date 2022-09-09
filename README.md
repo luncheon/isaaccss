@@ -128,10 +128,24 @@ export default {
         items: "align-items",
         justify: "justify-content",
       },
-      value: {
-        abs: "absolute",
-        rel: "relative",
-      },
+
+      // for value, specify an array of either
+      //   [propertyNameOrPattern, { alias: value }] or
+      //   [propertyNameOrPattern, [aliasPattern, replacerStringOrFunction]]
+      value: [
+        [
+          "box-shadow",
+          {
+            sm: "0 1px 2px hsla($shadow-hsl / 0.1)",
+            md: "0 1px 2px hsla($shadow-hsl / 0.1),0 3px 6px hsla($shadow-hsl / 0.1)",
+          },
+        ],
+        [
+          // `m:[1]`->{margin:.0625rem} `m-l:[16]`->{margin-left:1rem}
+          /^margin|^padding|^font-size$/,
+          [/\[(-?\d*\.?\d+)\]/g, (_, $1) => `${+$1 / 16}rem`.replace(/^0\./, ".")],
+        ],
+      ],
     },
   ],
 

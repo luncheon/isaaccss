@@ -22,10 +22,20 @@ const readmeAliases = [
       items: "align-items",
       justify: "justify-content",
     },
-    value: {
-      abs: "absolute",
-      rel: "relative",
-    },
+    value: [
+      [
+        "box-shadow",
+        {
+          sm: "0 1px 2px hsla($shadow-hsl / 0.1)",
+          md: "0 1px 2px hsla($shadow-hsl / 0.1),0 3px 6px hsla($shadow-hsl / 0.1)",
+        },
+      ],
+      [
+        // `m:[1]`->{margin:.0625rem} `m:[16]`->{margin:1rem}
+        /^margin|^padding|^font-size$/,
+        [/\[(-?\d*\.?\d+)\]/g, (_, $1) => `${+$1 / 16}rem`.replace(/^0/, "")],
+      ],
+    ],
   },
 ];
 
@@ -122,8 +132,13 @@ describe("aliases", () => {
 
     it("value", () => {
       const parse = parser({ aliases });
-      assert.deepEqual(parse`pos:abs`, { specificity: 1, properties: [{ name: "position", value: "absolute" }] });
-      assert.deepEqual(parse`pos:rel`, { specificity: 1, properties: [{ name: "position", value: "relative" }] });
+      assert.deepEqual(parse`box-shadow:sm`, { specificity: 1, properties: [{ name: "box-shadow", value: "0 1px 2px hsla(var(--shadow-hsl) / 0.1)" }] });
+      assert.deepEqual(parse`box-shadow:md`, { specificity: 1, properties: [{ name: "box-shadow", value: "0 1px 2px hsla(var(--shadow-hsl) / 0.1),0 3px 6px hsla(var(--shadow-hsl) / 0.1)" }] });
+      assert.deepEqual(parse`m:[1]`, { specificity: 1, properties: [{ name: "margin", value: ".0625rem" }] });
+      assert.deepEqual(parse`m-l:[16]`, { specificity: 1, properties: [{ name: "margin-left", value: "1rem" }] });
+      assert.deepEqual(parse`font-size:[24]`, { specificity: 1, properties: [{ name: "font-size", value: "1.5rem" }] });
+      assert.deepEqual(parse`p-b:[.5]`, { specificity: 1, properties: [{ name: "padding-bottom", value: ".03125rem" }] });
+      assert.deepEqual(parse`p:[1.5]`, { specificity: 1, properties: [{ name: "padding", value: ".09375rem" }] });
     });
   });
 });

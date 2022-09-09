@@ -1,11 +1,12 @@
 export type AliasElement = { readonly [token in string]: string } | readonly [RegExp, string | Parameters<string["replace"]>[1]];
 export type Alias = AliasElement | undefined | null | false;
+export type ValueAlias = readonly [property: string | RegExp, alias: Alias | readonly Alias[]];
 
 export interface Aliases {
   readonly media?: Alias | readonly Alias[];
   readonly selector?: Alias | readonly Alias[];
   readonly property?: Alias | readonly Alias[];
-  readonly value?: Alias | readonly Alias[];
+  readonly value?: readonly ValueAlias[];
 }
 
 export type DeepArray<T> = readonly (T | DeepArray<T>)[];

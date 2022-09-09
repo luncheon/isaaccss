@@ -1,79 +1,74 @@
 import { all as __knownCssProperties } from "known-css-properties";
 const knownCssPropertySet = new Set(__knownCssProperties);
-function* flattenAliases(aliases, key) {
-    if (!aliases) {
-        return;
-    }
-    if (Array.isArray(aliases)) {
-        for (const alias of aliases) {
-            yield* flattenAliases(alias, key);
+function* deepFlatFilterMap(arrayOrElement, selector, predicate) {
+    if (arrayOrElement) {
+        if (Array.isArray(arrayOrElement)) {
+            for (const element of arrayOrElement) {
+                yield* deepFlatFilterMap(element, selector);
+            }
         }
-        return;
-    }
-    const alias = aliases[key];
-    if (!alias) {
-        return;
-    }
-    if (!Array.isArray(alias) || alias[0] instanceof RegExp) {
-        yield alias;
-    }
-    else {
-        for (const a of alias) {
-            if (a) {
-                yield a;
+        else {
+            const element = selector(arrayOrElement);
+            if (element !== undefined && element !== null && element !== false && (!predicate || predicate(element))) {
+                yield element;
             }
         }
     }
 }
-const unescapeBackslash = (s) => s.replace(/\\(.)/g, "$1");
-const unescapeWhitespace = (s) => s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
-const replaceTokens = (source, aliases, tokenPattern) => {
+const applyAliases = (source, tokenPattern, aliases) => {
+    if (!aliases) {
+        return source;
+    }
+    if (!Array.isArray(aliases)) {
+        return source.replaceAll(tokenPattern, token => aliases[token] ?? token);
+    }
+    if (aliases[0] instanceof RegExp) {
+        return source.replace(aliases[0], aliases[1]);
+    }
     for (const alias of aliases) {
-        if (Array.isArray(alias)) {
-            source = source.replace(alias[0], alias[1]);
-        }
-        else {
-            source = source.replaceAll(tokenPattern, token => alias[token] ?? token);
-        }
+        source = applyAliases(source, tokenPattern, alias);
     }
     return source;
 };
-const replaceProperty = (property, aliases) => {
-    for (const alias of aliases) {
-        if (Array.isArray(alias)) {
-            property = property.replace(alias[0], alias[1]);
-        }
-        else {
-            property = alias[property] || property;
-        }
-    }
-    return property;
-};
+const unescapeBackslash = (s) => s.replace(/\\(.)/g, "$1");
+const unescapeWhitespace = (s) => s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
 const transformMedia = (media, aliases) => {
-    media = replaceTokens(media, flattenAliases(aliases, "media"), /[\w$#-]+/g);
+    for (const alias of deepFlatFilterMap(aliases, a => a.media)) {
+        media = applyAliases(media, /[\w$#@-]+/g, alias);
+    }
     media = unescapeWhitespace(media);
     media = media.replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3");
     return unescapeBackslash(media);
 };
 const transformSelector = (selector, aliases) => {
-    selector = replaceTokens(selector, flattenAliases(aliases, "selector"), /([:>+~_]|::)[\w$#-]+/g);
+    for (const alias of deepFlatFilterMap(aliases, a => a.selector)) {
+        selector = applyAliases(selector, /([:>+~_]|::)[\w$#@-]+/g, alias);
+    }
     selector = unescapeWhitespace(selector);
     return unescapeBackslash(selector);
-};
-const transformValue = (value, aliases) => {
-    value = replaceTokens(value, flattenAliases(aliases, "value"), /[\w$#-]+/g);
-    value = unescapeWhitespace(value);
-    value = value.replace(/\$([_a-zA-Z0-9-]*[a-zA-Z0-9])/g, "var(--$1)");
-    return unescapeBackslash(value);
 };
 const transformProperty = (property, aliases) => {
     if (property.startsWith("--")) {
         return property;
     }
-    property = replaceProperty(property, flattenAliases(aliases, "property"));
+    for (const alias of deepFlatFilterMap(aliases, a => a.property)) {
+        property = applyAliases(property, /^.*$/g, alias);
+    }
     if (knownCssPropertySet.has(property)) {
         return property;
     }
+};
+const transformValue = (property, value, aliases) => {
+    for (const alias of deepFlatFilterMap(aliases, a => a.value)) {
+        for (const [p, a] of alias) {
+            if (p instanceof RegExp ? p.test(property) : p === property) {
+                value = applyAliases(value, /[\w$#@-]+/g, a);
+            }
+        }
+    }
+    value = unescapeWhitespace(value);
+    value = value.replace(/\$([_a-zA-Z0-9-]*[a-zA-Z0-9])/g, "var(--$1)");
+    return unescapeBackslash(value);
 };
 export const parseClass = (className, options) => {
     const aliases = options?.aliases;
@@ -89,7 +84,7 @@ export const parseClass = (className, options) => {
         const match = s.match(/^([^:]+):(.+?)(!?)$/);
         const name = match && transformProperty(match[1], aliases);
         if (name) {
-            properties.push({ name, value: transformValue(match[2], aliases), important: !!match[3] });
+            properties.push({ name, value: transformValue(name, match[2], aliases), important: !!match[3] });
         }
         else {
             unknownProperties.push(s);
