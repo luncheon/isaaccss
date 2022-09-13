@@ -24,3 +24,12 @@
   width: 100%;
   resize: vertical;
 }
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  line-height: 1.5;
+}

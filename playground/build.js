@@ -10,6 +10,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = (...pathSegments) => path.resolve(__dirname, ...pathSegments);
 const resolveOutput = (...pathSegments) => resolve("assets", ...pathSegments);
 
+fs.rmSync(resolveOutput(), { recursive: true, force: true });
+
+await esbuild.build({
+  entryPoints: {
+    "editor.worker": resolve("node_modules/monaco-editor/esm/vs/editor/editor.worker.js"),
+    "css.worker": resolve("node_modules/monaco-editor/esm/vs/language/css/css.worker.js"),
+    "ts.worker": resolve("node_modules/monaco-editor/esm/vs/language/typescript/ts.worker.js"),
+  },
+  outdir: resolveOutput(),
+  assetNames: "[name]",
+  chunkNames: "[name]",
+  loader: { ".ttf": "file" },
+  bundle: true,
+  minify: true,
+  format: "iife",
+});
+
 const isaaccssInstance = isaaccss.plugin();
 
 /** @type esbuild.BuildOptions */
@@ -18,7 +35,7 @@ const buildOptions = {
   outfile: resolveOutput("playground.js"),
   bundle: true,
   minify: true,
-  loader: { ".otf": "copy" },
+  loader: { ".otf": "copy", ".ttf": "copy" },
   assetNames: "[name]",
   inject: [isaaccss.inject],
   define: { "process.env.BABEL_TYPES_8_BREAKING": false, "process.platform": "''", "Buffer.isBuffer": "Function" },
@@ -34,6 +51,5 @@ const buildOptions = {
 if (process.argv.includes("--serve")) {
   esbuild.serve({ servedir: "." }, buildOptions).then(({ port }) => console.log(`http://localhost:${port}`));
 } else {
-  fs.rmSync(resolveOutput(), { recursive: true, force: true });
   esbuild.build(buildOptions);
 }

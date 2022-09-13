@@ -1,6 +1,8 @@
 import { is } from "isaaccss";
-import { Fragment, h, render } from "https://esm.sh/preact";
-import { batch, signal } from "https://esm.sh/@preact/signals";
+import { Fragment, h, render } from "https://esm.sh/preact@10.10.6";
+import { batch, signal } from "https://esm.sh/@preact/signals@1.0.3";
+
+document.head.innerHTML += '<link rel="stylesheet" href="https://unpkg.com/open-props/open-props.min.css">';
 
 const previous = signal(0);
 const current = signal(1);

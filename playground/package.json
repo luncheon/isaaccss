@@ -15,7 +15,8 @@
     "babel-preset-solid": "^1.5.4",
     "esbuild-plugin-babel": "^0.2.3",
     "esbuild-plugin-pipe": "^0.2.0",
+    "monaco-editor": "^0.34.0",
     "solid-js": "^1.5.4",
-    "sucrase": "^3.25.0"
+    "sucrase": "^3.26.0"
   }
 }
