@@ -1,8 +1,9 @@
 {
   "name": "isaaccss",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "Inline-Style-as-a-Class CSS engine",
   "license": "WTFPL",
+  "repository": "luncheon/isaaccss",
   "type": "module",
   "exports": {
     ".": "./index.js",
