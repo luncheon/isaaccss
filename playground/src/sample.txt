@@ -10,6 +10,21 @@ const next = () => batch(() => [previous.value, current.value] = [current.value,
 
 const Link = ({ href }: { href: string }) => <a target="_top" class={is`c:$blue-6 :hover/c:$blue-4`} href={href}>{href}</a>
 
+const Button = ({ variant, onClick, children }: { variant: 'primary' | 'secondary', onClick: () => unknown, children: string }) => (
+  <button
+    type="button"
+    class={is`
+      bg:hsl($H,$S,$L) ${variant === "secondary" ? is`--H:30` : is`--H:210`}
+      --S:100% --L:50% :hover/--L:60% :active/--L:40%* 
+      b:3px_solid_hsl($H,$S,80%) b-radius:8px c:white cursor:pointer
+      p:4px_8px @w>=768px/p:8px_16px @hover:hover/:hover/scale:1.1
+    `}
+    onClick={onClick}
+  >
+    {children}
+  </button>
+);
+
 const App = () => (
   <>
     <p class={is`b:1px_solid_currentColor b-radius:4px bg:$blue-0 c:$blue-7 m:.5em_0 p:.375em_.75em @w>=768px/p:.5em_1em`}>
@@ -17,17 +32,7 @@ const App = () => (
       See <Link href="https://github.com/luncheon/isaaccss" /> for the spec.
     </p>
 
-    <button
-      type="button"
-      class={is`
-        b:none bg:hsl($H,$S,$L) --H:210 --S:100% --L:50% :hover/--L:60% :active/--L:40%*
-        b-radius:4px c:white cursor:pointer p:.375em_.75em @w>=768px/p:.5em_1em
-        @hover:hover/:hover/scale:1.1
-      `}
-      onClick={next}
-    >
-      {current.value}
-    </button>
+    <Button variant="primary" onClick={next}>{current.value}</Button>
   </>
 );
 

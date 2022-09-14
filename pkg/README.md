@@ -6,9 +6,10 @@ An atomic CSS DSL like inline style.
 ```jsx
 import { is } from "isaaccss";
 
-const SubmitButton = () => (
+const SubmitButton = ({ variant }: { variant: 'primary' | 'secondary' }) => (
   <button class={is`
-    background:hsl(var(--H),var(--S),var(--L)) --H:210 --S:100% --L:50% :hover/--L:60% :active/--L:40%*
+    background:hsl(var(--H),var(--S),var(--L)) ${variant === "secondary" ? is`--H:30` : is`--H:210`}
+    --S:100% --L:50% :hover/--L:60% :active/--L:40%*
     border:3px_solid_hsl(var(--H),var(--S),80%) border-radius:8px color:white
     padding:4px_8px @width>=768px/padding:8px_16px @hover:hover/:hover/scale:1.1
   `}>
@@ -23,15 +24,16 @@ Or using some short aliases:
 ```jsx
 import { is } from "isaaccss";
 
-const SubmitButton = () => (
+const SubmitButton = ({ variant }: { variant: 'primary' | 'secondary' }) => (
   <button class={is`
-    bg:hsl($H,$S,$L) --H:210 --S:100% --L:50% :hover/--L:60% :active/--L:40%* 
+    bg:hsl($H,$S,$L) ${variant === "secondary" ? is`--H:30` : is`--H:210`}
+    --S:100% --L:50% :hover/--L:60% :active/--L:40%* 
     b:3px_solid_hsl($H,$S,80%) b-radius:8px c:white
     p:4px_8px @w>=768px/p:8px_16px @hover:hover/:hover/scale:1.1
   `}>
     Submit
   </button>
-)
+);
 ```
 
 [Playground](https://luncheon.github.io/isaaccss/playground/)
@@ -68,8 +70,10 @@ const SubmitButton = () => (
 ```
 
 1. Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
-   - `@foo/d:none` generates `@media foo { display: none }`
-   - Tokens are parenthesized where necessary
+   - `@foo/d:none` generates `@media foo { .\#a { display: none } }`  
+     (`.\@foo\/d\:none` is compressed into `.\#a`)
+   - Tokens are parenthesized where necessary  
+     e.g. `@screen&w>=640px/m:0` -> `@media screen and (width >= 640px) { .\#a { margin: 0 } }`
 2. Optional `selectors/` indicates additional selectors
    - [Pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
      e.g. `:hover/`, `:has(>:checked)/`
@@ -84,7 +88,7 @@ const SubmitButton = () => (
    - Combination of the above  
      e.g. `:hover>input+label::before/`
    - If there are ampersands `&`, they becomes that class  
-     e.g. `&+&/m-l:1em` -> `.\&\+\& + .\&\+\& { margin-left: 1rem }`
+     e.g. `&+&/m-l:1rem` -> `.\&\+\& + .\&\+\& { margin-left: 1rem }`
 3. Required `property` indicates the property name
    - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
 4. Required `value` indicates the property value

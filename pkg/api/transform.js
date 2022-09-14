@@ -55,17 +55,11 @@ export const transform = (code, filename, options, babelParserPlugins, classes =
                 tagBindingPath.node.imported.name === TAG_IMPORT_SPECIFIER &&
                 tagBindingPath.parent.type === "ImportDeclaration" &&
                 tagBindingPath.parent.source.value === TAG_IMPORT_SOURCE) {
-                path.traverse({
-                    StringLiteral(path) {
-                        const className = transformClassName(path.node.value, path.node);
-                        compress && className !== path.node.value && path.replaceWith(t.stringLiteral(className))[0].skip();
-                    },
-                    TemplateElement(path) {
-                        const className = transformClassName(path.node.value.raw, path.node);
-                        compress && className !== path.node.value.raw && path.replaceWith(t.templateElement({ raw: className }))[0].skip();
-                    },
+                const quasis = path.node.quasi.quasis.map(node => {
+                    const className = transformClassName(node.value.raw, node);
+                    return compress && className !== node.value.raw ? t.templateElement({ raw: className }) : node;
                 });
-                compress && path.replaceWith(t.templateLiteral(path.node.quasi.quasis, path.node.quasi.expressions));
+                compress && path.replaceWith(t.templateLiteral(quasis, path.node.quasi.expressions));
             }
         },
     });

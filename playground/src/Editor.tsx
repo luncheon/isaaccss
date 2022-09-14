@@ -23,7 +23,7 @@ self.MonacoEnvironment = { getWorkerUrl: (_, label) => (label === "css" ? "./ass
 export const Editor = (props: { class?: string }) => {
   let ref: HTMLDivElement;
   let instance: monaco.editor.IStandaloneCodeEditor;
-  const onResize = () => console.log("layout", instance.layout());
+  const onResize = () => instance.layout();
   onMount(() => {
     instance = monaco.editor.create(ref!, {
       fontFamily: "Source Code Pro",
