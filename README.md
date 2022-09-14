@@ -68,8 +68,10 @@ const SubmitButton = () => (
 ```
 
 1. Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
-   - `@foo/d:none` generates `@media foo { display: none }`
-   - Tokens are parenthesized where necessary
+   - `@foo/d:none` generates `@media foo { .\#a { display: none } }`  
+     (`.\@foo\/d\:none` is compressed into `.\#a`)
+   - Tokens are parenthesized where necessary  
+     e.g. `@screen&w>=640px/m:0` -> `@media screen and (width >= 640px) { .\#a { margin: 0 } }`
 2. Optional `selectors/` indicates additional selectors
    - [Pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
      e.g. `:hover/`, `:has(>:checked)/`
@@ -84,7 +86,7 @@ const SubmitButton = () => (
    - Combination of the above  
      e.g. `:hover>input+label::before/`
    - If there are ampersands `&`, they becomes that class  
-     e.g. `&+&/m-l:1em` -> `.\&\+\& + .\&\+\& { margin-left: 1rem }`
+     e.g. `&+&/m-l:1rem` -> `.\&\+\& + .\&\+\& { margin-left: 1rem }`
 3. Required `property` indicates the property name
    - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
 4. Required `value` indicates the property value
