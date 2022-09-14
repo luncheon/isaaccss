@@ -1,13 +1,17 @@
 # isaaccss: Inline-Style-as-a-Class CSS engine
 
-A CSS class DSL like inline styles.
+An atomic CSS DSL like inline style.
 
 <!-- prettier-ignore -->
 ```jsx
 import { is } from "isaaccss";
 
-const Button = () => (
-  <button class={is`--H:210 --S:100% --L:50% padding:4px_8px @width>=768px/padding:8px_16px border-radius:8px color:white border:3px_solid_hsl(var(--H),var(--S),80%) background:hsl(var(--H),var(--S),var(--L)) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1`}>
+const SubmitButton = () => (
+  <button class={is`
+    background:hsl(var(--H),var(--S),var(--L)) --H:210 --S:100% --L:50% :hover/--L:60% :active/--L:40%*
+    border:3px_solid_hsl(var(--H),var(--S),80%) border-radius:8px color:white
+    padding:4px_8px @width>=768px/padding:8px_16px @hover:hover/:hover/scale:1.1
+  `}>
     Submit
   </button>
 );
@@ -19,13 +23,25 @@ Or using some short aliases:
 ```jsx
 import { is } from "isaaccss";
 
-const Button = () => (
-  <button class={is`--H:210 --S:100% --L:50% p:4px_8px @w>=768px/p:8px_16px b-radius:8px c:white b:3px_solid_hsl($H,$S,80%) bg:hsl($H,$S,$L) :hover/--L:60% :active/--L:40%* @hover:hover/:hover/scale:1.1`}>
+const SubmitButton = () => (
+  <button class={is`
+    bg:hsl($H,$S,$L) --H:210 --S:100% --L:50% :hover/--L:60% :active/--L:40%* 
+    b:3px_solid_hsl($H,$S,80%) b-radius:8px c:white
+    p:4px_8px @w>=768px/p:8px_16px @hover:hover/:hover/scale:1.1
+  `}>
     Submit
   </button>
 )
 ```
 
+[Playground](https://luncheon.github.io/isaaccss/playground/)
+
+## Intent
+
+- Like inline styles and other atomic CSS frameworks:
+  - Predictable changes
+  - No pondering class names
+  - Correct separation of concerns: markup and its style are strongly coupled and should be maintained together. Putting them into separate files is a bad idea.
 - Unlike inline styles:
   - Media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
   - Specificity can be adjusted
@@ -37,12 +53,13 @@ const Button = () => (
     - Simple and flexible: any media, any selector, any property and any value can be described as is
   - High specificity (ID-specificity = 1) by default to override styles from other CSS libraries
   - Specificity can be adjusted
-  - Class names can be compressed
+  - Class names can be compressed into prefixed short names such as `#a`, `#b`, ..., `#aa`, ...
   - Invalid class names can be detected
 - Unlike [Linaria](https://linaria.dev/):
   - Short aliases can be used
+  - Atomic styles are reused, preventing CSS file size bloating
 
-## Class Format
+## Syntax
 
 ```
 [@media/][selectors/]property:value[!][;property:value[!]...][?][*[*...]]
@@ -51,7 +68,7 @@ const Button = () => (
 ```
 
 1. Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
-   - `@foo/...` generates `@media foo {...}`
+   - `@foo/d:none` generates `@media foo { display: none }`
    - Tokens are parenthesized where necessary
 2. Optional `selectors/` indicates additional selectors
    - [Pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
@@ -82,18 +99,120 @@ const Button = () => (
 
 - An underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
 
+## Usage
+
+Import `is` from `"isaaccss"` and write styles in `is`-tagged template.
+
+```js
+import { is } from "isaaccss";
+
+document.body.className = is`m:0 p:1rem`;
+```
+
 ## Installation
 
 ```
 npm i -D isaaccss
 ```
 
-## Usage
+## Setup
 
-### Configuration Example
+### [esbuild](https://esbuild.github.io/)
 
 ```js
-import { defaultAliases } from "isaaccss";
+import esbuild from "esbuild";
+import isaaccss from "isaaccss/esbuild";
+
+esbuild.build({
+  entryPoints: ["src/index.ts"],
+  outdir: "dist",
+  bundle: true,
+  // Inject `isaaccss.inject`.
+  inject: [isaaccss.inject],
+  plugins: [
+    isaaccss.plugin({
+      // Optional filename filter. Default is following.
+      filter: /\.[cm][jt]x?$/,
+
+      // Optional isaaccss config. See `Configuration Example` section below.
+      pretty: true,
+      compress: { prefix: "~" },
+      aliases: [],
+      postcss: { plugins: [] },
+    }),
+  ],
+});
+```
+
+### [Rollup](https://rollupjs.org/)
+
+```js
+// rollup.config.js
+import isaaccss from "isaaccss/rollup";
+
+/** @type {import("rollup").RollupOptions} */
+export default {
+  input: "src/index.js",
+  output: { file: "dist/index.js" },
+  plugins: [
+    isaaccss({
+      // Optional include filter. By default, all bundled scripts are included.
+      include: ["**/*.js"],
+
+      // Optional exclude filter. By default, `**/node_modules/**` are excluded.
+      exclude: ["**/node_modules/**"],
+
+      // Optional output filename.
+      // Default is the output script filename with extension ".css".
+      output: "dist/index.css",
+
+      // Optional isaaccss config. See `Configuration Example` section below.
+      pretty: true,
+      compress: { prefix: "~" },
+      aliases: [],
+      postcss: { plugins: [] },
+    }),
+  ],
+};
+```
+
+When you want to merge other CSS files with isaaccss CSS, use [`rollup-plugin-import-css`](https://github.com/jleeson/rollup-plugin-import-css) instead of [`rollup-plugin-css-only`](https://github.com/thgh/rollup-plugin-css-only).
+
+```js
+// rollup.config.js
+import css from "rollup-plugin-import-css";
+import isaaccss from "isaaccss/rollup";
+
+/** @type {import("rollup").RollupOptions} */
+export default {
+  input: "src/index.js",
+  output: { file: "dist/index.js" },
+  plugins: [css(), isaaccss()],
+};
+```
+
+### [Vite](https://vitejs.dev/)
+
+Class names are not compressed in Vite dev server, but in Vite build.
+
+```js
+// vite.config.js
+import isaaccssPlugin from "isaaccss/vite";
+
+/** @type {import("vite").UserConfig} */
+export default {
+  plugins: [
+    isaaccssPlugin({
+      // Options are same as for Rollup isaaccss plugin above.
+    }),
+  ],
+};
+```
+
+## Configuration Example
+
+```js
+import { defaultAliases } from "isaaccss/aliases";
 import OpenProps from "open-props";
 import postcssJitProps from "postcss-jit-props";
 
@@ -141,6 +260,7 @@ export default {
           },
         ],
         [
+          // an example of rem-based pixel unit
           // `m:[1]`->{margin:.0625rem} `m-l:[16]`->{margin-left:1rem}
           /^margin|^padding|^font-size$/,
           [/\[(-?\d*\.?\d+)\]/g, (_, $1) => `${+$1 / 16}rem`.replace(/^0\./, ".")],
@@ -158,98 +278,6 @@ export default {
 ```
 
 See [src/aliases/default.ts](https://github.com/luncheon/isaaccss/blob/main/src/aliases/default.ts) for the default aliases.
-
-### [esbuild](https://esbuild.github.io/)
-
-```js
-import esbuild from "esbuild";
-import isaaccss from "isaaccss/esbuild";
-
-esbuild.build({
-  entryPoints: ["src/index.ts"],
-  outdir: "dist",
-  bundle: true,
-  // Inject `isaaccss.inject`.
-  inject: [isaaccss.inject],
-  plugins: [
-    isaaccss.plugin({
-      // Optional filename filter. Default is following.
-      filter: /\.[cm][jt]x?$/,
-
-      // Optional isaaccss config. See `Configuration Example` section above.
-      pretty: true,
-      compress: { prefix: "~" },
-      aliases: [],
-      postcss: { plugins: [] },
-    }),
-  ],
-});
-```
-
-### [Rollup](https://rollupjs.org/)
-
-```js
-// rollup.config.js
-import isaaccss from "isaaccss/rollup";
-
-/** @type {import("rollup").RollupOptions} */
-export default {
-  input: "src/index.js",
-  output: { file: "dist/index.js" },
-  plugins: [
-    isaaccss({
-      // Optional include filter. By default, all bundled scripts are included.
-      include: ["**/*.js"],
-
-      // Optional exclude filter. By default, `**/node_modules/**` are excluded.
-      exclude: ["**/node_modules/**"],
-
-      // Optional output filename.
-      // Default is the output script filename with extension ".css".
-      output: "dist/index.css",
-
-      // Optional isaaccss config. See `Configuration Example` section above.
-      pretty: true,
-      compress: { prefix: "~" },
-      aliases: [],
-      postcss: { plugins: [] },
-    }),
-  ],
-};
-```
-
-When you want to merge other CSS files with isaaccss CSS, use [`rollup-plugin-import-css`](https://github.com/jleeson/rollup-plugin-import-css) instead of [`rollup-plugin-css-only`](https://github.com/thgh/rollup-plugin-css-only).
-
-```js
-// rollup.config.js
-import css from "rollup-plugin-import-css";
-import isaaccss from "isaaccss/rollup";
-
-/** @type {import("rollup").RollupOptions} */
-export default {
-  input: "src/index.js",
-  output: { file: "dist/index.js" },
-  plugins: [css(), isaaccss()],
-};
-```
-
-### [Vite](https://vitejs.dev/)
-
-- Class name compression is not supported in Vite dev server.
-
-```js
-// vite.config.js
-import isaaccssPlugin from "isaaccss/vite";
-
-/** @type {import("vite").UserConfig} */
-export default {
-  plugins: [
-    isaaccssPlugin({
-      // Options are same as for Rollup isaaccss plugin above.
-    }),
-  ],
-};
-```
 
 ## License
 
