@@ -38,28 +38,42 @@ const SubmitButton = ({ variant }: { variant: 'primary' | 'secondary' }) => (
 
 [Playground](https://luncheon.github.io/isaaccss/playground/)
 
-## Intent
+## Installation
 
-- Like inline styles and other atomic CSS frameworks:
-  - Predictable changes
-  - No pondering class names
-  - Correct separation of concerns: markup and its style are strongly coupled and should be maintained together. Putting them into separate files is a bad idea.
-- Unlike inline styles:
-  - Media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
-  - Specificity can be adjusted
-  - Short aliases can be used
-  - [`Content-Security-Policy`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy): no need `'unsafe-inline'` or `'nonce-a682b15c'` for [`style-src`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy/style-src)
-- Unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
-  - This is a class name description rule, not a predefined property set, therefore:
-    - Less to remember
-    - Simple and flexible: any media, any selector, any property and any value can be described as is
-  - High specificity (ID-specificity = 1) by default to override styles from other CSS libraries
-  - Specificity can be adjusted
-  - Class names can be compressed into prefixed short names such as `#a`, `#b`, ..., `#aa`, ...
-  - Invalid class names can be detected
-- Unlike [Linaria](https://linaria.dev/):
-  - Short aliases can be used
-  - Atomic styles are reused, preventing CSS file size bloating
+```
+npm i -D isaaccss
+```
+
+## Usage
+
+Import `is` from `"isaaccss"` and write styles in `is`-tagged template.
+
+```js
+import { is } from "isaaccss";
+
+document.body.className = is`m:0 @screen&w>=640px/m:1rem`;
+```
+
+The above code with default config generates the following JS and CSS:
+
+```js
+document.body.className = `#a #b`;
+```
+
+```css
+.\#a:not(#\ ) {
+  margin: 0;
+}
+
+@media screen and (width>=640px) {
+  .\#b:not(#\ ) {
+    margin: 1rem;
+  }
+}
+```
+
+- `#` of `#a`, `#b`: prefix to avoid conflicts with other libraries and your CSS. Customizable.
+- `:not(#\ )`: selector to increase ID-specificity. Ensures greater specificity than other libraries or your CSS.
 
 ## Syntax
 
@@ -102,22 +116,6 @@ const SubmitButton = ({ variant }: { variant: 'primary' | 'secondary' }) => (
    - For example, add `*` to the preferred style between `:hover` and `:active`
 
 - An underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
-
-## Usage
-
-Import `is` from `"isaaccss"` and write styles in `is`-tagged template.
-
-```js
-import { is } from "isaaccss";
-
-document.body.className = is`m:0 p:1rem`;
-```
-
-## Installation
-
-```
-npm i -D isaaccss
-```
 
 ## Setup
 
@@ -282,6 +280,29 @@ export default {
 ```
 
 See [src/aliases/default.ts](https://github.com/luncheon/isaaccss/blob/main/src/aliases/default.ts) for the default aliases.
+
+## Intention
+
+- Like inline styles and other atomic CSS frameworks:
+  - Predictable changes
+  - No pondering class names
+  - Correct separation of concerns: markup and its style are strongly coupled and should be maintained together. Putting them into separate files is a bad idea.
+- Unlike inline styles:
+  - Media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
+  - Specificity can be adjusted
+  - Short aliases can be used
+  - [`Content-Security-Policy`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy): no need `'unsafe-inline'` or `'nonce-a682b15c'` for [`style-src`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy/style-src)
+- Unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
+  - This is a class name description rule, not a predefined property set, therefore:
+    - Less to remember
+    - Simple and flexible: any media, any selector, any property and any value can be described as is
+  - High specificity (ID-specificity = 1) by default to override styles from other CSS libraries
+  - Specificity can be adjusted
+  - Class names can be compressed into prefixed short names such as `#a`, `#b`, ..., `#aa`, ...
+  - Invalid class names can be detected
+- Unlike [Linaria](https://linaria.dev/):
+  - Short aliases can be used
+  - Atomic styles are reused, preventing CSS file size bloating
 
 ## License
 
