@@ -30,6 +30,27 @@ const applyAliases = (source, tokenPattern, aliases) => {
     }
     return source;
 };
+const applyPropertyAliases = (source, aliases) => {
+    if (!aliases) {
+        return source;
+    }
+    if (!Array.isArray(aliases)) {
+        return [].concat(...source.map(s => aliases[s] ?? s));
+    }
+    if (aliases[0] instanceof RegExp) {
+        const [search, replacer] = aliases;
+        if (Array.isArray(replacer)) {
+            return source.flatMap(s => (search.test(s) ? replacer.map(r => s.replace(search, r)) : [s]));
+        }
+        else {
+            return source.map(s => s.replace(search, replacer));
+        }
+    }
+    for (const alias of aliases) {
+        source = applyPropertyAliases(source, alias);
+    }
+    return source;
+};
 const unescapeBackslash = (s) => s.replace(/\\(.)/g, "$1");
 const unescapeWhitespace = (s) => s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
 const transformMedia = (media, aliases) => {
@@ -49,14 +70,18 @@ const transformSelector = (selector, aliases) => {
 };
 const transformProperty = (property, aliases) => {
     if (property.startsWith("--")) {
-        return property;
+        return [[property], []];
     }
+    let properties = [property];
     for (const alias of deepFlatFilterMap(aliases, a => a.property)) {
-        property = applyAliases(property, /^.*$/g, alias);
+        properties = applyPropertyAliases(properties, alias);
     }
-    if (knownCssPropertySet.has(property)) {
-        return property;
+    const known = [];
+    const unknown = [];
+    for (const p of properties) {
+        knownCssPropertySet.has(p) ? known.push(p) : unknown.push(p);
     }
+    return [known, unknown];
 };
 const transformValue = (property, value, aliases) => {
     for (const alias of deepFlatFilterMap(aliases, a => a.value)) {
@@ -82,9 +107,10 @@ export const parseClass = (className, options) => {
     const unknownProperties = [];
     for (const s of match[3].split(";")) {
         const match = s.match(/^([^:]+):(.+?)(!?)$/);
-        const name = match && transformProperty(match[1], aliases);
-        if (name) {
-            properties.push({ name, value: transformValue(name, match[2], aliases), important: !!match[3] });
+        if (match) {
+            const [known, unknown] = transformProperty(match[1], aliases);
+            properties.push(...known.map(name => ({ name, value: transformValue(name, match[2], aliases), important: !!match[3] })));
+            unknownProperties.push(...unknown);
         }
         else {
             unknownProperties.push(s);

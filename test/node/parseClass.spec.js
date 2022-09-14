@@ -17,8 +17,8 @@ const parse = (strings, ...args) => {
 describe("parseClass", () => {
   it("property", () => {
     assert.deepEqual(parse`x:0`, { specificity: 1, properties: [{ name: "x", value: "0" }] });
-    assert.deepEqual(parse`xx:0`, { specificity: 1, properties: [], unknownProperties: ["xx:0"] });
-    assert.deepEqual(parse`-x:0`, { specificity: 1, properties: [], unknownProperties: ["-x:0"] });
+    assert.deepEqual(parse`xx:0`, { specificity: 1, properties: [], unknownProperties: ["xx"] });
+    assert.deepEqual(parse`-x:0`, { specificity: 1, properties: [], unknownProperties: ["-x"] });
     assert.deepEqual(parse`--x:0`, { specificity: 1, properties: [{ name: "--x", value: "0" }] });
     assert.deepEqual(parse`--x-y:0`, { specificity: 1, properties: [{ name: "--x-y", value: "0" }] });
     assert.deepEqual(parse`--x--y:0`, { specificity: 1, properties: [{ name: "--x--y", value: "0" }] });
@@ -97,13 +97,13 @@ describe("parseClass", () => {
       media: "print",
       selector: "::before",
       properties: [{ name: "y", value: "1" }],
-      unknownProperties: ["xx:0"],
+      unknownProperties: ["xx"],
     });
     assert.deepEqual(parse`x:0;yy:1?`, {
       specificity: 0,
       layer: "",
       properties: [{ name: "x", value: "0" }],
-      unknownProperties: ["yy:1"],
+      unknownProperties: ["yy"],
     });
     assert.deepEqual(parse`x:0;y:1;d:2**`, {
       specificity: 3,

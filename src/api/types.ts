@@ -1,11 +1,17 @@
 export type AliasElement = { readonly [token in string]: string } | readonly [RegExp, string | Parameters<string["replace"]>[1]];
 export type Alias = AliasElement | undefined | null | false;
+export type PropertyAlias =
+  | { readonly [token in string]: string | readonly string[] }
+  | readonly [RegExp, string | readonly string[]]
+  | undefined
+  | null
+  | false;
 export type ValueAlias = readonly [property: string | RegExp, alias: Alias | readonly Alias[]];
 
 export interface Aliases {
   readonly media?: Alias | readonly Alias[];
   readonly selector?: Alias | readonly Alias[];
-  readonly property?: Alias | readonly Alias[];
+  readonly property?: PropertyAlias | readonly PropertyAlias[];
   readonly value?: readonly ValueAlias[];
 }
 

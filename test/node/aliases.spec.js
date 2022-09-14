@@ -87,6 +87,55 @@ describe("aliases", () => {
       assert.deepEqual(parse`b:0`, { specificity: 1, properties: [{ name: "border", value: "0" }] });
       assert.deepEqual(parse`b-b:0`, { specificity: 1, properties: [{ name: "border-bottom", value: "0" }] });
       assert.deepEqual(parse`b-b-c:0`, { specificity: 1, properties: [{ name: "border-bottom-color", value: "0" }] });
+      assert.deepEqual(parse`m-x:0`, {
+        specificity: 1,
+        properties: [
+          { name: "margin-left", value: "0" },
+          { name: "margin-right", value: "0" },
+        ],
+      });
+      assert.deepEqual(parse`p-y:0`, {
+        specificity: 1,
+        properties: [
+          { name: "padding-top", value: "0" },
+          { name: "padding-bottom", value: "0" },
+        ],
+      });
+      assert.deepEqual(parse`b-x-c:0`, {
+        specificity: 1,
+        properties: [
+          { name: "border-left-color", value: "0" },
+          { name: "border-right-color", value: "0" },
+        ],
+      });
+      assert.deepEqual(parse`b-b-radius:0`, {
+        specificity: 1,
+        properties: [
+          { name: "border-bottom-left-radius", value: "0" },
+          { name: "border-bottom-right-radius", value: "0" },
+        ],
+      });
+      assert.deepEqual(parse`b-l-radius:0`, {
+        specificity: 1,
+        properties: [
+          { name: "border-top-left-radius", value: "0" },
+          { name: "border-bottom-left-radius", value: "0" },
+        ],
+      });
+      assert.deepEqual(parse`b-r-radius:0`, {
+        specificity: 1,
+        properties: [
+          { name: "border-top-right-radius", value: "0" },
+          { name: "border-bottom-right-radius", value: "0" },
+        ],
+      });
+      assert.deepEqual(parse`b-t-radius:0`, {
+        specificity: 1,
+        properties: [
+          { name: "border-top-left-radius", value: "0" },
+          { name: "border-top-right-radius", value: "0" },
+        ],
+      });
     });
   });
 

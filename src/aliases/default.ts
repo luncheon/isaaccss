@@ -49,6 +49,17 @@ export const abbreviationAliases: Aliases = {
     [/-l-/, "-left-"],
     [/-r-/, "-right-"],
     [/-t-/, "-top-"],
+
+    [/\b(border|margin|padding)-x\b/, ["$1-left", "$1-right"]],
+    [/\b(border|margin|padding)-y\b/, ["$1-top", "$1-bottom"]],
+
+    {
+      // b-b-radius, b-l-radius, b-r-radius, b-t-radius
+      "border-bottom-radius": ["border-bottom-left-radius", "border-bottom-right-radius"],
+      "border-left-radius": ["border-top-left-radius", "border-bottom-left-radius"],
+      "border-right-radius": ["border-top-right-radius", "border-bottom-right-radius"],
+      "border-top-radius": ["border-top-left-radius", "border-top-right-radius"],
+    },
   ],
 };
 
