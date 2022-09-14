@@ -1,6 +1,6 @@
 {
   "name": "isaaccss",
-  "version": "0.12.2",
+  "version": "0.13.0",
   "description": "Inline-Style-as-a-Class CSS engine",
   "license": "WTFPL",
   "repository": "luncheon/isaaccss",
@@ -43,8 +43,8 @@
   },
   "dependencies": {
     "@babel/generator": "^7.19.0",
-    "@babel/parser": "^7.19.0",
-    "@babel/traverse": "^7.19.0",
+    "@babel/parser": "^7.19.1",
+    "@babel/traverse": "^7.19.1",
     "@babel/types": "^7.19.0",
     "@rollup/pluginutils": "^4.2.1",
     "css.escape": "^1.5.1",
