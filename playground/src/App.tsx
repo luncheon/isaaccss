@@ -1,9 +1,10 @@
 import { is } from "isaaccss";
-import { createMemo, type JSX } from "solid-js";
+import { createMemo, createSignal, type JSX } from "solid-js";
 import { Editor, sourceCode, Viewer } from "./Editor";
 import { transform } from "./transform";
 
-const transformed = createMemo(() => transform(sourceCode()));
+const [prettyCss, setPrettyCss] = createSignal(true);
+const transformed = createMemo(() => transform(sourceCode(), { pretty: prettyCss() }));
 
 const previewHtmlContent = (js: string, css: string) => `<html>
   <head>
@@ -22,11 +23,25 @@ const Header = () => (
   </header>
 );
 
-const Section = (props: { class?: string; caption: string; children: JSX.Element }) => (
+const SectionHeader = (props: { caption?: string; children?: JSX.Element }) => (
+  <div class={is`d:flex align-items:center p:.25rem_.5rem box-shadow:0_1px_3px_#ccc m-b:3px`}>
+    <h4>{props.caption}</h4>
+    <div class={is`flex:1`} />
+    {props.children}
+  </div>
+);
+
+const Section = (props: { class?: string; children: JSX.Element }) => (
   <section class={is`d:flex flex-direction:column overflow:hidden box-shadow:0_0_4px_#bbb,_0_2px_8px_#bbb ${props.class}`}>
-    <h4 class={is`p:.25rem_.5rem box-shadow:0_1px_3px_#ccc m-b:3px`}>{props.caption}</h4>
     {props.children}
   </section>
+);
+
+const Checkbox = (props: { label: string; checked?: boolean; onChange: (checked: boolean) => unknown }) => (
+  <label class={is`cursor:pointer d:flex align-items:center gap:.25em`}>
+    <input class={is`cursor:pointer`} type="checkbox" checked={props.checked} onChange={e => props.onChange(e.currentTarget.checked)} />
+    {props.label}
+  </label>
 );
 
 const Main = () => (
@@ -37,16 +52,25 @@ const Main = () => (
         _textarea/font-family:'Source_Code_Pro',monospace _textarea/font-size:0.875rem
       `}
   >
-    <Section caption="index.tsx" class={is`grid-area:tsx`}>
+    <Section class={is`grid-area:tsx`}>
+      <SectionHeader caption="index.tsx" />
       <Editor class={is`flex:1 overflow:hidden`} />
     </Section>
-    <Section caption="index.js" class={is`grid-area:js`}>
+
+    <Section class={is`grid-area:js`}>
+      <SectionHeader caption="index.js" />
       <Viewer class={is`flex:1 overflow:auto p:0_.5rem`} language="javascript" value={transformed().error ?? transformed().code ?? ""} />
     </Section>
-    <Section caption="index.css" class={is`grid-area:css`}>
+
+    <Section class={is`grid-area:css`}>
+      <SectionHeader caption="index.css">
+        <Checkbox label="Pretty" checked={prettyCss()} onChange={setPrettyCss} />
+      </SectionHeader>
       <Viewer class={is`flex:1 overflow:auto p:0_.5rem`} language="css" value={transformed().css ?? ""} />
     </Section>
-    <Section caption="preview" class={is`grid-area:preview`}>
+
+    <Section class={is`grid-area:preview`}>
+      <SectionHeader caption="Preview" />
       <iframe class={is`flex:1 overflow:auto`} srcdoc={previewHtmlContent(transformed().code ?? "", transformed().css ?? "")}></iframe>
     </Section>
   </main>

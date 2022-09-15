@@ -2,22 +2,30 @@ import { is } from "isaaccss";
 import { Fragment, h, render } from "https://esm.sh/preact@10.10.6";
 import { batch, signal } from "https://esm.sh/@preact/signals@1.0.3";
 
-document.head.innerHTML += '<link rel="stylesheet" href="https://unpkg.com/open-props/open-props.min.css">';
+document.head.innerHTML += '<link rel="stylesheet" href="https://esm.sh/open-props@1.4.14/open-props.min.css">';
 
-const previous = signal(0);
-const current = signal(1);
-const next = () => batch(() => [previous.value, current.value] = [current.value, previous.value + current.value]);
+const Alert = ({ variant, children }: { variant?: 'primary' | 'secondary', children?: any }) => (
+  <p
+    class={is`
+      ${variant === 'secondary' ? is`bg:$orange-0 c:$orange-7` : is`bg:$blue-0 c:$blue-7`}
+      b:1px_solid_currentColor b-radius:4px m:.5em_0 p:.375em_.75em @w>=640px/p:.5em_1em
+    `}
+  >
+    {children}
+  </p>
+)
 
-const Link = ({ href }: { href: string }) => <a target="_top" class={is`c:$blue-6 :hover/c:$blue-4`} href={href}>{href}</a>
+const Link = ({ href }: { href: string }) =>
+  <a target="_top" class={is`c:$blue-6 :hover/c:$blue-4`} href={href}>{href}</a>
 
-const Button = ({ variant, onClick, children }: { variant: 'primary' | 'secondary', onClick: () => unknown, children: string }) => (
+const Button = ({ variant, onClick, children }: { variant?: 'primary' | 'secondary', onClick: () => unknown, children?: string }) => (
   <button
     type="button"
     class={is`
       bg:hsl($H,$S,$L) ${variant === "secondary" ? is`--H:30` : is`--H:210`}
       --S:100% --L:50% :hover/--L:60% :active/--L:40%* 
       b:3px_solid_hsl($H,$S,80%) b-radius:8px c:white cursor:pointer
-      p:4px_8px @w>=768px/p:8px_16px @hover:hover/:hover/scale:1.1
+      p:4px_8px @w>=640px/p:8px_16px @hover:hover/:hover/scale:1.1
     `}
     onClick={onClick}
   >
@@ -25,14 +33,18 @@ const Button = ({ variant, onClick, children }: { variant: 'primary' | 'secondar
   </button>
 );
 
+const previous = signal(0);
+const current = signal(1);
+const next = () => batch(() => [previous.value, current.value] = [current.value, previous.value + current.value]);
+
 const App = () => (
   <>
-    <p class={is`b:1px_solid_currentColor b-radius:4px bg:$blue-0 c:$blue-7 m:.5em_0 p:.375em_.75em @w>=768px/p:.5em_1em`}>
+    <Alert variant="secondary">
       This is the playground for isaaccss demo.<br />
       See <Link href="https://github.com/luncheon/isaaccss" /> for the spec.
-    </p>
+    </Alert>
 
-    <Button variant="primary" onClick={next}>{current.value}</Button>
+    <Button variant="secondary" onClick={next}>{current.value}</Button>
   </>
 );
 

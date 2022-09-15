@@ -1,9 +1,12 @@
-import "monaco-editor/esm/vs/basic-languages/monaco.contribution";
-import "monaco-editor/esm/vs/language/css/monaco.contribution";
-import "monaco-editor/esm/vs/language/typescript/monaco.contribution";
+import "monaco-editor/esm/vs/basic-languages/css/css.contribution.js";
+import "monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution.js";
+import "monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution.js";
+import "monaco-editor/esm/vs/editor/edcore.main.js";
+import "monaco-editor/esm/vs/language/css/monaco.contribution.js";
+import "monaco-editor/esm/vs/language/typescript/monaco.contribution.js";
 
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 // import * as monaco from "monaco-editor";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 
 import { is } from "isaaccss";
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
