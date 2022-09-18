@@ -1,6 +1,6 @@
 {
   "name": "isaaccss",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Inline-Style-as-a-Class CSS engine",
   "private": true,
   "license": "WTFPL",
@@ -52,7 +52,7 @@
     "esbuild": "^0.15.7",
     "rollup": "^2.79.0",
     "typescript": "^4.8.3",
-    "vite": "^3.1.0"
+    "vite": "^3.1.2"
   },
   "dependencies": {
     "@babel/generator": "^7.19.0",
