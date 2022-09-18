@@ -53,13 +53,14 @@ const applyPropertyAliases = (source, aliases) => {
 };
 const unescapeBackslash = (s) => s.replace(/\\(.)/g, "$1");
 const unescapeWhitespace = (s) => s.replace(/(^|[^\\])(\\\\)*_/g, "$1$2 ");
-const transformMedia = (media, aliases) => {
-    for (const alias of deepFlatFilterMap(aliases, a => a.media)) {
-        media = applyAliases(media, /[\w$#@-]+/g, alias);
+const transformMediaOrContainer = (query, aliases, aliasSelector) => {
+    for (const alias of deepFlatFilterMap(aliases, aliasSelector)) {
+        query = applyAliases(query, /[\w$#@-]+/g, alias);
     }
-    media = unescapeWhitespace(media);
-    media = media.replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3");
-    return unescapeBackslash(media);
+    query = unescapeWhitespace(query);
+    query = query.replace(/(^| )([^ ()]+\b[^ ()]+)($| )/g, "$1($2)$3");
+    query = query.replace(/([^ ])\(/g, "$1 (");
+    return unescapeBackslash(query);
 };
 const transformSelector = (selector, aliases) => {
     for (const alias of deepFlatFilterMap(aliases, a => a.selector)) {
@@ -98,18 +99,18 @@ const transformValue = (property, value, aliases) => {
 export const parseClass = (className, options) => {
     const aliases = options?.aliases;
     const match = className.match(
-    // @media/                   selector/                properties                    ?    *
-    /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+:.+?!?(?:;[^:]+:.+?!?)*)(\??)(\**)$/);
+    // @media/                   @^container/                selector/                property    ...properties     ?    *
+    /^(?:@((?:[^/\\]|\\.)+?)\/)?(?:@\^((?:[^/\\]|\\.)+?)\/)?(?:((?:[^/\\]|\\.)+?)\/)?([^:]+:.+?!?(?:;[^:]+:.+?!?)*)(\??)(\**)$/);
     if (!match) {
         return { className, properties: [], unknownProperties: [className], specificity: 1 };
     }
     const properties = [];
     const unknownProperties = [];
-    for (const s of match[3].split(";")) {
+    for (const s of match[4].split(";")) {
         const match = s.match(/^([^:]+):(.+?)(!?)$/);
         if (match) {
             const [known, unknown] = transformProperty(match[1], aliases);
-            properties.push(...known.map(name => ({ name, value: transformValue(name, match[2], aliases), important: !!match[3] })));
+            known.forEach(name => properties.push({ name, value: transformValue(name, match[2], aliases), important: !!match[3] }));
             unknownProperties.push(...unknown);
         }
         else {
@@ -120,10 +121,19 @@ export const parseClass = (className, options) => {
         className,
         properties,
         unknownProperties,
-        specificity: (match[4] === "?" ? 0 : 1) + match[5].length,
+        specificity: (match[5] === "?" ? 0 : 1) + match[6].length,
     };
-    match[1] && (style.media = transformMedia(match[1], aliases));
-    match[4] === "?" && (style.layer = "");
-    match[2] && (style.selector = transformSelector(match[2], aliases));
+    if (match[1]?.startsWith("^")) {
+        if (match[2]) {
+            return { className, properties: [], unknownProperties: [className], specificity: 1 };
+        }
+        style.container = transformMediaOrContainer(match[1].slice(1), aliases, a => a.container);
+    }
+    else {
+        match[1] && (style.media = transformMediaOrContainer(match[1], aliases, a => a.media));
+        match[2] && (style.container = transformMediaOrContainer(match[2], aliases, a => a.container));
+    }
+    match[5] === "?" && (style.layer = "");
+    match[3] && (style.selector = transformSelector(match[3], aliases));
     return style;
 };

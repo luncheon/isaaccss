@@ -21,7 +21,69 @@ describe("cssify", () => {
     );
   });
 
-  it("media, layer", () => {
+  it("media, container, layer", () => {
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }], media: "m" },
+        { className: "b", properties: [{ name: "y", value: "1" }], media: "n" },
+        { className: "c", properties: [{ name: "z", value: "2" }] },
+      ]),
+      ".c{z:2}@media m{.a{x:0}}@media n{.b{y:1}}",
+    );
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }], media: "m" },
+        { className: "b", properties: [{ name: "y", value: "1" }], media: "m" },
+      ]),
+      "@media m{.a{x:0}.b{y:1}}",
+    );
+
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }], container: "(w<0)" },
+        { className: "b", properties: [{ name: "y", value: "1" }], container: "(w>0)" },
+        { className: "c", properties: [{ name: "z", value: "2" }] },
+      ]),
+      ".c{z:2}@container (w<0){.a{x:0}}@container (w>0){.b{y:1}}",
+    );
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }], container: "(w>0)" },
+        { className: "b", properties: [{ name: "y", value: "1" }], container: "(w>0)" },
+      ]),
+      "@container (w>0){.a{x:0}.b{y:1}}",
+    );
+
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }], media: "m", container: "(w<0)" },
+        { className: "b", properties: [{ name: "y", value: "1" }], media: "m", container: "(w>0)" },
+      ]),
+      "@media m{@container (w<0){.a{x:0}}@container (w>0){.b{y:1}}}",
+    );
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }], media: "m", container: "(w>0)" },
+        { className: "b", properties: [{ name: "y", value: "1" }], media: "n", container: "(w>0)" },
+      ]),
+      "@media m{@container (w>0){.a{x:0}}}@media n{@container (w>0){.b{y:1}}}",
+    );
+
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }] },
+        { className: "b", properties: [{ name: "y", value: "1" }], layer: "" },
+      ]),
+      "@layer{.b{y:1}}.a{x:0}",
+    );
+    assert.equal(
+      cssify([
+        { className: "a", properties: [{ name: "x", value: "0" }], layer: "" },
+        { className: "b", properties: [{ name: "y", value: "1" }], layer: "" },
+      ]),
+      "@layer{.a{x:0}.b{y:1}}",
+    );
+
     assert.equal(
       cssify([
         { className: "a", properties: [{ name: "x", value: "0" }], media: "p" },
@@ -48,6 +110,116 @@ describe("cssify", () => {
         { className: "#d", properties: [{ name: "x", value: "0" }] },
       ]),
       ".\\#a:s,.\\#b:t,.\\#d{x:0}.\\#c:u{x:0!important}",
+    );
+  });
+
+  it("pretty", () => {
+    const pretty = classes => cssify(classes, { pretty: true });
+    assert.equal(
+      pretty([{ className: "a", properties: [{ name: "x", value: "0", important: false }] }]),
+      `
+.a{
+  x:0
+}
+`.trimStart(),
+    );
+    assert.equal(
+      pretty([
+        {
+          className: "a",
+          properties: [
+            { name: "x", value: "0", important: false },
+            { name: "y", value: "1", important: false },
+          ],
+        },
+      ]),
+      `
+.a{
+  x:0;
+  y:1
+}
+`.trimStart(),
+    );
+    assert.equal(
+      pretty([
+        { className: "a", properties: [{ name: "x", value: "0", important: false }], media: "m" },
+        { className: "b", properties: [{ name: "y", value: "1", important: false }], media: "n" },
+      ]),
+      `
+@media m{
+  .a{
+    x:0
+  }
+}
+
+@media n{
+  .b{
+    y:1
+  }
+}
+`.trimStart(),
+    );
+    assert.equal(
+      pretty([
+        { className: "a", properties: [{ name: "x", value: "0", important: false }], container: "(w<0)" },
+        { className: "b", properties: [{ name: "y", value: "1", important: false }], container: "(w>0)" },
+      ]),
+      `
+@container (w<0){
+  .a{
+    x:0
+  }
+}
+
+@container (w>0){
+  .b{
+    y:1
+  }
+}
+`.trimStart(),
+    );
+    assert.equal(
+      pretty([
+        { className: "a", properties: [{ name: "x", value: "0", important: false }], layer: "" },
+        { className: "b", properties: [{ name: "y", value: "1", important: false }] },
+      ]),
+      `
+@layer{
+  .a{
+    x:0
+  }
+}
+
+.b{
+  y:1
+}
+`.trimStart(),
+    );
+    assert.equal(
+      pretty([{ className: "a", properties: [{ name: "x", value: "0", important: false }], media: "m", container: "(w>0)" }]),
+      `
+@media m{
+  @container (w>0){
+    .a{
+      x:0
+    }
+  }
+}
+`.trimStart(),
+    );
+    assert.equal(
+      pretty([{ className: "a", properties: [{ name: "x", value: "0", important: false }], media: "m", container: "(w>0)", layer: "" }]),
+      `
+@media m{
+  @container (w>0){
+    @layer{
+      .a{
+        x:0
+      }
+    }
+  }
+}
+`.trimStart(),
     );
   });
 });

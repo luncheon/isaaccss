@@ -78,9 +78,9 @@ document.body.className = `#a #b`;
 ## Syntax
 
 ```
-[@media/][selectors/]property:value[!][;property:value[!]...][?][*[*...]]
- ~~~~~~~  ~~~~~~~~~~ ~~~~~~~~ ~~~~~ ~  ~~~~~~~~~~~~~~~~~~~~~  ~  ~~~~~~~
-   (1)       (2)       (3)     (4) (5)          (6)          (7)   (8)
+[@media/][@^container/][selectors/]property:value[!][;property:value[!]...][?][*[*...]]
+ ~~~~~~~  ~~~~~~~~~~~~  ~~~~~~~~~~ ~~~~~~~~ ~~~~~ ~  ~~~~~~~~~~~~~~~~~~~~~  ~  ~~~~~~~
+   (1)        (2)           (3)      (4)     (5) (6)          (7)          (8)   (9)
 ```
 
 1. Optional `@media/` indicates [media queries](https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries)
@@ -88,7 +88,10 @@ document.body.className = `#a #b`;
      (`.\@foo\/d\:none` is compressed into `.\#a`)
    - Tokens are parenthesized where necessary  
      e.g. `@screen&w>=640px/m:0` -> `@media screen and (width >= 640px) { .\#a { margin: 0 } }`
-2. Optional `selectors/` indicates additional selectors
+2. Optional `@^container/` indicates [container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Container_Queries)
+   - `@^w>=200/m:1rem` generates `@container (w>=200) { .\#a { margin:1rem } }`
+   - `@^card(w>=200)/m-l:1rem` generates `@container card (w>=200) { .\#a { margin-left: 1rem } }`
+3. Optional `selectors/` indicates additional selectors
    - [Pseudo-classes](https://developer.mozilla.org/docs/Web/CSS/Pseudo-classes)  
      e.g. `:hover/`, `:has(>:checked)/`
    - [Pseudo-elements](https://developer.mozilla.org/docs/Web/CSS/Pseudo-elements)  
@@ -103,16 +106,16 @@ document.body.className = `#a #b`;
      e.g. `:hover>input+label::before/`
    - If there are ampersands `&`, they becomes that class  
      e.g. `&+&/m-l:1rem` -> `.\&\+\& + .\&\+\& { margin-left: 1rem }`
-3. Required `property` indicates the property name
+4. Required `property` indicates the property name
    - Must be one of the [known properties](https://github.com/known-css/known-css-properties/blob/master/data/all.json) or a [custom property](https://developer.mozilla.org/docs/Web/CSS/--*)
-4. Required `value` indicates the property value
+5. Required `value` indicates the property value
    - `$bar` will be replaced with `var(--bar)`
      - Custom property set libraries, such as [Open Props](https://open-props.style/), can help with design themes
-5. Optional `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
-6. Multiple `property:value[!]` can be specified, delimited by semicolons `;`
-7. Optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
+6. Optional `!` indicates [`!important`](https://developer.mozilla.org/en-US/docs/Web/CSS/important)
+7. Multiple `property:value[!]` can be specified, delimited by semicolons `;`
+8. Optional trailing `?` generates unnamed [`@layer{}`](https://developer.mozilla.org/docs/Web/CSS/@layer)
    - For example, add `?` to the components in a component library, so that applications using it can override the properties
-8. Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
+9. Optional trailing `*` increases ID-[specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity), more than one can be specified
    - For example, add `*` to the preferred style between `:hover` and `:active`
 
 - An underscore `_` will be replaced with a whitespace ` ` and can be escaped with a backslash (`\_` will be replaced with `_`)
@@ -233,26 +236,37 @@ export default {
 
     // Custom aliases. For example:
     {
+      // Alias format of `media`, `container` and `selector` is one of the following:
+      // - { "search": replacementString }
+      // - [/pattern/g, replacementStringOrFunction]
+      // - Array of the above
       media: {
         dark: "prefers-color-scheme:dark",
         light: "prefers-color-scheme:light",
         sm: "640px", // use breakpoints like `@w<sm/d:none`
         md: "768px",
       },
+      container: {},
       selector: {
         "::a": "::after",
         "::b": "::before",
         ":f": ":focus",
         ":h": ":hover",
       },
+
+      // Alias format of `property` is one of the following:
+      // - { "search": replacementStringOrStringArray }
+      // - [/pattern/g, replacementStringOrStringArray]
+      // - Array of the above
       property: {
         items: "align-items",
         justify: "justify-content",
       },
 
-      // for value, specify an array of either
-      //   [propertyNameOrPattern, { alias: value }] or
-      //   [propertyNameOrPattern, [aliasPattern, replacerStringOrFunction]]
+      // Alias format of `value` is one of the following:
+      // - [propertyNameOrPattern, { "search": replacementString }] or
+      // - [propertyNameOrPattern, [/pattern/g, replacementStringOrFunction]]
+      // - Array of the above
       value: [
         [
           "box-shadow",
@@ -288,14 +302,14 @@ See [src/aliases/default.ts](https://github.com/luncheon/isaaccss/blob/main/src/
   - No pondering class names
   - Correct separation of concerns: markup and its style are strongly coupled and should be maintained together. Putting them into separate files is a bad idea.
 - Unlike inline styles:
-  - Media queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
+  - Media queries, container queries and selectors (combinators, pseudo-class, pseudo-elements) can be described
   - Specificity can be adjusted
   - Short aliases can be used
   - [`Content-Security-Policy`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy): no need `'unsafe-inline'` or `'nonce-a682b15c'` for [`style-src`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy/style-src)
 - Unlike [Tailwind CSS](https://tailwindcss.com/) and [Windi CSS](https://windicss.org/):
   - This is a class name description rule, not a predefined property set, therefore:
     - Less to remember
-    - Simple and flexible: any media, any selector, any property and any value can be described as is
+    - Simple and flexible: any media, any container, any selector, any property and any value can be described as is
   - High specificity (ID-specificity = 1) by default to override styles from other CSS libraries
   - Specificity can be adjusted
   - Class names can be compressed into prefixed short names such as `#a`, `#b`, ..., `#aa`, ...

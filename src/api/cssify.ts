@@ -42,6 +42,7 @@ export const cssify = (classes: Classes, options?: CssifyOptions): string => {
       );
 
   const mediaSelector = createBlockSelector(({ media }) => (media ? `@media ${media}` : ""));
+  const containerSelector = createBlockSelector(({ container }) => (container ? `@container ${container}` : ""));
   const layerSelector = createBlockSelector(({ layer }) => (layer !== undefined ? `@layer${layer ? " " + layer : ""}` : undefined));
 
   const selectorSelector = (cls: CssClass) => {
@@ -58,5 +59,5 @@ export const cssify = (classes: Classes, options?: CssifyOptions): string => {
       (body, classes) => block(indent, classes.map(selectorSelector).join(`,${newline}${indents[indent]}`), body + newline),
     );
 
-  return mediaSelector(layerSelector(propertiesSelector))(0, classes);
+  return mediaSelector(containerSelector(layerSelector(propertiesSelector)))(0, classes);
 };

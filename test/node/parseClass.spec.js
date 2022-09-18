@@ -45,7 +45,6 @@ describe("parseClass", () => {
     assert.deepEqual(parse`@print/x`, { specificity: 1, properties: [], unknownProperties: ["@print/x"] });
     assert.deepEqual(parse`@print/x:`, { specificity: 1, properties: [], unknownProperties: ["@print/x:"] });
     assert.deepEqual(parse`@print/x:0`, { media: "print", specificity: 1, properties: [{ name: "x", value: "0" }] });
-    assert.deepEqual(parse`@print/x:0`, { media: "print", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`@hover:hover/x:0`, { media: "(hover:hover)", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`@min-width:1px_and_max-width:2px/x:0`, { media: "(min-width:1px) and (max-width:2px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`@width<1px/x:0`, { media: "(width<1px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
@@ -54,6 +53,20 @@ describe("parseClass", () => {
     assert.deepEqual(parse`@width>1px/x:0`, { media: "(width>1px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`@1px<=width<2px/x:0`, { media: "(1px<=width<2px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
     assert.deepEqual(parse`@width>1px_and_height>2px/x:0`, { media: "(width>1px) and (height>2px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
+  });
+
+  it("container", () => {
+    assert.deepEqual(parse`@^parent`, { specificity: 1, properties: [], unknownProperties: ["@^parent"] });
+    assert.deepEqual(parse`@^parent/`, { specificity: 1, properties: [], unknownProperties: ["@^parent/"] });
+    assert.deepEqual(parse`@^parent/x`, { specificity: 1, properties: [], unknownProperties: ["@^parent/x"] });
+    assert.deepEqual(parse`@^parent/x:`, { specificity: 1, properties: [], unknownProperties: ["@^parent/x:"] });
+    assert.deepEqual(parse`@^parent/x:0`, { container: "parent", specificity: 1, properties: [{ name: "x", value: "0" }] });
+    assert.deepEqual(parse`@^min-width:1px/x:0`, { container: "(min-width:1px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
+    assert.deepEqual(parse`@^width<1px/x:0`, { container: "(width<1px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
+    assert.deepEqual(parse`@^parent(width<1px)/x:0`, { container: "parent (width<1px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
+    assert.deepEqual(parse`@print/@^parent(width<1px)/x:0`, { media: "print", container: "parent (width<1px)", specificity: 1, properties: [{ name: "x", value: "0" }] });
+    assert.deepEqual(parse`@^print/@^parent(width<1px)/x:0`, { specificity: 1, properties: [], unknownProperties: ["@^print/@^parent(width<1px)/x:0"] });
+    assert.deepEqual(parse`@\^print/x:0`, { media: "(^print)", specificity: 1, properties: [{ name: "x", value: "0" }] });
   });
 
   it("specificity", () => {

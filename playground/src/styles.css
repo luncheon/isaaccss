@@ -22,7 +22,10 @@
 :where(textarea, iframe) {
   display: block;
   width: 100%;
-  resize: vertical;
+}
+
+:where(textarea) {
+  resize: none;
 }
 
 html,

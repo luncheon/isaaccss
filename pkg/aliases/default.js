@@ -4,9 +4,22 @@ export const mediaOperatorAliases = {
         [/&/g, " and "],
         [/\|/g, " or "],
     ],
+    container: [
+        [/!/g, "not "],
+        [/&/g, " and "],
+        [/\|/g, " or "],
+    ],
 };
 export const abbreviationAliases = {
     media: {
+        h: "height",
+        "min-h": "min-height",
+        "max-h": "max-height",
+        w: "width",
+        "min-w": "min-width",
+        "max-w": "max-width",
+    },
+    container: {
         h: "height",
         "min-h": "min-height",
         "max-h": "max-height",

@@ -21,6 +21,7 @@ export const cssify = (classes, options) => {
     const block = (indent, header, body) => header ? `${indents[indent]}${header}{${newline}${body}${indents[indent]}}${newline}` : body;
     const createBlockSelector = (headSelector) => (bodySelector) => (indent, classes) => groupJoin(newline, classes, headSelector, (header, classes) => block(indent, header, bodySelector(indent + (header ? 1 : 0), classes)));
     const mediaSelector = createBlockSelector(({ media }) => (media ? `@media ${media}` : ""));
+    const containerSelector = createBlockSelector(({ container }) => (container ? `@container ${container}` : ""));
     const layerSelector = createBlockSelector(({ layer }) => (layer !== undefined ? `@layer${layer ? " " + layer : ""}` : undefined));
     const selectorSelector = (cls) => {
         const selector = cls.selector ?? "";
@@ -28,5 +29,5 @@ export const cssify = (classes, options) => {
         return selector.includes("&") ? selector.replaceAll("&", selfSelector) : selfSelector + selector;
     };
     const propertiesSelector = (indent, classes) => groupJoin(newline, classes, cls => cls.properties.map(p => `${indents[indent + 1]}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(";" + newline), (body, classes) => block(indent, classes.map(selectorSelector).join(`,${newline}${indents[indent]}`), body + newline));
-    return mediaSelector(layerSelector(propertiesSelector))(0, classes);
+    return mediaSelector(containerSelector(layerSelector(propertiesSelector)))(0, classes);
 };

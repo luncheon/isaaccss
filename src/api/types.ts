@@ -10,6 +10,7 @@ export type ValueAlias = readonly [property: string | RegExp, alias: Alias | rea
 
 export interface Aliases {
   readonly media?: Alias | readonly Alias[];
+  readonly container?: Alias | readonly Alias[];
   readonly selector?: Alias | readonly Alias[];
   readonly property?: PropertyAlias | readonly PropertyAlias[];
   readonly value?: readonly ValueAlias[];
@@ -32,6 +33,7 @@ export interface CssifyOptions {
 export interface CssClass {
   readonly className: string;
   readonly media?: string;
+  readonly container?: string;
   readonly layer?: string;
   readonly selector?: string;
   readonly specificity: number;
