@@ -20,11 +20,10 @@ export const transform = (code, filename, options, babelParserPlugins, classes =
     const compress = options?.compress ?? true;
     const compressPrefix = (typeof compress === "object" && compress?.prefix) || "#";
     const transformClassName = (className, node) => className
+        .trim()
         .split(/\s+/)
+        .filter(Boolean)
         .map(className => {
-        if (!className) {
-            return className;
-        }
         const existing = classes.get(className);
         if (existing) {
             return existing.className;
@@ -55,11 +54,24 @@ export const transform = (code, filename, options, babelParserPlugins, classes =
                 tagBindingPath.node.imported.name === TAG_IMPORT_SPECIFIER &&
                 tagBindingPath.parent.type === "ImportDeclaration" &&
                 tagBindingPath.parent.source.value === TAG_IMPORT_SOURCE) {
-                const quasis = path.node.quasi.quasis.map(node => {
-                    const className = transformClassName(node.value.raw, node);
-                    return compress && className !== node.value.raw ? t.templateElement({ raw: className }) : node;
+                const quasi = path.node.quasi;
+                const quasis = quasi.quasis.map((node, index) => {
+                    let className = transformClassName(node.value.raw, node);
+                    if (!compress) {
+                        return node;
+                    }
+                    if (quasi.quasis.length > 1) {
+                        if (className) {
+                            index !== 0 && (className = " " + className);
+                            index !== quasi.quasis.length - 1 && (className += " ");
+                        }
+                        else if (index !== 0 && index !== quasi.quasis.length - 1) {
+                            className = " ";
+                        }
+                    }
+                    return t.templateElement({ raw: className });
                 });
-                compress && path.replaceWith(t.templateLiteral(quasis, path.node.quasi.expressions));
+                compress && path.replaceWith(t.templateLiteral(quasis, quasi.expressions));
             }
         },
     });
