@@ -1,5 +1,5 @@
 import "css.escape";
-import type { CssifyOptions, Style } from "./types.js";
-declare type Classes = Iterable<Style>;
+import type { CssClass, CssifyOptions } from "./types.js";
+declare type Classes = Iterable<CssClass>;
 export declare const cssify: (classes: Classes, options?: CssifyOptions) => string;
 export {};

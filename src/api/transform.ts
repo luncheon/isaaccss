@@ -3,7 +3,7 @@ import { parse, ParserOptions as BabelParserOptions } from "@babel/parser";
 import _traverse from "@babel/traverse";
 import * as t from "@babel/types";
 import { parseClass } from "./parseClass.js";
-import type { Style, TransformOptions } from "./types.js";
+import type { CssClass, TransformOptions } from "./types.js";
 
 const generate: typeof _generate =
   typeof _generate === "object" && typeof (_generate as any).default === "function" ? (_generate as any).default : _generate;
@@ -29,8 +29,8 @@ export const transform = (
   filename: string,
   options?: TransformOptions,
   babelParserPlugins?: BabelParserOptions["plugins"],
-  classes = new Map<string, Style>(),
-): { code: string; classes: Map<string, Style> } => {
+  classes = new Map<string, CssClass>(),
+): { code: string; classes: Map<string, CssClass> } => {
   const compress = options?.compress ?? true;
   const compressPrefix = (typeof compress === "object" && compress?.prefix) || "#";
 

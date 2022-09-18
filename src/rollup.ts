@@ -2,7 +2,7 @@ import { createFilter, FilterPattern } from "@rollup/pluginutils";
 import { AcceptedPlugin } from "postcss";
 import type { Plugin } from "rollup";
 import { defaultAliases } from "./aliases/default.js";
-import { Aliases, cssify, CssifyOptions, postcssify, Style, transform } from "./api/index.js";
+import { Aliases, CssClass, cssify, CssifyOptions, postcssify, transform } from "./api/index.js";
 
 export interface IsaaccssRollupPluginOptions extends CssifyOptions {
   readonly include: FilterPattern;
@@ -27,7 +27,7 @@ export const resolveIsaaccssRollupPluginOptions = (options?: IsaaccssRollupPlugi
 
 const isaaccssRollupPlugin = (options?: IsaaccssRollupPluginOptions): Plugin => {
   const { filter, transformOptions, cssifyOptions } = resolveIsaaccssRollupPluginOptions(options);
-  const classes = new Map<string, Style>();
+  const classes = new Map<string, CssClass>();
   return {
     name: "isaaccss",
     transform: {

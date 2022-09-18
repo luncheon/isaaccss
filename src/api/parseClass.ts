@@ -1,5 +1,5 @@
 import { all as __knownCssProperties } from "known-css-properties";
-import type { Alias, DeepArray, ParserOptions, PropertyAlias, Style, StyleProperty } from "./types.js";
+import type { Alias, CssClass, CssProperty, DeepArray, ParserOptions, PropertyAlias } from "./types.js";
 
 type Writable<T> = {
   -readonly [P in keyof T]: T[P];
@@ -112,7 +112,7 @@ const transformValue = (property: string, value: string, aliases?: ParserOptions
   return unescapeBackslash(value);
 };
 
-export const parseClass = (className: string, options?: ParserOptions): Writable<Style> => {
+export const parseClass = (className: string, options?: ParserOptions): Writable<CssClass> => {
   const aliases = options?.aliases;
   const match = className.match(
     // @media/                   selector/                properties                    ?    *
@@ -121,7 +121,7 @@ export const parseClass = (className: string, options?: ParserOptions): Writable
   if (!match) {
     return { className, properties: [], unknownProperties: [className], specificity: 1 };
   }
-  const properties: StyleProperty[] = [];
+  const properties: CssProperty[] = [];
   const unknownProperties: string[] = [];
   for (const s of match[3].split(";")) {
     const match = s.match(/^([^:]+):(.+?)(!?)$/);
@@ -133,7 +133,12 @@ export const parseClass = (className: string, options?: ParserOptions): Writable
       unknownProperties.push(s);
     }
   }
-  const style: Writable<Style> = { className, properties, unknownProperties, specificity: (match[4] === "?" ? 0 : 1) + match[5].length };
+  const style: Writable<CssClass> = {
+    className,
+    properties,
+    unknownProperties,
+    specificity: (match[4] === "?" ? 0 : 1) + match[5].length,
+  };
   match[1] && (style.media = transformMedia(match[1], aliases));
   match[4] === "?" && (style.layer = "");
   match[2] && (style.selector = transformSelector(match[2], aliases));

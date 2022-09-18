@@ -1,5 +1,5 @@
 import "css.escape";
-import type { CssifyOptions, Style } from "./types.js";
+import type { CssClass, CssifyOptions } from "./types.js";
 
 const groupToMap = <T, K>(array: Iterable<T>, keySelector: (element: T) => K): Map<K, T[]> => {
   const map = new Map<K, T[]>();
@@ -24,7 +24,7 @@ const groupJoin = <T, K>(
     .join(separator);
 };
 
-type Classes = Iterable<Style>;
+type Classes = Iterable<CssClass>;
 
 export const cssify = (classes: Classes, options?: CssifyOptions): string => {
   const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
@@ -34,7 +34,7 @@ export const cssify = (classes: Classes, options?: CssifyOptions): string => {
     header ? `${indents[indent]}${header}{${newline}${body}${indents[indent]}}${newline}` : body;
 
   const createBlockSelector =
-    (headSelector: (cls: Style) => string | undefined) =>
+    (headSelector: (cls: CssClass) => string | undefined) =>
     (bodySelector: (indent: number, classes: Classes) => string) =>
     (indent: number, classes: Classes): string =>
       groupJoin(newline, classes, headSelector, (header, classes) =>
@@ -44,7 +44,7 @@ export const cssify = (classes: Classes, options?: CssifyOptions): string => {
   const mediaSelector = createBlockSelector(({ media }) => (media ? `@media ${media}` : ""));
   const layerSelector = createBlockSelector(({ layer }) => (layer !== undefined ? `@layer${layer ? " " + layer : ""}` : undefined));
 
-  const selectorSelector = (cls: Style) => {
+  const selectorSelector = (cls: CssClass) => {
     const selector = cls.selector ?? "";
     const selfSelector = "." + CSS.escape(cls.className) + ":not(#\\ )".repeat(cls.specificity ?? 0);
     return selector.includes("&") ? selector.replaceAll("&", selfSelector) : selfSelector + selector;

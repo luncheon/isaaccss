@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { createRequire } from "node:module";
 import { AcceptedPlugin } from "postcss";
 import { defaultAliases } from "./aliases/default.js";
-import { Aliases, cssify, CssifyOptions, postcssify, Style, transform, TransformOptions } from "./api/index.js";
+import { Aliases, CssClass, cssify, CssifyOptions, postcssify, transform, TransformOptions } from "./api/index.js";
 
 const inject = createRequire(import.meta.url).resolve("./inject.js");
 
@@ -47,7 +47,7 @@ const plugin = (options?: IsaaccssEsbuildPluginOptions): EsbuildPipeablePlugin =
       let css: string | undefined;
       build.onStart(async () => {
         transformedCodeMap.clear();
-        const classes = new Map<string, Style>();
+        const classes = new Map<string, CssClass>();
         const promises: Promise<unknown>[] = [];
         const load = async (path: string) => {
           const code = await fs.readFile(path, "utf8");

@@ -116,7 +116,12 @@ export const parseClass = (className, options) => {
             unknownProperties.push(s);
         }
     }
-    const style = { className, properties, unknownProperties, specificity: (match[4] === "?" ? 0 : 1) + match[5].length };
+    const style = {
+        className,
+        properties,
+        unknownProperties,
+        specificity: (match[4] === "?" ? 0 : 1) + match[5].length,
+    };
     match[1] && (style.media = transformMedia(match[1], aliases));
     match[4] === "?" && (style.layer = "");
     match[2] && (style.selector = transformSelector(match[2], aliases));

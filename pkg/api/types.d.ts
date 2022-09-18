@@ -24,16 +24,16 @@ export interface TransformOptions extends ParserOptions {
 export interface CssifyOptions {
     readonly pretty?: boolean;
 }
-export interface Style {
+export interface CssClass {
     readonly className: string;
     readonly media?: string;
     readonly layer?: string;
     readonly selector?: string;
     readonly specificity: number;
-    readonly properties: readonly StyleProperty[];
+    readonly properties: readonly CssProperty[];
     readonly unknownProperties: readonly string[];
 }
-export interface StyleProperty {
+export interface CssProperty {
     readonly name: string;
     readonly value: string;
     readonly important: boolean;
