@@ -1,7 +1,7 @@
 import "css.escape";
 import type { CssifyOptions, Style } from "./types.js";
 
-const groupToMap = <T, K>(array: readonly T[] | Iterable<T>, keySelector: (element: T) => K): Map<K, T[]> => {
+const groupToMap = <T, K>(array: Iterable<T>, keySelector: (element: T) => K): Map<K, T[]> => {
   const map = new Map<K, T[]>();
   for (const element of array) {
     const key = keySelector(element);
@@ -11,43 +11,52 @@ const groupToMap = <T, K>(array: readonly T[] | Iterable<T>, keySelector: (eleme
   return map;
 };
 
-const joinGroup = <T, K>(
+const groupJoin = <T, K>(
   separator: string,
-  array: readonly T[] | Iterable<T>,
+  elements: Iterable<T>,
   groupKeySelector: (element: T) => K,
   joinedValueSelector: (key: K, elements: T[]) => string,
 ) => {
-  const grouped = groupToMap(array, groupKeySelector);
+  const grouped = groupToMap(elements, groupKeySelector);
   return [...grouped.keys()]
     .sort()
     .map(key => joinedValueSelector(key, grouped.get(key)!))
     .join(separator);
 };
 
-const mediaSelector = (c: Style) => c.media ?? "";
-const layerSelector = (c: Style) => c.layer;
-const selectorSelector = (c: Style) => {
-  const selector = c.selector ?? "";
-  const selfSelector = "." + CSS.escape(c.className) + ":not(#\\ )".repeat(c.specificity ?? 0);
-  return selector.includes("&") ? selector.replaceAll("&", selfSelector) : selfSelector + selector;
-};
-const propertiesSelector = (indent: string, newline: string) => (c: Style) =>
-  c.properties.map(p => `${indent}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(";" + newline);
+type Classes = Iterable<Style>;
 
-export const cssify = (classes: Iterable<Style>, options?: CssifyOptions): string => {
+export const cssify = (classes: Classes, options?: CssifyOptions): string => {
   const [singleIndent, newline] = options?.pretty ? ["  ", "\n"] : ["", ""];
-  return joinGroup(newline, classes, mediaSelector, (media, mediaRecords) => {
-    const indent1 = media ? singleIndent : "";
-    const content = joinGroup(newline, mediaRecords, layerSelector, (layer, layerRecords) => {
-      const hasLayer = layer !== undefined;
-      const indent2 = indent1 + (hasLayer ? singleIndent : "");
-      const indent3 = indent2 + singleIndent;
-      const content = joinGroup(newline, layerRecords, propertiesSelector(indent3, newline), (properties, selectorRecords) => {
-        const selector = selectorRecords.sort().map(selectorSelector).join(`,${newline}${indent2}`);
-        return `${indent2}${selector}{${newline}${properties}${newline}${indent2}}${newline}`;
-      });
-      return hasLayer ? `${indent1}@layer${layer ? " " : ""}${layer}{${newline}${content}${indent1}}${newline}` : content;
-    });
-    return media ? `@media ${media}{${newline}${content}}${newline}` : content;
-  });
+  const indents = [0, 1, 2, 3, 4].map(n => singleIndent.repeat(n));
+
+  const block = (indent: number, header: string | undefined, body: string) =>
+    header ? `${indents[indent]}${header}{${newline}${body}${indents[indent]}}${newline}` : body;
+
+  const createBlockSelector =
+    (headSelector: (cls: Style) => string | undefined) =>
+    (bodySelector: (indent: number, classes: Classes) => string) =>
+    (indent: number, classes: Classes): string =>
+      groupJoin(newline, classes, headSelector, (header, classes) =>
+        block(indent, header, bodySelector(indent + (header ? 1 : 0), classes)),
+      );
+
+  const mediaSelector = createBlockSelector(({ media }) => (media ? `@media ${media}` : ""));
+  const layerSelector = createBlockSelector(({ layer }) => (layer !== undefined ? `@layer${layer ? " " + layer : ""}` : undefined));
+
+  const selectorSelector = (cls: Style) => {
+    const selector = cls.selector ?? "";
+    const selfSelector = "." + CSS.escape(cls.className) + ":not(#\\ )".repeat(cls.specificity ?? 0);
+    return selector.includes("&") ? selector.replaceAll("&", selfSelector) : selfSelector + selector;
+  };
+
+  const propertiesSelector = (indent: number, classes: Classes) =>
+    groupJoin(
+      newline,
+      classes,
+      cls => cls.properties.map(p => `${indents[indent + 1]}${p.name}:${p.value}${p.important ? "!important" : ""}`).join(";" + newline),
+      (body, classes) => block(indent, classes.map(selectorSelector).join(`,${newline}${indents[indent]}`), body + newline),
+    );
+
+  return mediaSelector(layerSelector(propertiesSelector))(0, classes);
 };
