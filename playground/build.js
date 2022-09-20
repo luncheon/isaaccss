@@ -27,7 +27,7 @@ await esbuild.build({
   format: "iife",
 });
 
-const isaaccssInstance = isaaccss.plugin();
+const isaaccssInstance = isaaccss.plugin({ filter: /\.tsx$/ });
 
 /** @type esbuild.BuildOptions */
 const buildOptions = {

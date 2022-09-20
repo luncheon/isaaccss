@@ -1,10 +1,23 @@
 import { is } from "isaaccss";
 import { createMemo, createSignal, type JSX } from "solid-js";
-import { Editor, sourceCode, Viewer } from "./Editor";
+import { Editor, Viewer } from "./Editor";
+import sampleTsx from "./sample.txt";
 import { transform } from "./transform";
 
+const [sourceCode, _setSourceCode] = createSignal(
+  (location.hash.startsWith("#code=") && decodeURIComponent(location.hash.slice(6))) || sampleTsx,
+);
 const [prettyCss, setPrettyCss] = createSignal(true);
 const transformed = createMemo(() => transform(sourceCode(), { pretty: prettyCss() }));
+
+const setSourceCode = (s: string) => location.replace("#code=" + encodeURIComponent(s));
+
+addEventListener("hashchange", () => {
+  if (location.hash.startsWith("#code=")) {
+    const code = decodeURIComponent(location.hash.slice(6));
+    code != null && _setSourceCode(code);
+  }
+});
 
 const previewHtmlContent = (js: string, css: string) => `<html>
   <head>
@@ -54,7 +67,7 @@ const Main = () => (
   >
     <Section class={is`grid-area:tsx`}>
       <SectionHeader caption="index.tsx" />
-      <Editor class={is`flex:1 overflow:hidden`} />
+      <Editor class={is`flex:1 overflow:hidden`} value={sourceCode()} onChange={setSourceCode} />
     </Section>
 
     <Section class={is`grid-area:js`}>

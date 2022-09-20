@@ -10,10 +10,6 @@ import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 
 import { is } from "isaaccss";
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
-import sampleTsx from "./sample.txt";
-
-const [sourceCode, setSourceCode] = createSignal(sampleTsx);
-export { sourceCode };
 
 self.MonacoEnvironment = { getWorkerUrl: (_, label) => (label === "css" ? "./assets/css.worker.js" : "./assets/ts.worker.js") };
 
@@ -23,7 +19,7 @@ self.MonacoEnvironment = { getWorkerUrl: (_, label) => (label === "css" ? "./ass
   ts.typescriptDefaults.addExtraLib('declare module "isaaccss" { export declare const is: string["raw"] }', "isaaccss.d.ts");
 }
 
-export const Editor = (props: { class?: string }) => {
+export const Editor = (props: { class?: string; value: string; onChange: (code: string) => unknown }) => {
   let ref: HTMLDivElement;
   let instance: monaco.editor.IStandaloneCodeEditor;
   const onResize = () => instance.layout();
@@ -32,12 +28,13 @@ export const Editor = (props: { class?: string }) => {
       fontFamily: "Source Code Pro",
       fontSize: 14,
       minimap: { enabled: false },
-      model: monaco.editor.createModel(sourceCode(), "typescript", monaco.Uri.parse("index.tsx")),
+      model: monaco.editor.createModel(props.value, "typescript", monaco.Uri.parse("index.tsx")),
       padding: { bottom: 0 },
       renderWhitespace: "all",
       scrollBeyondLastLine: false,
     });
-    instance.onDidChangeModelContent(() => setSourceCode(instance.getValue()));
+    instance.onDidChangeModelContent(() => props.onChange(instance.getValue()));
+    createEffect(() => props.value !== instance.getValue() && instance.setValue(props.value));
     addEventListener("resize", onResize);
   });
   onCleanup(() => {

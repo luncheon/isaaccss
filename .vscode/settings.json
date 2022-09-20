@@ -7,7 +7,8 @@
     "**/.*": true,
     "**/node_modules": true,
     "**/package-lock.json": true,
-    "pkg/": true
+    "pkg/": true,
+    "playground/assets/": true
   },
   "cSpell.words": ["combinators", "cssify", "isaaccss", "postcssify"],
   "typescript.tsdk": "node_modules/typescript/lib"
